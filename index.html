@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>APEX WIRE — Motorsport, Every Series, Every Session</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20x%3D%221%22%20y%3D%221%22%20width%3D%2262%22%20height%3D%2262%22%20rx%3D%2214%22%20fill%3D%22%23101214%22%20stroke%3D%22%2331363d%22%20stroke-width%3D%221%22/%3E%3Cpath%20d%3D%22M16%2047%20L32%2015%20L48%2047%22%20fill%3D%22none%22%20stroke%3D%22%23ffb300%22%20stroke-width%3D%225%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22/%3E%3Cpath%20d%3D%22M8%2032.5%20L23%2032.5%22%20fill%3D%22none%22%20stroke%3D%22%23e8402a%22%20stroke-width%3D%224%22%20stroke-linecap%3D%22round%22/%3E%3Cpath%20d%3D%22M41%2032.5%20L56%2032.5%22%20fill%3D%22none%22%20stroke%3D%22%23e8402a%22%20stroke-width%3D%224%22%20stroke-linecap%3D%22round%22/%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2215%22%20r%3D%223.5%22%20fill%3D%22%23f1efe9%22/%3E%3C/svg%3E">
+<title>94rubbermarbles — Motorsport, Every Series, Every Session</title>
+<link rel="icon" type="image/png" href="assets/favicon-94.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -21,6 +21,15 @@
   --red:#e8402a;
   --green:#33c17d;
   --blue:#5b8def;
+  --purple:#a06cf7;
+  --cyan:#25e0d8;
+}
+@font-face{
+  font-family:'Race Sport';
+  src:url(assets/race-sport.ttf) format('truetype');
+  font-weight:normal;
+  font-style:normal;
+  font-display:swap;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 html{scroll-behavior:smooth;}
@@ -73,7 +82,7 @@ header.site{
   flex-wrap:wrap; gap:16px;
 }
 .brand{
-  font-family:'Oswald',sans-serif; font-weight:700; font-size:28px;
+  font-family:'Race Sport',sans-serif; font-weight:400; font-size:30px;
   letter-spacing:0.01em; text-transform:uppercase;
   display:flex; align-items:center; gap:9px; text-decoration:none;
 }
@@ -88,7 +97,7 @@ nav.primary a:hover, nav.primary a.active{color:var(--amber);}
 .social-links svg{width:17px; height:17px; display:block;}
 footer .social-links{margin-left:4px;}
 .series-rail{
-  display:grid; grid-template-columns:repeat(9,1fr); gap:0; width:100%;
+  display:grid; grid-template-columns:repeat(11,1fr); gap:0; width:100%;
   border-top:1px solid var(--rule); border-bottom:1px solid var(--rule);
   background:var(--surface);
 }
@@ -229,6 +238,8 @@ footer .social-links{margin-left:4px;}
 .chip.nascar{background:rgba(255,179,0,0.15); color:var(--amber);}
 .chip.indy{background:rgba(51,193,125,0.15); color:var(--green);}
 .chip.wec{background:rgba(241,239,233,0.12); color:var(--text);}
+.chip.wrc{background:rgba(160,108,247,0.15); color:var(--purple);}
+.chip.formula-e{background:rgba(37,224,216,0.15); color:var(--cyan);}
 .round-num{font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--text-faint);}
 .chip{display:inline-flex; align-items:center; gap:5px;}
 .chip-logo{height:13px; width:auto; max-width:42px; object-fit:contain; display:block; background:#f1efe9; border-radius:2px; padding:2px 4px; box-sizing:content-box;}
@@ -237,6 +248,7 @@ footer .social-links{margin-left:4px;}
 .ticker-logo[src*="IndyCar_Series_logo"]{height:26px; max-width:44px;}
 .ticker-logo[src*="IndyNXTLogo"]{height:24px; max-width:42px;}
 .ticker-logo-white{filter:brightness(0) invert(1);}
+img[src*="WRC_logo.svg"]{filter:brightness(0) invert(1);}
 .series-hero .info .series-logo{height:34px; width:auto; max-width:200px; object-fit:contain; display:block; margin-bottom:16px; background:#f1efe9; border-radius:3px; padding:8px 14px; box-sizing:content-box;}
 .event-card .track-svg{height:56px; width:100%;}
 .event-card .track-svg svg{width:100%; height:100%;}
@@ -392,6 +404,8 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 .dot.moto{background:var(--blue);}
 .dot.indy{background:var(--green);}
 .dot.wec{background:var(--text);}
+.dot.wrc{background:var(--purple);}
+.dot.formula-e{background:var(--cyan);}
 .cal-weekdays{
   display:grid; grid-template-columns:repeat(7,1fr); gap:1px;
   font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.08em; text-transform:uppercase;
@@ -520,23 +534,23 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
   <div class="ticker-track">
     <div class="ticker-inner">
       <span><img class="ticker-logo" src="https://upload.wikimedia.org/wikipedia/commons/2/2d/Formula_One_logo.svg" alt="F1">
-      FIA clears the controversial “Macarena” rotating rear wing after completing a safety review.</span>
+      Lando Norris has signed a new long-term contract with McLaren, extending his stay until at least 2030.</span>
       <span><img class="ticker-logo" src="https://upload.wikimedia.org/wikipedia/commons/c/cb/NASCAR_Cup_Series_logo.svg" alt="NASCAR Cup">
-      Blaney's late two-tire gamble won the Dollar Tree 301 — now the field locks in Saturday at Daytona's regular-season finale</span>
+      Ross Chastain wins the Daytona pole for the Coke Zero Sugar 400 with a speed of 184.396 mph.</span>
       <span><img class="ticker-logo" src="https://upload.wikimedia.org/wikipedia/commons/4/4f/NASCAR_OAP_SERIES_Logo.svg" alt="O'Reilly Series">
-      Kvapil rides a two-race win streak into Friday's Winn-Dixie 250 at Daytona, the regular-season finale that sets the Chase field</span>
+      Connor Zilisch captured pole for the Winn‑Dixie 250 at Daytona in the 2026 O’Reilly Auto Parts Series.</span>
       <span><img class="ticker-logo" src="https://upload.wikimedia.org/wikipedia/commons/2/22/NASCAR_Craftsman_Truck_Series_logo.svg" alt="Truck Series">
-      Riggs' New Hampshire win set the 10-truck Chase field — Ankrum grabbed the last spot by just 7 points over Friesen</span>
+      Layne Riggs captured his sixth 2026 NASCAR Craftsman Truck Series victory in a double‑overtime win at New Hampshire Motor Speedway on August 22.</span>
       <span><img class="ticker-logo" src="https://upload.wikimedia.org/wikipedia/en/3/33/ARCA_Menards_Series_Logo.svg" alt="ARCA">
-      Max Reaves led 98 of 100 laps to sweep the Illinois State Fairgrounds dirt mile, his 3rd win of the year</span>
+      Carson Brown wins the ARCA Menards Series race at Springfield.</span>
       <span><img class="ticker-logo" src="https://upload.wikimedia.org/wikipedia/en/b/b5/IndyCar_Series_logo.svg" alt="NTT IndyCar">
-      Kirkwood's dominant D.C. win cut Palou's championship lead to 91 points ahead of the Milwaukee doubleheader</span>
+      Mission Foods announced sponsorship of the season‑final IndyCar race at Laguna Seca.</span>
       <span><img class="ticker-logo" src="https://upload.wikimedia.org/wikipedia/en/a/a8/IndyNXTLogo.png" alt="Indy NXT">
-      Fittipaldi leads a tight title fight by just 18 points over Johnson and Kucharczyk as the ladder heads to Milwaukee</span>
+      Tymek Kucharczyk applies title pressure in his strong first U.S. Indy NXT season.</span>
       <span><img class="ticker-logo ticker-logo-white" src="https://upload.wikimedia.org/wikipedia/commons/f/f9/MotoGP_logo_%282024%29.svg" alt="MotoGP">
-      Fernández won a wide-open British GP at Silverstone — just 24 points cover the top five in the standings</span>
+      Yamaha confirms Jack Miller’s MotoGP departure, paving the way for his move to WorldSBK.</span>
       <span><img class="ticker-logo" src="https://upload.wikimedia.org/wikipedia/commons/4/4c/FIA_WEC_Logo_2024.png" alt="WEC">
-      Barcelona and Monza replace the cancelled Qatar and Bahrain finales as BMW leads both championships</span>
+      Ricky Taylor will drive the #12 Cadillac for Team JOTA at the upcoming 6 Hours of COTA.</span>
     </div>
   </div>
   <div class="ticker-clock"><span id="localtime">--:--:--</span></div>
@@ -545,12 +559,7 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 <header class="site">
   <div class="header-top">
     <div>
-      <a class="brand" href="#home" data-view="home"><svg class="mark" viewBox="0 0 64 64" aria-hidden="true">
-        <path d="M16 47 L32 15 L48 47" fill="none" stroke="#ffb300" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M6 32.5 L23 32.5" fill="none" stroke="#e8402a" stroke-width="4.5" stroke-linecap="round"/>
-        <path d="M41 32.5 L58 32.5" fill="none" stroke="#e8402a" stroke-width="4.5" stroke-linecap="round"/>
-        <circle cx="32" cy="15" r="4" fill="#f1efe9"/>
-      </svg>APEX WIRE</a>
+      <a class="brand" href="#home" data-view="home"><img class="mark" src="assets/brand-logo-94.png" alt="94 logo" style="height:42px;width:auto;object-fit:contain;margin-right:-32.3px;position:relative;z-index:0;"><span style="position:relative;z-index:2;top:4px;-webkit-text-stroke:1.5px #000;text-shadow:1px 0 0 #000,-1px 0 0 #000,0 1px 0 #000,0 -1px 0 #000,1px 1px 0 #000,-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000;">&#xF010;ubbe&#xF010;ma&#xF010;bles</span></a>
       <div class="brand-sub">Every series. Every session. One line.</div>
     </div>
     <nav class="primary">
@@ -606,6 +615,14 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
     <img class="rail-logo" src="https://upload.wikimedia.org/wikipedia/commons/4/4c/FIA_WEC_Logo_2024.png" alt="WEC">
     <span class="rail-car-icon"><img src="wec-hypercar-cutout.png" alt="WEC Hypercar"></span>
   </a>
+  <a href="#wrc" data-view="wrc" title="WRC">
+    <img class="rail-logo" src="https://upload.wikimedia.org/wikipedia/commons/b/bb/WRC_logo.svg" alt="WRC">
+    <span class="rail-car-icon"><img src="wrc.png" alt="WRC rally car"></span>
+  </a>
+  <a href="#formula-e" data-view="formula-e" title="Formula E">
+    <img class="rail-logo" src="https://upload.wikimedia.org/wikipedia/commons/a/a4/FIA_Formula_E_World_Championship_Logo.svg" alt="Formula E">
+    <span class="rail-car-icon"><img src="formula-e.png" alt="Formula E car"></span>
+  </a>
 </nav>
 
 <div class="wrap">
@@ -620,8 +637,8 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
   <section class="hero">
     <div>
       <div class="hero-tag">Breaking · Championship</div>
-      <h1>The summer break is over — <em>five title fights</em> get real in the next three weekends.</h1>
-      <p class="deck">Norris survived a chaotic Zandvoort to win the Dutch GP, Kirkwood took the inaugural Freedom 250 around the National Mall, and MotoGP lands at Aragón next as NASCAR's regular season enters its final laps before the 16-driver Chase field is set at Darlington. Every series, one page.</p>
+      <h1>Antonelli's 19th-to-1st Monza win blows the title fight <em>wide open</em>.</h1>
+      <p class="deck">Kimi Antonelli recovered from a grid penalty to beat teammate George Russell and stretch his championship lead to 66 points. F1 heads to Madrid's all-new street circuit next, MotoGP lands at Aragón, and NASCAR's regular season enters its final laps before the Chase field is set at Darlington. Every series, one page.</p>
       <div class="hero-meta">
         <span><b>9</b> series tracked</span>
         <span><b>9</b> race weekends this month</span>
@@ -652,17 +669,17 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
   <section class="events-grid">
     
     <div class="event-card">
-      <div class="series-row"><span class="chip f1"><img class="chip-logo" src="https://upload.wikimedia.org/wikipedia/commons/2/2d/Formula_One_logo.svg" alt="Formula 1 logo">Formula 1</span><span class="round-num">Round 13 / 24</span></div>
-      <div class="track-svg"><img class="diagram" src="https://upload.wikimedia.org/wikipedia/commons/8/8d/Monza_Map-2021.png" alt="Autodromo Nazionale Monza circuit diagram"></div>
-      <h3>Italian Grand Prix</h3>
-      <div class="venue">Autodromo Nazionale Monza, Italy</div>
-      <div class="countdown" data-target="2026-09-06T15:00:00+02:00">
+      <div class="series-row"><span class="chip f1"><img class="chip-logo" src="https://upload.wikimedia.org/wikipedia/commons/2/2d/Formula_One_logo.svg" alt="Formula 1 logo">Formula 1</span><span class="round-num">Round 14 / 24</span></div>
+      <div class="track-svg"><img class="diagram" src="https://upload.wikimedia.org/wikipedia/commons/2/25/Madring_%282026%29.svg" alt="Madring circuit diagram"></div>
+      <h3>Spanish Grand Prix</h3>
+      <div class="venue">Madrid Street Circuit (debut), Spain</div>
+      <div class="countdown" data-target="2026-09-13T15:00:00+02:00">
         <div class="cell"><span class="n dd">00</span><span class="u">DAYS</span></div>
         <div class="cell"><span class="n hh">00</span><span class="u">HRS</span></div>
         <div class="cell"><span class="n mm">00</span><span class="u">MIN</span></div>
         <div class="cell"><span class="n ss">00</span><span class="u">SEC</span></div>
       </div>
-      <div class="event-date"><span>4–6 Sep</span><span>Sun 15:00 CEST</span></div>
+      <div class="event-date"><span>11–13 Sep</span><span>Sun 15:00 CEST</span></div>
     </div>
 
     <div class="event-card">
@@ -720,13 +737,13 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 
   <section class="news-grid">
     
-    <a class="story" href="#f1" data-view="f1">
+    <a class="story" href="#article:f1-antonelli-monza" data-view="article">
       <div class="art"><img class="diagram" src="https://upload.wikimedia.org/wikipedia/commons/8/8d/Monza_Map-2021.png" alt="Autodromo Nazionale Monza circuit diagram"></div>
       <div class="story-body">
         <span class="chip f1"><img class="chip-logo" src="https://upload.wikimedia.org/wikipedia/commons/2/2d/Formula_One_logo.svg" alt="Formula 1 logo">Formula 1</span>
-        <h4>Norris survives Zandvoort chaos — now Monza's slipstreams await</h4>
-        <p>Verstappen's lap-1 crash reshuffled the Dutch GP; F1's fastest track is next, where draft trains can swing the title fight in a single lap.</p>
-        <div class="meta"><span>Feature</span><span>6 min read</span></div>
+        <h4>19th to 1st: Antonelli's home win rewrites the title fight</h4>
+        <p>A penalty, a virtual safety car, and a late pass on his own teammate — Antonelli leads by 66 points.</p>
+        <div class="meta"><span>Race Report</span><span>5 min read</span></div>
       </div>
     </a>
 
@@ -969,7 +986,7 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
     <div class="article-meta">
       <span id="article-category"></span>
       <span id="article-readtime"></span>
-      <span>By the ApexWire Desk</span>
+      <span>By the 94rubbermarbles Desk</span>
       <span id="article-date"></span>
     </div>
   </div>
@@ -1001,6 +1018,8 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
       <span><i class="dot moto"></i>MotoGP</span>
       <span><i class="dot indy"></i>IndyCar / NXT</span>
       <span><i class="dot wec"></i>WEC</span>
+      <span><i class="dot wrc"></i>WRC</span>
+      <span><i class="dot formula-e"></i>Formula E</span>
     </div>
   </div>
 
@@ -1033,7 +1052,7 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
       <div class="badge">FIA Formula 1 World Championship · 24 rounds</div>
       <h1>Formula 1</h1>
       <p>The pinnacle of open-wheel racing returns from its summer shutdown at Zandvoort, with the title fight and a crowded driver market both heating up through a run of eight rounds to close the season.</p>
-      <div class="stat-row"><div><b>12</b> rounds remaining</div></div>
+      <div class="stat-row"><div><b>11</b> rounds remaining</div></div>
       <div class="hero-actions">
         <a class="tickets" href="https://tickets.formula1.com" target="_blank" rel="noopener">Tickets</a>
         <a class="official" href="https://www.formula1.com" target="_blank" rel="noopener">Official Site →</a>
@@ -1047,36 +1066,36 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
     <div class="src">Wikimedia Commons · CC BY-SA 4.0</div>
   </div>
 
-  <div class="sector-label"><span class="num">S2</span><span class="name">Sector 02 — Next Up</span><span class="line"></span></div>
-  <section class="next-up-panel">
+  <div class="sector-label"><span class="num">S2</span><span class="name">Sector 02 — Next Up</span><span class="line"></span><span id="f1-live-badge" style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.08em;color:var(--text-faint);"></span></div>
+  <section class="next-up-panel" id="f1-next-up-panel">
     <div class="track">
-      <img class="diagram" src="https://upload.wikimedia.org/wikipedia/commons/8/8d/Monza_Map-2021.png" alt="Autodromo Nazionale Monza circuit diagram">
-      <div class="cap">AUTODROMO NAZIONALE MONZA · TRACK MAP</div>
+      <img class="diagram" id="f1-next-track-img" src="https://upload.wikimedia.org/wikipedia/commons/2/25/Madring_%282026%29.svg" alt="Madring circuit diagram">
+      <div class="cap" id="f1-next-track-cap">MADRING · MADRID · TRACK MAP</div>
     </div>
     <div class="info">
-      <div class="series-row"><span class="chip f1"><img class="chip-logo" src="https://upload.wikimedia.org/wikipedia/commons/2/2d/Formula_One_logo.svg" alt="Formula 1 logo">Formula 1</span><span class="round-num">Round 13 / 24</span></div>
-      <h3>Italian Grand Prix</h3>
-      <div class="venue">Autodromo Nazionale Monza, Italy</div>
-      <div class="countdown" data-target="2026-09-06T15:00:00+02:00">
+      <div class="series-row"><span class="chip f1"><img class="chip-logo" src="https://upload.wikimedia.org/wikipedia/commons/2/2d/Formula_One_logo.svg" alt="Formula 1 logo">Formula 1</span><span class="round-num" id="f1-next-round">Round 14 / 24</span></div>
+      <h3 id="f1-next-name">Spanish Grand Prix</h3>
+      <div class="venue" id="f1-next-venue">Madrid Street Circuit ("Madring"), Spain — inaugural</div>
+      <div class="countdown" id="f1-next-countdown" data-target="2026-09-13T15:00:00+02:00">
         <div class="cell"><span class="n dd">00</span><span class="u">DAYS</span></div>
         <div class="cell"><span class="n hh">00</span><span class="u">HRS</span></div>
         <div class="cell"><span class="n mm">00</span><span class="u">MIN</span></div>
         <div class="cell"><span class="n ss">00</span><span class="u">SEC</span></div>
       </div>
-      <div class="event-date"><span>4–6 Sep 2026</span><span>Sun 15:00 CEST</span></div>
+      <div class="event-date" id="f1-next-date"><span>11–13 Sep 2026</span><span>Sun 15:00 CEST</span></div>
       <div class="session-schedule">
         <h4>Session Schedule</h4>
-        <table>
-          <tr><td>Practice 1</td><td>Fri 4 Sep · 12:30 CEST</td></tr>
-          <tr><td>Practice 2</td><td>Fri 4 Sep · 16:00 CEST</td></tr>
-          <tr><td>Practice 3</td><td>Sat 5 Sep · 12:30 CEST</td></tr>
-          <tr><td>Qualifying</td><td>Sat 5 Sep · 16:00 CEST</td></tr>
-          <tr class="race"><td>Race</td><td>Sun 6 Sep · 15:00 CEST</td></tr>
+        <table id="f1-next-sessions">
+          <tr><td>Practice 1</td><td>Fri 11 Sep · 13:30 CEST</td></tr>
+          <tr><td>Practice 2</td><td>Fri 11 Sep · 17:00 CEST</td></tr>
+          <tr><td>Practice 3</td><td>Sat 12 Sep · 12:30 CEST</td></tr>
+          <tr><td>Qualifying</td><td>Sat 12 Sep · 16:00 CEST</td></tr>
+          <tr class="race"><td>Race</td><td>Sun 13 Sep · 15:00 CEST</td></tr>
         </table>
       </div>
       <div class="watch-block">
         <h4>Championship Watch</h4>
-        <p>Lando Norris's chaotic win at Zandvoort — after Verstappen crashed out on lap 1 — tightens a title fight that now heads to F1's fastest track, where slipstream battles down the Monza straights can flip track position in a single lap.</p>
+        <p id="f1-next-watch">Kimi Antonelli's astonishing recovery drive from 19th on the grid to win his home Italian Grand Prix — passing George Russell in the closing laps — stretched his championship lead to 66 points. F1 now heads to a brand-new street circuit in Madrid with zero historical setup data for any team.</p>
       </div>
     </div>
   </section>
@@ -1085,8 +1104,7 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
   <table class="schedule-table">
     <thead><tr><th>Race</th><th>Venue</th><th>Date</th></tr></thead>
     <tbody>
-      <tr class="next"><td class="name">Italian Grand Prix <span class="tag-next">NEXT</span></td><td>Monza, Italy</td><td>4–6 Sep</td></tr>
-<tr><td class="name">Spanish Grand Prix</td><td>Madrid Street Circuit (debut), Spain</td><td>11–13 Sep</td></tr>
+      <tr class="next"><td class="name">Spanish Grand Prix <span class="tag-next">NEXT</span></td><td>Madrid Street Circuit (debut), Spain</td><td>11–13 Sep</td></tr>
 <tr><td class="name">Azerbaijan Grand Prix</td><td>Baku City Circuit, Azerbaijan</td><td>24–26 Sep</td></tr>
 <tr><td class="name">Singapore Grand Prix</td><td>Marina Bay, Singapore</td><td>9–11 Oct</td></tr>
 <tr><td class="name">United States Grand Prix</td><td>Circuit of the Americas, Austin</td><td>23–25 Oct</td></tr>
@@ -1140,23 +1158,13 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
   <div class="sector-label"><span class="num">S5</span><span class="name">Sector 05 — On the Wire</span><span class="line"></span></div>
   <section class="news-grid flat" style="margin-bottom:20px;">
     
-    <a class="story" href="#article:f1-back-from-break" data-view="article">
-      <div class="art"><img class="diagram" src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Zandvoort_Circuit.png/960px-Zandvoort_Circuit.png" alt="Circuit Zandvoort circuit diagram"></div>
-      <div class="story-body">
-        <span class="chip f1"><img class="chip-logo" src="https://upload.wikimedia.org/wikipedia/commons/2/2d/Formula_One_logo.svg" alt="Formula 1 logo">Formula 1</span>
-        <h4>Back from the break: what changed in three weeks off</h4>
-        <p>Power-unit allocations, floor tweaks, and a driver market still simmering before Zandvoort.</p>
-        <div class="meta"><span>Feature</span><span>6 min</span></div>
-      </div>
-    </a>
-
-    <a class="story" href="#article:f1-monza" data-view="article">
+    <a class="story" href="#article:f1-antonelli-monza" data-view="article">
       <div class="art"><img class="diagram" src="https://upload.wikimedia.org/wikipedia/commons/8/8d/Monza_Map-2021.png" alt="Autodromo Nazionale Monza circuit diagram"></div>
       <div class="story-body">
         <span class="chip f1"><img class="chip-logo" src="https://upload.wikimedia.org/wikipedia/commons/2/2d/Formula_One_logo.svg" alt="Formula 1 logo">Formula 1</span>
-        <h4>Monza, in one line: Italy's only round this year</h4>
-        <p>With Imola off the calendar, the Temple of Speed carries the entire tifosi weekend alone.</p>
-        <div class="meta"><span>Preview</span><span>3 min</span></div>
+        <h4>19th to 1st: Antonelli's home win rewrites the title fight</h4>
+        <p>A penalty, a virtual safety car, and a late pass on his own teammate — Antonelli leads by 66 points.</p>
+        <div class="meta"><span>Race Report</span><span>5 min</span></div>
       </div>
     </a>
 
@@ -1171,6 +1179,7 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
     </a>
   </section>
 </section>
+
 
 
 <section class="view" id="view-nascar-cup">
@@ -2304,11 +2313,279 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
   </section>
 </section>
 
+
+<section class="view" id="view-wrc">
+  <div class="sector-label">
+    <span class="num">S1</span>
+    <span class="name">FIA World Rally Championship</span>
+    <span class="line"></span>
+  </div>
+
+  <section class="series-hero">
+    <div class="photo">
+      <img src="wrc.png" alt="WRC Rally1 car livery">
+      <div class="cap">RALLY1 CAR · NO SINGLE CIRCUIT DIAGRAM (STAGE-BASED FORMAT)</div>
+    </div>
+    <div class="info">
+      <img class="series-logo" src="https://upload.wikimedia.org/wikipedia/commons/b/bb/WRC_logo.svg" alt="WRC logo" style="background:#1a1d22;">
+      <div class="badge">FIA World Rally Championship · 54th season · 14 rounds</div>
+      <h1>World Rally Championship</h1>
+      <p>Sami Pajari's historic run of three straight wins at Estonia, Finland and Paraguay has turned the title fight on its head, cutting Elfyn Evans's championship lead to just 20 points with three rounds to go. The series heads to the gravel of Chile next.</p>
+      <div class="stat-row"><div><b>3</b> rounds remain of 14 this season</div></div>
+      <div class="hero-actions">
+        <a class="tickets" href="https://www.wrc.com/en/whats-on/tickets.html" target="_blank" rel="noopener">Tickets</a>
+        <a class="official" href="https://www.wrc.com" target="_blank" rel="noopener">Official Site →</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="series-photo-strip">
+    <img src="wrc.png" alt="WRC Rally1 car on stage">
+    <div class="cap">RALLY1 CAR · 2026 SEASON</div>
+  </div>
+
+  <div class="sector-label"><span class="num">S2</span><span class="name">Sector 02 — Next Up</span><span class="line"></span></div>
+  <section class="next-up-panel">
+    <div class="track">
+      <img src="wrc.png" alt="WRC Rally1 car livery">
+      <div class="cap">RALLY CHILE BIOBÍO · SERVICE PARK: CONCEPCIÓN</div>
+    </div>
+    <div class="info">
+      <div class="series-row"><span class="chip wrc"><img class="chip-logo" src="https://upload.wikimedia.org/wikipedia/commons/b/bb/WRC_logo.svg" alt="WRC logo" style="background:#1a1d22;">WRC</span><span class="round-num">Round 12 / 14</span></div>
+      <h3>Rally Chile Biobío</h3>
+      <div class="venue">Concepción, Biobío, Chile — gravel</div>
+      <div class="countdown" data-target="2026-09-10T09:00:00-04:00">
+        <div class="cell"><span class="n dd">00</span><span class="u">DAYS</span></div>
+        <div class="cell"><span class="n hh">00</span><span class="u">HRS</span></div>
+        <div class="cell"><span class="n mm">00</span><span class="u">MIN</span></div>
+        <div class="cell"><span class="n ss">00</span><span class="u">SEC</span></div>
+      </div>
+      <div class="event-date"><span>10–13 Sep 2026</span><span>16 stages · gravel</span></div>
+      <div class="session-schedule">
+        <h4>Rally Itinerary</h4>
+        <table>
+          <tr><td>Shakedown</td><td>Wed 9 Sep</td></tr>
+          <tr><td>Leg 1</td><td>Thu–Fri 10–11 Sep</td></tr>
+          <tr><td>Leg 2</td><td>Sat 12 Sep</td></tr>
+          <tr class="race"><td>Leg 3 + Power Stage</td><td>Sun 13 Sep</td></tr>
+        </table>
+      </div>
+      <div class="watch-block">
+        <h4>Championship Watch</h4>
+        <p>Sami Pajari's third consecutive win at Paraguay — a first in WRC history — cut Elfyn Evans's championship lead from 30 points to 20, with Evans on 216 and Pajari on 196 heading into Chile. Oliver Solberg sits third on 175. Chile can't settle the drivers' title outright, but Toyota Gazoo Racing can clinch a record-equalling manufacturers' crown if it extends its lead by six points.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="sector-label"><span class="num">S3</span><span class="name">Sector 03 — Remaining Schedule</span><span class="line"></span></div>
+  <table class="schedule-table">
+    <thead><tr><th>Rally</th><th>Venue</th><th>Date</th></tr></thead>
+    <tbody>
+      <tr class="next"><td class="name">Rally Chile Biobío <span class="tag-next">NEXT</span></td><td>Concepción, Chile</td><td>10–13 Sep</td></tr>
+<tr><td class="name">Rally Italia Sardegna</td><td>Sardinia, Italy</td><td>1–4 Oct</td></tr>
+<tr><td class="name">Rally Saudi Arabia (season finale)</td><td>Jeddah, Saudi Arabia</td><td>11–14 Nov</td></tr>
+    </tbody>
+  </table>
+
+  <div class="sector-label" id="wrc-rules"><span class="num">S4</span><span class="name">Sector 04 — Know the Rules</span><span class="line"></span></div>
+  <section class="explainer-strip">
+    <a class="explainer-cell" href="#wrc:wrc-format"><div class="eyebrow">WRC</div><h4>Stages, not laps</h4><p>A rally runs across closed public and forest roads split into timed special stages over three or four days — there's no single circuit, and the route changes every event.</p><span class="more">→ Full breakdown</span></a>
+<a class="explainer-cell" href="#wrc:wrc-points"><div class="eyebrow">WRC</div><h4>Power Stage and Super Sunday</h4><p>Beyond the 25-18-15... points for outright rally position, the final Sunday adds two more bonus scoring opportunities worth up to 10 extra points combined.</p><span class="more">→ Full breakdown</span></a>
+<a class="explainer-cell" href="#wrc:wrc-tech"><div class="eyebrow">WRC</div><h4>Hybrid is gone — for now</h4><p>Rally1 cars dropped their hybrid units after 2024. A bigger regulation overhaul with alternate bodywork options was proposed for 2026 but has been pushed back to 2027.</p><span class="more">→ Full breakdown</span></a>
+  </section>
+
+  <section class="rules-detail">
+    <div class="rules-block" id="wrc-format">
+      <h4><span class="rb-num">01</span> Rally Weekend Format</h4>
+      <p>Unlike circuit racing, a WRC round is contested over closed public and forest roads specific to that event, split into 15-20 timed special stages run across three competitive legs (typically Friday through Sunday), preceded by a shakedown stage for setup and reconnaissance.</p>
+      <p>Crews complete limited pre-event reconnaissance runs to prepare pace notes, then tackle the live stages against the clock one car at a time, with road position and running order adjusted daily based on the standings.</p>
+    </div>
+    <div class="rules-block" id="wrc-points">
+      <h4><span class="rb-num">02</span> Points System</h4>
+      <ul>
+        <li><b>Overall rally result:</b> 25-18-15-12-10-8-6-4-2-1 for the top 10 classified crews.</li>
+        <li><b>Power Stage:</b> up to 5 bonus points for the fastest crews through the final, live-televised stage.</li>
+        <li><b>Super Sunday:</b> up to 5 more bonus points for the best combined time across Sunday's other stages.</li>
+        <li>Maximum available per rally: 35 points. Co-Drivers' points mirror the Drivers'; Manufacturers' points sum the best two crews per marque.</li>
+      </ul>
+    </div>
+    <div class="rules-block" id="wrc-championship">
+      <h4><span class="rb-num">03</span> Championship Structure</h4>
+      <p>Straight full-season points table across all 14 rounds — no playoff. Separate titles run in parallel for Drivers', Co-Drivers', and Manufacturers', all decided by cumulative points after the Saudi Arabia finale.</p>
+    </div>
+    <div class="rules-block" id="wrc-tech">
+      <h4><span class="rb-num">04</span> Technical Regulations</h4>
+      <p>Rally1 cars have run without hybrid assistance since 2025, when the plug-in units introduced in 2022 were dropped. Cars use a 1.6-litre turbocharged four-cylinder engine on 100% fossil-free fuel, with the air restrictor trimmed from 36mm to 35mm and minimum weight lowered to 1,180kg to keep performance in line with the outgoing hybrid-era cars.</p>
+      <p>A more sweeping overhaul — offering manufacturers alternate bodywork options (B-class, C-class, compact SUV, or a bespoke concept car) on a common safety cell, with power capped around 330bhp and a €400,000 cost cap — was proposed to arrive for 2026, but the FIA pushed the changeover back, meaning the current Rally1 ruleset carries through this season with 2027 now the target for the next generation of cars.</p>
+    </div>
+    <div class="rules-block" id="wrc-notable">
+      <h4><span class="rb-num">05</span> Notable Procedural Rules</h4>
+      <p>Running order on Saturday and Sunday flips to fastest-first from the previous day's classification, unlike circuit racing's grid-holds-until-the-next-session structure — meaning the rally leader often opens the road on loose-surface stages, sweeping debris into the racing line for those behind.</p>
+      <p>Hankook is the championship's sole tyre supplier across all conditions, supplying separate compounds for dry and wet asphalt and a dedicated gravel tyre used across the loose-surface rounds like Chile.</p>
+    </div>
+  </section>
+
+  <div class="sector-label"><span class="num">S5</span><span class="name">Sector 05 — On the Wire</span><span class="line"></span></div>
+  <section class="news-grid flat" style="margin-bottom:20px;">
+    <a class="story" href="#article:wrc-pajari-hattrick" data-view="article">
+      <div class="art"><img src="wrc.png" alt="WRC Rally1 car livery"></div>
+      <div class="story-body">
+        <span class="chip wrc"><img class="chip-logo" src="https://upload.wikimedia.org/wikipedia/commons/b/bb/WRC_logo.svg" alt="WRC logo" style="background:#1a1d22;">WRC</span>
+        <h4>Pajari's hat-trick puts Evans on notice</h4>
+        <p>Three wins in a row is a WRC first — and it's turned a comfortable title lead into a genuine fight.</p>
+        <div class="meta"><span>Analysis</span><span>4 min</span></div>
+      </div>
+    </a>
+    <a class="story" href="#article:wrc-super-sunday" data-view="article">
+      <div class="art"><img src="wrc.png" alt="WRC Rally1 car livery"></div>
+      <div class="story-body">
+        <span class="chip wrc"><img class="chip-logo" src="https://upload.wikimedia.org/wikipedia/commons/b/bb/WRC_logo.svg" alt="WRC logo" style="background:#1a1d22;">WRC</span>
+        <h4>Power Stage and Super Sunday, explained</h4>
+        <p>Up to 10 extra points are on the table before the rally even technically ends.</p>
+        <div class="meta"><span>Explainer</span><span>3 min</span></div>
+      </div>
+    </a>
+  </section>
+</section>
+
+
+<section class="view" id="view-formula-e">
+  <div class="sector-label">
+    <span class="num">S1</span>
+    <span class="name">ABB FIA Formula E World Championship</span>
+    <span class="line"></span>
+  </div>
+
+  <section class="series-hero">
+    <div class="photo">
+      <img src="formula-e.png" alt="Formula E Gen3 car">
+      <div class="cap">GUGGENHEIM RENAULT · FORMULA E CAR</div>
+    </div>
+    <div class="info">
+      <img class="series-logo" src="https://upload.wikimedia.org/wikipedia/commons/a/a4/FIA_Formula_E_World_Championship_Logo.svg" alt="Formula E logo" style="background:#1a1d22;">
+      <div class="badge">ABB FIA Formula E World Championship · off-season</div>
+      <h1>Formula E</h1>
+      <p>Season 12 wrapped up in London in mid-August, closing out the Gen3 Evo era. The championship is now in its off-season, gearing up for the biggest campaign in its history: a 21-race, 13-city GEN4-era season opening under the lights in Jeddah this December.</p>
+      <div class="stat-row"><div><b>Off-season</b> — Season 13 (GEN4 era) opens 18–19 Dec 2026</div></div>
+      <div class="hero-actions">
+        <a class="tickets" href="https://www.fiaformulae.com/en/tickets" target="_blank" rel="noopener">Tickets</a>
+        <a class="official" href="https://www.fiaformulae.com" target="_blank" rel="noopener">Official Site →</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="series-photo-strip">
+    <img src="formula-e.png" alt="Formula E Gen3 car on display">
+    <div class="cap">GUGGENHEIM RENAULT · FORMULA E CAR</div>
+  </div>
+
+  <div class="sector-label"><span class="num">S2</span><span class="name">Sector 02 — Next Up</span><span class="line"></span></div>
+  <section class="next-up-panel">
+    <div class="track">
+      <img src="formula-e.png" alt="Formula E Gen3 car">
+      <div class="cap">JEDDAH CORNICHE CIRCUIT · SEASON 13 OPENER</div>
+    </div>
+    <div class="info">
+      <div class="series-row"><span class="chip formula-e"><img class="chip-logo" src="https://upload.wikimedia.org/wikipedia/commons/a/a4/FIA_Formula_E_World_Championship_Logo.svg" alt="Formula E logo" style="background:#1a1d22;">Formula E</span><span class="round-num">Round 1–2 / 21</span></div>
+      <h3>Jeddah E-Prix Double-Header</h3>
+      <div class="venue">Jeddah Corniche Circuit, Saudi Arabia — GEN4 era begins</div>
+      <div class="countdown" data-target="2026-12-18T19:00:00+03:00">
+        <div class="cell"><span class="n dd">00</span><span class="u">DAYS</span></div>
+        <div class="cell"><span class="n hh">00</span><span class="u">HRS</span></div>
+        <div class="cell"><span class="n mm">00</span><span class="u">MIN</span></div>
+        <div class="cell"><span class="n ss">00</span><span class="u">SEC</span></div>
+      </div>
+      <div class="event-date"><span>18–19 Dec 2026</span><span>Night races</span></div>
+      <div class="session-schedule">
+        <h4>Weekend Format</h4>
+        <table>
+          <tr><td>Practice + Qualifying</td><td>Fri 18 Dec</td></tr>
+          <tr><td>Race 1 — E-Prix Unleashed</td><td>Fri 18 Dec, night</td></tr>
+          <tr class="race"><td>Race 2 — E-Prix</td><td>Sat 19 Dec, night</td></tr>
+        </table>
+      </div>
+      <div class="watch-block">
+        <h4>What's Changing</h4>
+        <p>The GEN4 car debuts with 600kW of power (roughly 815hp), active all-wheel drive for the full race rather than just under braking, and a 0-100kph time of 1.8 seconds. Jeddah hosts a season opener for the first time, pairing a new short-format "E-Prix Unleashed" sprint race with the traditional E-Prix on the same weekend — the first of eight double-header events on the championship's longest-ever calendar.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="sector-label"><span class="num">S3</span><span class="name">Sector 03 — Remaining Schedule</span><span class="line"></span></div>
+  <table class="schedule-table">
+    <thead><tr><th>Event</th><th>Venue</th><th>Date</th></tr></thead>
+    <tbody>
+      <tr class="next"><td class="name">Jeddah E-Prix (season opener) <span class="tag-next">NEXT</span></td><td>Jeddah Corniche Circuit, Saudi Arabia</td><td>18–19 Dec</td></tr>
+<tr><td class="name">Mexico City E-Prix</td><td>Autódromo Hermanos Rodríguez</td><td>16 Jan 2027</td></tr>
+<tr><td class="name">Austin E-Prix (debut)</td><td>Circuit of the Americas, USA</td><td>6 Feb 2027</td></tr>
+<tr><td class="name">Miami E-Prix</td><td>Miami International Autodrome, USA</td><td>20 Feb 2027</td></tr>
+<tr><td class="name">São Paulo E-Prix</td><td>Anhembi Sambadrome, Brazil</td><td>13 Mar 2027</td></tr>
+<tr><td class="name">...season continues through Europe and Asia</td><td>Berlin, Monaco, Zandvoort, Brands Hatch, Madrid, Sanya, Shanghai</td><td>May–Jul 2027</td></tr>
+<tr><td class="name">Tokyo E-Prix (season finale)</td><td>Tokyo Street Circuit, Japan</td><td>24–25 Jul 2027</td></tr>
+    </tbody>
+  </table>
+
+  <div class="sector-label" id="formula-e-rules"><span class="num">S4</span><span class="name">Sector 04 — Know the Rules</span><span class="line"></span></div>
+  <section class="explainer-strip">
+    <a class="explainer-cell" href="#formula-e:formula-e-format"><div class="eyebrow">Formula E</div><h4>Two races, one weekend</h4><p>New for the GEN4 era: double-header weekends now pair a short, unrestricted "E-Prix Unleashed" sprint with a traditional strategic E-Prix, rather than two races of similar length.</p><span class="more">→ Full breakdown</span></a>
+<a class="explainer-cell" href="#formula-e:formula-e-tech"><div class="eyebrow">Formula E</div><h4>GEN4: the biggest leap yet</h4><p>600kW of power, permanent active all-wheel drive, and a sub-2-second 0-100kph time headline the new generation of car debuting this December.</p><span class="more">→ Full breakdown</span></a>
+<a class="explainer-cell" href="#formula-e:formula-e-championship"><div class="eyebrow">Formula E</div><h4>Street circuits, mostly</h4><p>Formula E has traditionally raced on temporary street circuits in city centers — though the GEN4 era leans further into permanent road courses like COTA and Zandvoort to handle the car's extra speed.</p><span class="more">→ Full breakdown</span></a>
+  </section>
+
+  <section class="rules-detail">
+    <div class="rules-block" id="formula-e-format">
+      <h4><span class="rb-num">01</span> Race Weekend Format</h4>
+      <p>Standard weekends run practice and a knockout qualifying format (duels or group-based depending on the season) to set the grid, followed by a single E-Prix.</p>
+      <p>New for the GEN4 era: double-header weekends — eight of them on the 2026-27 calendar — pair a shorter, higher-power "E-PrixUnleashed" sprint race with a traditional E-Prix on the same weekend, giving fans two distinct styles of racing rather than two similar-length races.</p>
+    </div>
+    <div class="rules-block" id="formula-e-points">
+      <h4><span class="rb-num">02</span> Points System</h4>
+      <p>Race points follow a Formula-style scale for the top 10 finishers, with additional bonus points historically available for pole position and fastest lap. Both races on a double-header weekend award full championship points.</p>
+    </div>
+    <div class="rules-block" id="formula-e-championship">
+      <h4><span class="rb-num">03</span> Championship Structure</h4>
+      <p>Straight cumulative points table across the full season — no playoff. Drivers' and Teams' World Championships are decided by total points after the season finale, this year a double-header in Tokyo.</p>
+    </div>
+    <div class="rules-block" id="formula-e-tech">
+      <h4><span class="rb-num">04</span> Technical Regulations</h4>
+      <p>The outgoing Gen3 Evo package (used through Season 12) was the first Formula E car to race internationally with all-wheel drive, combining a 250kW front powertrain with a 350kW rear unit for up to 600kW combined, and was the first-ever "net zero carbon" race car by design.</p>
+      <p>The incoming GEN4 car, debuting in Jeddah this December, raises peak power to 600kW (roughly 815hp) with permanent active all-wheel drive throughout the race (rather than only under braking), 700kW of regenerative braking capacity, and a 0-100kph time of just 1.8 seconds — a significant step up in performance that has pushed the calendar toward faster, more permanent circuits.</p>
+    </div>
+    <div class="rules-block" id="formula-e-notable">
+      <h4><span class="rb-num">05</span> Notable Procedural Rules</h4>
+      <p>Formula E has historically relied on tools like Attack Mode (a power boost activated by driving through an off-line activation zone) to encourage overtaking on tight street circuits — specifics of how these carry over are among the details still being finalized for the GEN4 ruleset.</p>
+      <p>Three new venues headline the 2026-27 calendar: the Circuit of the Americas (Austin), Zandvoort, and Brands Hatch — the latter replacing London's ExCeL as the series' UK home.</p>
+    </div>
+  </section>
+
+  <div class="sector-label"><span class="num">S5</span><span class="name">Sector 05 — On the Wire</span><span class="line"></span></div>
+  <section class="news-grid flat" style="margin-bottom:20px;">
+    <a class="story" href="#article:formula-e-gen4" data-view="article">
+      <div class="art"><img src="formula-e.png" alt="Formula E Gen3 car"></div>
+      <div class="story-body">
+        <span class="chip formula-e"><img class="chip-logo" src="https://upload.wikimedia.org/wikipedia/commons/a/a4/FIA_Formula_E_World_Championship_Logo.svg" alt="Formula E logo" style="background:#1a1d22;">Formula E</span>
+        <h4>GEN4 is coming: everything that's changing</h4>
+        <p>More power, permanent all-wheel drive, and a night race in Jeddah to kick it all off.</p>
+        <div class="meta"><span>Explainer</span><span>4 min</span></div>
+      </div>
+    </a>
+    <a class="story" href="#article:formula-e-calendar" data-view="article">
+      <div class="art"><img src="formula-e.png" alt="Formula E Gen3 car"></div>
+      <div class="story-body">
+        <span class="chip formula-e"><img class="chip-logo" src="https://upload.wikimedia.org/wikipedia/commons/a/a4/FIA_Formula_E_World_Championship_Logo.svg" alt="Formula E logo" style="background:#1a1d22;">Formula E</span>
+        <h4>Inside Formula E's biggest-ever calendar</h4>
+        <p>21 races, 13 cities, three brand-new venues — what's driving the expansion.</p>
+        <div class="meta"><span>Preview</span><span>3 min</span></div>
+      </div>
+    </a>
+  </section>
+</section>
+
 </div>
 
 <footer>
   <div class="wrap">
-    <span>APEX WIRE — an independent motorsport tracker. Schedules subject to change by each series.</span>
+    <span>94rubbermarbles — an independent motorsport tracker. Schedules subject to change by each series.</span>
     <div class="foot-links">
       <a href="#news" data-view="news">The Wire</a>
       <a href="#f1" data-view="f1">F1</a>
@@ -2375,7 +2652,7 @@ tickCountdowns();
 setInterval(tickCountdowns, 1000);
 
 // ---- SPA view router ----
-const VALID_VIEWS = ['home','news','calendar','article','f1','nascar-cup','nascar-oreilly','arca','indycar','indy-nxt','motogp','wec','nascar-truck'];
+const VALID_VIEWS = ['home','news','calendar','article','f1','nascar-cup','nascar-oreilly','arca','indycar','indy-nxt','motogp','wec','nascar-truck','wrc','formula-e'];
 
 const TRACKS = {
   zandvoort: {src:'https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Zandvoort_Circuit.png/960px-Zandvoort_Circuit.png', alt:'Circuit Zandvoort circuit diagram', cap:'CIRCUIT ZANDVOORT · TRACK MAP', diagram:true},
@@ -2429,6 +2706,18 @@ const ARTICLES = {
       "Madrid's arrival was announced years in advance, but that doesn't make a brand-new street circuit any less of an unknown quantity. The layout blends public roads around the IFEMA exhibition complex with purpose-built sections, in the now-familiar hybrid format Formula 1 has favored for its newest street venues rather than a pure downtown blast.",
       "No team has raced here, which means no historical setup data exists — simulator work and track-limits scouting from support-series test days will be doing a lot of the heavy lifting before FP1 even starts. Drivers have been cautious in preview commentary, which is usually a sign a track has at least one corner that's going to catch someone out in the early sessions.",
       "Its calendar slot matters as much as the layout: Madrid closes out the European leg of the season before the long-haul flyaway stretch begins, meaning whatever the points picture looks like after this weekend is what teams carry into a run of races where testing and set-up correction get a lot harder.",
+    ],
+  },
+  'f1-antonelli-monza': {
+    view:'f1', chip:'f1', chipLogo:'https://upload.wikimedia.org/wikipedia/commons/2/2d/Formula_One_logo.svg', chipText:'Formula 1',
+    title:"19th to 1st: Antonelli's home win rewrites the title fight", category:'Race Report', readTime:'5 min read', date:'6 Sep 2026',
+    track:'monza',
+    dek:"A grid penalty put him at the back. A virtual safety car and a late pass on his own teammate put him on top of the podium — and 66 points clear in the standings.",
+    body:[
+      "Kimi Antonelli started the Italian Grand Prix 19th on the grid after taking an engine change that cost him a 30-place penalty. He finished it on the top step of his home podium, the first Italian to win at Monza since 1966, after a drive through the field that outran even his own team's optimistic simulations.",
+      "The race turned on strategy as much as pace. A mid-race virtual safety car gave Antonelli a cheap stop for fresh mediums while championship rival and teammate George Russell stayed out on aging hards. By the run to Ascari with only a handful of laps left, the tyre gap was too much for Russell to defend, and Antonelli completed the pass for the lead — and the win.",
+      "Max Verstappen ran the same alternate strategy to recover to third. Charles Leclerc's home weekend ended in the gravel on lap two, and Lewis Hamilton could only manage sixth as Ferrari left Monza empty-handed. Lando Norris and Oscar Piastri filled fourth and fifth after a race-long McLaren scrap.",
+      "The result stretches Antonelli's championship lead over Russell to 66 points — nearly three race wins' worth — with 11 rounds still to run. F1 heads to Madrid next for the sport's newest circuit, with zero historical data for any team to lean on.",
     ],
   },
   'cup-bubble': {
@@ -2634,6 +2923,48 @@ const ARTICLES = {
       "For the field at large, a fourth manufacturer means more factory-backed opportunities for drivers trying to climb the NASCAR ladder, and another OEM investing in the sport's development tier at a moment when that pipeline matters more than ever to Cup and the O'Reilly Series above it.",
     ],
   },
+  'wrc-pajari-hattrick': {
+    view:'wrc', chip:'wrc', chipLogo:'https://upload.wikimedia.org/wikipedia/commons/b/bb/WRC_logo.svg', chipText:'WRC',
+    title:"Pajari's hat-trick puts Evans on notice", category:'Analysis', readTime:'4 min read', date:'31 Aug 2026',
+    dek:"Three wins in a row is a WRC first — and it's turned a comfortable title lead into a genuine fight.",
+    body:[
+      "Sami Pajari's victory at Rally del Paraguay was his third in a row, following wins in Estonia and his home event in Finland — the first time any driver has opened a run of consecutive WRC victories with their first three career wins. Fittingly, it came the hard way: a water leak on his GR Yaris on Friday morning, then a composed recovery once Elfyn Evans and Hayden Paddon both picked up tyre trouble on Saturday's brutal stage seven.",
+      "The result matters far beyond the trophy. Evans's championship lead, which stood at 30 points heading into Paraguay, is now down to 20 with three rounds left. Oliver Solberg sits a further 21 points back in third, while Takamoto Katsuta, Adrien Fourmaux, Sébastien Ogier and Thierry Neuville remain mathematically alive but need a near-perfect run home.",
+      "Toyota Gazoo Racing's grip on the manufacturers' title is barely in question — the team can wrap up a record-equalling sixth straight crown in Chile with a modest points day — but the drivers' fight is now genuinely open for the first time all season. With a maximum of 35 points on offer per rally, the 20-point gap is barely more than a single strong Power Stage and Super Sunday combined.",
+      "Evans, for his part, was characteristically blunt after Paraguay: picking up just 3 bonus points was 'not enough, unfortunately.' Chile's 16 gravel stages around Concepción won't decide the title outright, but a bad weekend for the championship leader here would make Sardinia's asphalt a must-win in October.",
+    ],
+  },
+  'wrc-super-sunday': {
+    view:'wrc', chip:'wrc', chipLogo:'https://upload.wikimedia.org/wikipedia/commons/b/bb/WRC_logo.svg', chipText:'WRC',
+    title:"Power Stage and Super Sunday, explained", category:'Explainer', readTime:'3 min read', date:'17 Aug 2026',
+    dek:"Up to 10 extra points are on the table before the rally even technically ends.",
+    body:[
+      "Rally results have always rewarded outright pace — 25 points down to 1 for the top ten classified crews — but the modern WRC scoring system layers two more bonus opportunities on top, both confined to the final day of competition.",
+      "The Power Stage is the rally's last special stage, run against the clock with live TV coverage and worth up to 5 bonus points to the fastest crews through it — a chance for a driver who's had a quiet weekend to still walk away with something, and for a leader to pad their advantage right at the finish.",
+      "Super Sunday is newer and less familiar to casual fans: it scores the best combined time across Sunday's other stages (excluding the Power Stage itself), worth up to 5 further points. Together, the two bonuses mean a rally winner can bank as many as 35 points in a single weekend — enough to swing a tight title race like this year's Evans-versus-Pajari fight in a single afternoon.",
+    ],
+  },
+  'formula-e-gen4': {
+    view:'formula-e', chip:'formula-e', chipLogo:'https://upload.wikimedia.org/wikipedia/commons/a/a4/FIA_Formula_E_World_Championship_Logo.svg', chipText:'Formula E',
+    title:"GEN4 is coming: everything that's changing", category:'Explainer', readTime:'4 min read', date:'24 Jun 2026',
+    dek:"More power, permanent all-wheel drive, and a night race in Jeddah to kick it all off.",
+    body:[
+      "Formula E's Gen3 Evo era wrapped up in London in mid-August, and the championship now has four months to build anticipation for its biggest technical leap yet. The GEN4 car doubles down on the areas that made Gen3 distinctive — all-wheel drive, heavy regeneration, street-circuit agility — while adding a genuine jump in outright performance.",
+      "Peak power rises to 600kW, roughly 815 horsepower, with active all-wheel drive now running throughout the race rather than being limited mostly to braking zones. Regenerative braking capacity climbs to 700kW, and Formula E is touting a 0-100kph time of just 1.8 seconds — figures that would have been unthinkable for an electric single-seater a few generations ago.",
+      "That extra speed is reshaping the calendar as much as the car. Three new venues — the Circuit of the Americas in Austin, Zandvoort in the Netherlands, and Brands Hatch as the new UK home — lean toward permanent, faster layouts rather than the tight temporary street circuits that defined Formula E's first decade.",
+      "The season opens with a genuine first: a night race in Jeddah serving as the season opener, pairing the traditional E-Prix with a new shorter, higher-intensity 'E-PrixUnleashed' sprint on the same weekend — one of eight double-headers on the championship's longest-ever calendar.",
+    ],
+  },
+  'formula-e-calendar': {
+    view:'formula-e', chip:'formula-e', chipLogo:'https://upload.wikimedia.org/wikipedia/commons/a/a4/FIA_Formula_E_World_Championship_Logo.svg', chipText:'Formula E',
+    title:"Inside Formula E's biggest-ever calendar", category:'Preview', readTime:'3 min read', date:'24 Jun 2026',
+    dek:"21 races, 13 cities, three brand-new venues — what's driving the expansion.",
+    body:[
+      "The 2026-27 season will run 21 races across 13 events in 11 countries — the largest footprint in Formula E's history, up from 17 races at 11 venues the previous season. The championship is leaning into that scale deliberately: eight of the thirteen events are now double-headers, pairing back-to-back race weekends in the same city for the first time in the sport's history at venues like Berlin and Monaco.",
+      "Geographically, the calendar clusters races by continent to cut down on travel between rounds — the season opens in the Middle East (Jeddah), swings through the Americas in the new year (Mexico City, the series' first visit to Austin's Circuit of the Americas, Miami, and São Paulo), then spends the back half of the season working through Europe and Asia before finishing in Tokyo.",
+      "The three new venues say a lot about where the series is heading. Brands Hatch takes over as Formula E's UK home from London's ExCeL circuit, while COTA and Zandvoort mark a broader shift toward permanent, higher-speed circuits — a deliberate response to the GEN4 car's extra performance, which needs more room to stretch its legs than a tight downtown street course can offer.",
+    ],
+  },
 };
 
 function renderArticle(slug){
@@ -2667,7 +2998,9 @@ function showView(view, scrollTarget){
   const target = document.getElementById('view-' + view);
   if(target) target.classList.add('active');
   document.querySelectorAll('[data-view]').forEach(a=>{
-    a.classList.toggle('active', a.dataset.view === view);
+    const href = a.getAttribute('href') || '';
+    const isAnchorLink = href.includes(':');
+    a.classList.toggle('active', !isAnchorLink && a.dataset.view === view);
   });
   if(view === 'calendar' && calReady){
     resetCalendarToToday();
@@ -2714,6 +3047,8 @@ const CAL_SERIES = {
   'indy-nxt': {logo:'https://upload.wikimedia.org/wikipedia/en/a/a8/IndyNXTLogo.png', tickets:'https://www.indycar.com/Tickets', official:'https://www.indynxt.com'},
   'motogp': {logo:'https://upload.wikimedia.org/wikipedia/commons/f/f9/MotoGP_logo_%282024%29.svg', tickets:'https://tickets.motogp.com/en/', official:'https://www.motogp.com'},
   'wec': {logo:'https://upload.wikimedia.org/wikipedia/commons/4/4c/FIA_WEC_Logo_2024.png', tickets:'https://www.fiawec.com/en/page/ticketing', official:'https://www.fiawec.com'},
+  'wrc': {logo:'https://upload.wikimedia.org/wikipedia/commons/b/bb/WRC_logo.svg', tickets:'https://www.wrc.com/en/whats-on/tickets.html', official:'https://www.wrc.com'},
+  'formula-e': {logo:'https://upload.wikimedia.org/wikipedia/commons/a/a4/FIA_Formula_E_World_Championship_Logo.svg', tickets:'https://www.fiaformulae.com/en/tickets', official:'https://www.fiaformulae.com'},
 };
 
 // Matched against each event's `watch` string in order — first match per network wins.
@@ -2741,116 +3076,65 @@ function watchLogosHTML(ev, imgClass){
 }
 
 const CAL_EVENTS = [
-  {date:'2026-08-15', view:'nascar-cup', chip:'nascar', series:'NASCAR Cup', name:'Cook Out 400 (Richmond)', venue:'Richmond Raceway, VA',
-    result:{winner:'Joey Logano', note:'Won by 0.392s over Chase Briscoe, who led a race-high 171 laps but couldn\'t complete the late pass. Logano led 95 laps for his 2nd win of the season.'}},
-  {date:'2026-08-16', view:'indycar', chip:'indy', series:'IndyCar', name:'Markham (inaugural)', venue:'Streets of Markham, Ontario',
-    result:{winner:'Marcus Ericsson', note:'Passed Romain Grosjean with 5 laps to go to win by 7.5s, snapping a 63-race winless streak for his 5th career victory and first since joining Andretti. Will Power completed the podium.'}},
-  {date:'2026-08-22', view:'nascar-truck', chip:'nascar', series:'Truck Series', name:'Team EJP 175 (New Hampshire)', venue:'New Hampshire Motor Speedway — regular-season finale',
-    result:{winner:'Layne Riggs', note:'Led a race-high 106 of 189 laps and won by 0.293s over Chandler Smith for his 11th career Truck Series victory, surviving nine cautions.'}},
-  {date:'2026-08-23', view:'indycar', chip:'indy', series:'IndyCar', name:'Freedom 250 (Washington, D.C.)', venue:'Streets of Washington, D.C. — National Mall',
-    result:{winner:'Kyle Kirkwood', note:'Led 128 of 147 laps to win the inaugural race by just over 3 seconds. Championship leader Álex Palou finished 20th after a drive-through penalty and mid-race incident.'}},
-  {date:'2026-08-23', view:'f1', chip:'f1', series:'F1', name:'Dutch GP (Zandvoort)', venue:'Circuit Zandvoort, Netherlands',
-    result:{winner:'Lando Norris', note:'Won a chaotic race after Max Verstappen crashed out at Turn 1 on lap 1, beating Kimi Antonelli by 11.5s and George Russell by 15.9s in the final Dutch GP of Zandvoort\'s current contract.'}},
-  {date:'2026-08-23', view:'nascar-cup', chip:'nascar', series:'NASCAR Cup', name:'Dollar Tree 301 (NH)', venue:'New Hampshire Motor Speedway, Loudon, NH',
-    result:{winner:'Ryan Blaney', note:'Took two tires on the final pit stop to jump the field and held off Bubba Wallace by 0.586s for his 3rd win of the season and 20th career win.'}},
-  {date:'2026-08-23', view:'arca', chip:'nascar', series:'ARCA', name:'Illinois State Fairgrounds', venue:'Illinois State Fairgrounds, Springfield — one-mile dirt',
-    result:{winner:'Max Reaves', note:'Started from the pole and led 98 of 100 laps for his first career win on dirt, his 3rd ARCA win of the season.'}},
-  {date:'2026-08-28', view:'nascar-oreilly', chip:'nascar', series:'O\'Reilly Series', name:'Winn-Dixie 250 (Daytona)', venue:'Daytona International Speedway, FL',
-    sessions:[{label:'Practice',time:'Fri 28 Aug · 1:00 PM ET'},{label:'Qualifying',time:'Fri 28 Aug · 3:00 PM ET'},{label:'Race',time:'Fri 28 Aug · 7:30 PM ET'}], watch:'The CW'},
-  {date:'2026-08-28', view:'arca', chip:'nascar', series:'ARCA', name:'Atlas 200 (Madison)', venue:'Madison International Speedway, Oregon, WI',
-    sessions:[{label:'Qualifying',time:'Fri 28 Aug · single-car (TBA)'},{label:'Race',time:'Fri 28 Aug · 8:00 PM CT'}], watch:'FS1'},
-  {date:'2026-08-29', view:'nascar-cup', chip:'nascar', series:'NASCAR Cup', name:'Coke Zero Sugar 400 (Daytona)', venue:'Daytona International Speedway, FL — regular-season finale',
-    sessions:[{label:'Qualifying',time:'Fri 28 Aug · 4:00 PM ET'},{label:'Race',time:'Sat 29 Aug · 7:30 PM ET'}], watch:'NBC (Peacock stream)'},
-  {date:'2026-08-29', view:'indycar', chip:'indy', series:'IndyCar', name:'Milwaukee Mile — R1', venue:'The Milwaukee Mile, West Allis, WI',
-    sessions:[{label:'Practice',time:'Fri 28 Aug · 5:00 PM CT'},{label:'Qualifying',time:'Sat 29 Aug · 10:05 AM CT'},{label:'Race',time:'Sat 29 Aug · 1:30 PM CT'}], watch:'FOX (national)'},
-  {date:'2026-08-30', view:'indycar', chip:'indy', series:'IndyCar', name:'Milwaukee Mile — R2', venue:'The Milwaukee Mile, West Allis, WI',
-    sessions:[{label:'Race',time:'Sun 30 Aug · 12:00 PM CT'}], watch:'FOX (national)'},
-  {date:'2026-08-30', view:'indy-nxt', chip:'indy', series:'Indy NXT', name:'Race at Milwaukee Mile', venue:'West Allis, Wisconsin — support race for IndyCar',
-    sessions:[{label:'Practice',time:'Fri 28 Aug · 3:00 PM CT'},{label:'Qualifying',time:'Sat 29 Aug · 2:00 PM CT'},{label:'Race',time:'Sun 30 Aug · 10:00 AM CT'}], watch:'FS1'},
-  {date:'2026-08-30', view:'motogp', chip:'moto', series:'MotoGP', name:'Aragón GP', venue:'MotorLand Aragón, Spain',
-    sessions:[{label:'Free Practice 1',time:'Fri 28 Aug · 10:45 CEST'},{label:'Practice',time:'Fri 28 Aug · 15:00 CEST'},{label:'Qualifying',time:'Sat 29 Aug · 11:50 CEST'},{label:'Sprint',time:'Sat 29 Aug · 15:00 CEST'},{label:'Warm-Up',time:'Sun 30 Aug · 9:40 CEST'},{label:'Race',time:'Sun 30 Aug · 14:00 CEST'}], watch:'FS1'},
-  {date:'2026-09-05', view:'nascar-oreilly', chip:'nascar', series:'O\'Reilly Series', name:'Race at Darlington', venue:'Darlington Raceway, SC — Chase opener',
-    sessions:[{label:'Race',time:'Sat 5 Sep · 7:30 PM ET'}], watch:'The CW'},
-  {date:'2026-09-05', view:'indy-nxt', chip:'indy', series:'Indy NXT', name:'Laguna Seca — R1', venue:'WeatherTech Raceway Laguna Seca, Monterey, CA',
-    sessions:[{label:'Race',time:'Sat 5 Sep · 6:30 PM PT'}], watch:'FS2'},
-  {date:'2026-09-06', view:'f1', chip:'f1', series:'F1', name:'Italian GP (Monza)', venue:'Autodromo Nazionale Monza, Italy',
-    sessions:[{label:'Practice 1',time:'Fri 4 Sep · 12:30 CEST'},{label:'Practice 2',time:'Fri 4 Sep · 16:00 CEST'},{label:'Practice 3',time:'Sat 5 Sep · 12:30 CEST'},{label:'Qualifying',time:'Sat 5 Sep · 16:00 CEST'},{label:'Race',time:'Sun 6 Sep · 15:00 CEST'}], watch:'Apple TV (exclusive)'},
-  {date:'2026-09-06', view:'nascar-cup', chip:'nascar', series:'NASCAR Cup', name:'Southern 500 (Darlington) — Playoffs R1', venue:'Darlington Raceway, SC',
-    sessions:[{label:'Practice/Qualifying',time:'Sat 5 Sep · 4:30 PM ET'},{label:'Race',time:'Sun 6 Sep · 5:00 PM ET'}], watch:'USA Network'},
-  {date:'2026-09-06', view:'indycar', chip:'indy', series:'IndyCar', name:'Laguna Seca — Championship', venue:'WeatherTech Raceway Laguna Seca — season finale',
-    sessions:[{label:'Practice',time:'Fri 4 Sep · 2:00 PM PT'},{label:'Qualifying',time:'Sat 5 Sep · 1:30 PM PT'},{label:'Race',time:'Sun 6 Sep · 11:30 AM PT'}], watch:'FOX (national)'},
-  {date:'2026-09-06', view:'indy-nxt', chip:'indy', series:'Indy NXT', name:'Laguna Seca — Championship', venue:'WeatherTech Raceway Laguna Seca — title-deciding finale',
-    sessions:[{label:'Race',time:'Sun 6 Sep · 9:30 AM PT'}], watch:'FS1'},
-  {date:'2026-09-06', view:'wec', chip:'wec', series:'WEC', name:'Lone Star Le Mans (COTA)', venue:'Circuit of the Americas, Austin, TX',
-    sessions:[{label:'Free Practice 1',time:'Fri 4 Sep · 11:00 AM CT'},{label:'Free Practice 2',time:'Fri 4 Sep · 3:35 PM CT'},{label:'Hyperpole',time:'Sat 5 Sep · 2:15 PM CT'},{label:'Warm-Up',time:'Sun 6 Sep · 8:30 AM CT'},{label:'Race',time:'Sun 6 Sep · 12:00 PM CT'}], watch:'truTV (full) / HBO Max'},
-  {date:'2026-09-06', view:'arca', chip:'nascar', series:'ARCA', name:'DuQuoin State Fairgrounds', venue:'DuQuoin State Fairgrounds, IL — dirt mile',
-    sessions:[{label:'Race',time:'Sun 6 Sep · 7:30 PM CT'}], watch:'FS1'},
-  {date:'2026-09-12', view:'nascar-oreilly', chip:'nascar', series:'O\'Reilly Series', name:'Race at WWT Raceway', venue:'World Wide Technology Raceway, Madison, IL',
-    sessions:[{label:'Practice',time:'Sat 12 Sep · 12:00 PM CT'},{label:'Qualifying',time:'Sat 12 Sep · 1:05 PM CT'},{label:'Race',time:'Sat 12 Sep · 6:30 PM CT'}], watch:'The CW'},
-  {date:'2026-09-12', view:'arca', chip:'nascar', series:'ARCA', name:'Race at Salem', venue:'Salem Speedway, IN',
-    sessions:[{label:'Race',time:'Sat 12 Sep · 8:00 PM ET'}], watch:'FOX (national)'},
-  {date:'2026-09-13', view:'f1', chip:'f1', series:'F1', name:'Spanish GP (Madrid, debut)', venue:'Madrid Street Circuit ("Madring"), Spain — inaugural',
-    sessions:[{label:'Practice 1',time:'Fri 11 Sep · 13:30 CEST'},{label:'Practice 2',time:'Fri 11 Sep · 17:00 CEST'},{label:'Practice 3',time:'Sat 12 Sep · 12:30 CEST'},{label:'Qualifying',time:'Sat 12 Sep · 16:00 CEST'},{label:'Race',time:'Sun 13 Sep · 15:00 CEST'}], watch:'Apple TV (exclusive)'},
-  {date:'2026-09-13', view:'nascar-cup', chip:'nascar', series:'NASCAR Cup', name:'Enjoy Illinois 300 (WWT)', venue:'World Wide Technology Raceway, Madison, IL',
-    sessions:[{label:'Practice',time:'Sat 12 Sep · 7:30 PM CT'},{label:'Qualifying',time:'Sat 12 Sep · 8:40 PM CT'},{label:'Race',time:'Sun 13 Sep · 2:00 PM CT'}], watch:'USA Network'},
-  {date:'2026-09-13', view:'motogp', chip:'moto', series:'MotoGP', name:'San Marino GP (Misano)', venue:'Misano World Circuit, Italy',
-    sessions:[{label:'Free Practice 1',time:'Fri 11 Sep · 10:45 CEST'},{label:'Free Practice 2',time:'Fri 11 Sep · 15:00 CEST'},{label:'Free Practice 3',time:'Sat 12 Sep · 10:10 CEST'},{label:'Qualifying',time:'Sat 12 Sep · 11:15 CEST'},{label:'Sprint',time:'Sat 12 Sep · 15:00 CEST'},{label:'Warm-Up',time:'Sun 13 Sep · 9:40 CEST'},{label:'Race',time:'Sun 13 Sep · 14:00 CEST'}], watch:'FS1'},
-  {date:'2026-09-17', view:'arca', chip:'nascar', series:'ARCA', name:'Race at Bristol', venue:'Bristol Motor Speedway, TN',
-    sessions:[{label:'Qualifying',time:'Thu 17 Sep · 2:00 PM ET'},{label:'Race',time:'Thu 17 Sep · 5:30 PM ET'}], watch:'FS1'},
-  {date:'2026-09-17', view:'nascar-truck', chip:'nascar', series:'Truck Series', name:'UNOH 250 (Bristol)', venue:'Bristol Motor Speedway, TN',
-    sessions:[{label:'Race',time:'Thu 17 Sep · 8:00 PM ET'}], watch:'FS1'},
-  {date:'2026-09-18', view:'nascar-oreilly', chip:'nascar', series:'O\'Reilly Series', name:'Race at Bristol', venue:'Bristol Motor Speedway, TN',
-    sessions:[{label:'Practice',time:'Fri 18 Sep · 2:00 PM ET'},{label:'Qualifying',time:'Fri 18 Sep · 3:05 PM ET'},{label:'Race',time:'Fri 18 Sep · 7:30 PM ET'}], watch:'The CW'},
-  {date:'2026-09-19', view:'nascar-cup', chip:'nascar', series:'NASCAR Cup', name:'Bristol Night Race — R1 elim.', venue:'Bristol Motor Speedway, TN',
-    sessions:[{label:'Practice',time:'Fri 18 Sep · 4:30 PM ET'},{label:'Qualifying',time:'Fri 18 Sep · 5:40 PM ET'},{label:'Race',time:'Sat 19 Sep · 7:30 PM ET'}], watch:'USA Network'},
-  {date:'2026-09-20', view:'motogp', chip:'moto', series:'MotoGP', name:'Austrian GP (Red Bull Ring)', venue:'Red Bull Ring, Austria',
-    sessions:[{label:'Free Practice 1',time:'Fri 18 Sep · 10:45 CEST'},{label:'Free Practice 2',time:'Fri 18 Sep · 15:00 CEST'},{label:'Free Practice 3',time:'Sat 19 Sep · 10:10 CEST'},{label:'Qualifying',time:'Sat 19 Sep · 11:15 CEST'},{label:'Sprint',time:'Sat 19 Sep · 15:00 CEST'},{label:'Warm-Up',time:'Sun 20 Sep · 9:40 CEST'},{label:'Race',time:'Sun 20 Sep · 14:00 CEST'}], watch:'FS1'},
-  {date:'2026-09-25', view:'arca', chip:'nascar', series:'ARCA', name:'Kansas — Championship', venue:'Kansas Speedway, KS — championship finale',
-    sessions:[{label:'Race',time:'Fri 25 Sep · 7:00 PM CT'}], watch:'FS1'},
-  {date:'2026-09-26', view:'f1', chip:'f1', series:'F1', name:'Azerbaijan GP (Baku)', venue:'Baku City Circuit, Azerbaijan',
-    sessions:[{label:'Practice 1',time:'Thu 24 Sep · 12:30 AZT'},{label:'Practice 2',time:'Thu 24 Sep · 16:00 AZT'},{label:'Practice 3',time:'Fri 25 Sep · 12:30 AZT'},{label:'Qualifying',time:'Fri 25 Sep · 16:00 AZT'},{label:'Race',time:'Sat 26 Sep · 15:00 AZT'}], watch:'Apple TV (exclusive)'},
-  {date:'2026-09-26', view:'nascar-truck', chip:'nascar', series:'Truck Series', name:'RaceToStopSuicide.com 200 (Kansas)', venue:'Kansas Speedway, KS',
-    sessions:[{label:'Race',time:'Sat 26 Sep · 12:00 PM CT'}], watch:'FS1'},
-  {date:'2026-09-27', view:'nascar-cup', chip:'nascar', series:'NASCAR Cup', name:'Hollywood Casino 400 (Kansas)', venue:'Kansas Speedway, KS — Round of 12 opens',
-    sessions:[{label:'Race',time:'Sun 27 Sep · 2:00 PM CT'}], watch:'USA Network'},
-  {date:'2026-09-27', view:'wec', chip:'wec', series:'WEC', name:'6 Hours of Fuji', venue:'Fuji Speedway, Japan',
-    sessions:[{label:'Free Practice 1',time:'Fri 25 Sep · 10:15 JST'},{label:'Free Practice 2',time:'Fri 25 Sep · 14:30 JST'},{label:'Free Practice 3',time:'Sat 26 Sep · 9:50 JST'},{label:'Hyperpole',time:'Sat 26 Sep · 15:20 JST'},{label:'Race',time:'Sun 27 Sep · 11:00 JST'}], watch:'HBO Max'},
-  {date:'2026-10-04', view:'nascar-cup', chip:'nascar', series:'NASCAR Cup', name:'South Point 400 (Las Vegas)', venue:'Las Vegas Motor Speedway, NV',
-    sessions:[{label:'Practice',time:'Sat 3 Oct · 1:30 PM PT'},{label:'Qualifying',time:'Sat 3 Oct · 2:40 PM PT'},{label:'Race',time:'Sun 4 Oct · 2:30 PM PT'}], watch:'USA Network'},
-  {date:'2026-10-04', view:'motogp', chip:'moto', series:'MotoGP', name:'Japanese GP (Motegi)', venue:'Mobility Resort Motegi, Japan',
-    sessions:[{label:'Free Practice 1',time:'Fri 2 Oct · 10:45 JST'},{label:'Free Practice 2',time:'Fri 2 Oct · 15:00 JST'},{label:'Free Practice 3',time:'Sat 3 Oct · 10:10 JST'},{label:'Qualifying',time:'Sat 3 Oct · 11:15 JST'},{label:'Sprint',time:'Sat 3 Oct · 15:00 JST'},{label:'Warm-Up',time:'Sun 4 Oct · 9:40 JST'},{label:'Race',time:'Sun 4 Oct · 14:00 JST'}], watch:'FS1'},
-  {date:'2026-10-09', view:'nascar-truck', chip:'nascar', series:'Truck Series', name:'Ecosave 200 (Charlotte)', venue:'Charlotte Motor Speedway, NC — oval',
-    sessions:[{label:'Race',time:'Fri 9 Oct · 5:00 PM ET'}], watch:'FOX (national)'},
-  {date:'2026-10-11', view:'f1', chip:'f1', series:'F1', name:'Singapore GP', venue:'Marina Bay Street Circuit, Singapore — sprint weekend',
-    sessions:[{label:'Practice 1',time:'Fri 9 Oct · 16:30 SGT'},{label:'Sprint Qualifying',time:'Fri 9 Oct · 20:30 SGT'},{label:'Sprint',time:'Sat 10 Oct · 17:00 SGT'},{label:'Qualifying',time:'Sat 10 Oct · 21:00 SGT'},{label:'Race',time:'Sun 11 Oct · 20:00 SGT'}], watch:'Apple TV (exclusive)'},
-  {date:'2026-10-11', view:'motogp', chip:'moto', series:'MotoGP', name:'Indonesian GP (Mandalika)', venue:'Pertamina Mandalika Circuit, Indonesia',
-    sessions:[{label:'Free Practice 1',time:'Fri 9 Oct · 10:45 WITA'},{label:'Free Practice 2',time:'Fri 9 Oct · 15:00 WITA'},{label:'Free Practice 3',time:'Sat 10 Oct · 10:10 WITA'},{label:'Qualifying',time:'Sat 10 Oct · 10:50 WITA'},{label:'Sprint',time:'Sat 10 Oct · 15:00 WITA'},{label:'Warm-Up',time:'Sun 11 Oct · 10:40 WITA'},{label:'Race',time:'Sun 11 Oct · 15:00 WITA'}], watch:'FS1'},
-  {date:'2026-10-16', view:'nascar-truck', chip:'nascar', series:'Truck Series', name:'Craftsman 150 (Phoenix)', venue:'Phoenix Raceway, AZ',
-    sessions:[{label:'Race',time:'Fri 16 Oct · 4:30 PM MST'}], watch:'FS1'},
-  {date:'2026-10-18', view:'wec', chip:'wec', series:'WEC', name:'6 Hours of Barcelona', venue:'Circuit de Barcelona-Catalunya, Spain — inaugural',
-    sessions:[{label:'Race',time:'Sun 18 Oct · time TBC (CEST)'}], watch:'HBO Max'},
-  {date:'2026-10-23', view:'nascar-truck', chip:'nascar', series:'Truck Series', name:'Love\'s RV Stop 225 (Talladega)', venue:'Talladega Superspeedway, AL',
-    sessions:[{label:'Race',time:'Fri 23 Oct · 3:00 PM CT'}], watch:'FS1'},
-  {date:'2026-10-25', view:'f1', chip:'f1', series:'F1', name:'United States GP (Austin)', venue:'Circuit of the Americas, Austin, TX',
-    sessions:[{label:'Practice 1',time:'Fri 23 Oct · 12:30 PM CT'},{label:'Practice 2',time:'Fri 23 Oct · 4:00 PM CT'},{label:'Practice 3',time:'Sat 24 Oct · 11:00 AM CT'},{label:'Qualifying',time:'Sat 24 Oct · 3:00 PM CT'},{label:'Race',time:'Sun 25 Oct · 3:00 PM CT'}], watch:'Apple TV (exclusive)'},
-  {date:'2026-10-25', view:'motogp', chip:'moto', series:'MotoGP', name:'Australian GP (Phillip Island)', venue:'Phillip Island Grand Prix Circuit, Australia',
-    sessions:[{label:'Free Practice 1',time:'Fri 23 Oct · 10:45 AEDT'},{label:'Free Practice 2',time:'Fri 23 Oct · 15:00 AEDT'},{label:'Free Practice 3',time:'Sat 24 Oct · 10:10 AEDT'},{label:'Qualifying',time:'Sat 24 Oct · 11:15 AEDT'},{label:'Sprint',time:'Sat 24 Oct · 15:00 AEDT'},{label:'Warm-Up',time:'Sun 25 Oct · 9:40 AEDT'},{label:'Race',time:'Sun 25 Oct · 14:00 AEDT'}], watch:'FS1 (US) / Network 10 (AU)'},
-  {date:'2026-10-30', view:'nascar-truck', chip:'nascar', series:'Truck Series', name:'Slim Jim 200 (Martinsville)', venue:'Martinsville Speedway, VA',
-    sessions:[{label:'Race',time:'Fri 30 Oct · 6:00 PM ET'}], watch:'FS1'},
-  {date:'2026-11-01', view:'f1', chip:'f1', series:'F1', name:'Mexico City GP', venue:'Autódromo Hermanos Rodríguez, Mexico City',
-    sessions:[{label:'Practice 1',time:'Fri 30 Oct · 12:30 CST'},{label:'Practice 2',time:'Fri 30 Oct · 16:00 CST'},{label:'Practice 3',time:'Sat 31 Oct · 11:30 CST'},{label:'Qualifying',time:'Sat 31 Oct · 15:00 CST'},{label:'Race',time:'Sun 1 Nov · 14:00 CST'}], watch:'Apple TV (exclusive)'},
-  {date:'2026-11-06', view:'nascar-truck', chip:'nascar', series:'Truck Series', name:'Baptist Health 200 — Championship', venue:'Homestead-Miami Speedway, FL — championship finale',
-    sessions:[{label:'Race',time:'Fri 6 Nov · 7:30 PM ET'}], watch:'FS1'},
-  {date:'2026-11-07', view:'nascar-oreilly', chip:'nascar', series:'O\'Reilly Series', name:'Homestead — Championship', venue:'Homestead-Miami Speedway, FL — championship finale',
-    sessions:[{label:'Race',time:'Sat 7 Nov · 5:00 PM ET'}], watch:'The CW'},
-  {date:'2026-11-08', view:'f1', chip:'f1', series:'F1', name:'São Paulo GP', venue:'Autódromo José Carlos Pace, Interlagos, Brazil',
-    sessions:[{label:'Practice 1',time:'Fri 6 Nov · 16:30 BRT'},{label:'Practice 2',time:'Fri 6 Nov · 20:00 BRT'},{label:'Practice 3',time:'Sat 7 Nov · 15:30 BRT'},{label:'Qualifying',time:'Sat 7 Nov · 19:00 BRT'},{label:'Race',time:'Sun 8 Nov · 18:00 BRT'}], watch:'Apple TV (exclusive)'},
-  {date:'2026-11-08', view:'nascar-cup', chip:'nascar', series:'NASCAR Cup', name:'Homestead — Championship', venue:'Homestead-Miami Speedway, FL — championship race',
-    sessions:[{label:'Race',time:'Sun 8 Nov · 3:00 PM ET'}], watch:'NBC (Peacock stream)'},
-  {date:'2026-11-08', view:'wec', chip:'wec', series:'WEC', name:'6 Hours of Monza — Season Finale', venue:'Autodromo Nazionale Monza, Italy — title-deciding finale',
-    sessions:[{label:'Race',time:'Sun 8 Nov · time TBC (CET)'}], watch:'HBO Max'},
-  {date:'2026-11-21', view:'f1', chip:'f1', series:'F1', name:'Las Vegas GP', venue:'Las Vegas Strip Circuit, NV',
-    sessions:[{label:'Practice 1',time:'Thu 19 Nov · 6:30 PM PT'},{label:'Practice 2',time:'Thu 19 Nov · 10:00 PM PT'},{label:'Practice 3',time:'Fri 20 Nov · 6:30 PM PT'},{label:'Qualifying',time:'Fri 20 Nov · 10:00 PM PT'},{label:'Race',time:'Sat 21 Nov · 10:00 PM PT'}], watch:'Apple TV (exclusive)'}
+  {date:'2026-08-15', view:'nascar-cup', chip:'nascar', series:'NASCAR Cup', name:'Cook Out 400 (Richmond)', venue:'Richmond Raceway, VA', result:{winner:'Joey Logano', note:'Won by 0.392s over Chase Briscoe, who led a race-high 171 laps but couldn\'t complete the late pass. Logano led 95 laps for his 2nd win of the season.'}},
+  {date:'2026-08-16', view:'indycar', chip:'indy', series:'IndyCar', name:'Markham (inaugural)', venue:'Streets of Markham, Ontario', result:{winner:'Marcus Ericsson', note:'Passed Romain Grosjean with 5 laps to go to win by 7.5s, snapping a 63-race winless streak for his 5th career victory and first since joining Andretti. Will Power completed the podium.'}},
+  {date:'2026-08-22', view:'nascar-truck', chip:'nascar', series:'Truck Series', name:'Team EJP 175 (New Hampshire)', venue:'New Hampshire Motor Speedway — regular-season finale', result:{winner:'Layne Riggs', note:'Led a race-high 106 of 189 laps and won by 0.293s over Chandler Smith for his 11th career Truck Series victory, surviving nine cautions.'}},
+  {date:'2026-08-23', view:'indycar', chip:'indy', series:'IndyCar', name:'Freedom 250 (Washington, D.C.)', venue:'Streets of Washington, D.C. — National Mall', result:{winner:'Kyle Kirkwood', note:'Led 128 of 147 laps to win the inaugural race by just over 3 seconds. Championship leader Álex Palou finished 20th after a drive-through penalty and mid-race incident.'}},
+  {date:'2026-08-23', view:'f1', chip:'f1', series:'F1', name:'Dutch GP (Zandvoort)', venue:'Circuit Zandvoort, Netherlands', result:{winner:'Lando Norris', note:'Won a chaotic race after Max Verstappen crashed out at Turn 1 on lap 1, beating Kimi Antonelli by 11.5s and George Russell by 15.9s in the final Dutch GP of Zandvoort\'s current contract.'}},
+  {date:'2026-08-23', view:'nascar-cup', chip:'nascar', series:'NASCAR Cup', name:'Dollar Tree 301 (NH)', venue:'New Hampshire Motor Speedway, Loudon, NH', result:{winner:'Ryan Blaney', note:'Took two tires on the final pit stop to jump the field and held off Bubba Wallace by 0.586s for his 3rd win of the season and 20th career win.'}},
+  {date:'2026-08-23', view:'arca', chip:'nascar', series:'ARCA', name:'Illinois State Fairgrounds', venue:'Illinois State Fairgrounds, Springfield — one-mile dirt', result:{winner:'Max Reaves', note:'Started from the pole and led 98 of 100 laps for his first career win on dirt, his 3rd ARCA win of the season.'}},
+  {date:'2026-08-28', view:'nascar-oreilly', chip:'nascar', series:'O\'Reilly Series', name:'Winn-Dixie 250 (Daytona)', venue:'Daytona International Speedway, FL', result:{winner:'Ryan Sieg', note:'Won by 0.149 seconds over Austin Hill, earning his first O\'Reilly Auto Parts Series victory.'}},
+  {date:'2026-08-28', view:'arca', chip:'nascar', series:'ARCA', name:'Atlas 200 (Madison)', venue:'Madison International Speedway, Oregon, WI', result:{winner:'Tristan McKee', note:'McKee captured his third ARCA Menards Series victory of the 2026 season.'}},
+  {date:'2026-08-29', view:'nascar-cup', chip:'nascar', series:'NASCAR Cup', name:'Coke Zero Sugar 400 (Daytona)', venue:'Daytona International Speedway, FL — regular-season finale', sessions:[{label:'Qualifying',time:'Fri 28 Aug · 4:00 PM ET'},{label:'Race',time:'Sat 29 Aug · 7:30 PM ET'}], watch:'NBC (Peacock stream)'},
+  {date:'2026-08-29', view:'indycar', chip:'indy', series:'IndyCar', name:'Milwaukee Mile — R1', venue:'The Milwaukee Mile, West Allis, WI', result:{winner:'Pato O\'Ward', note:'Won after a rain‑delayed finish, edging David Malukas by 1.75 seconds to complete a single‑day doubleheader sweep'}},
+  {date:'2026-08-30', view:'indycar', chip:'indy', series:'IndyCar', name:'Milwaukee Mile — R2', venue:'The Milwaukee Mile, West Allis, WI', sessions:[{label:'Race',time:'Sun 30 Aug · 12:00 PM CT'}], watch:'FOX (national)'},
+  {date:'2026-08-30', view:'indy-nxt', chip:'indy', series:'Indy NXT', name:'Race at Milwaukee Mile', venue:'West Allis, Wisconsin — support race for IndyCar', sessions:[{label:'Practice',time:'Fri 28 Aug · 3:00 PM CT'},{label:'Qualifying',time:'Sat 29 Aug · 2:00 PM CT'},{label:'Race',time:'Sun 30 Aug · 10:00 AM CT'}], watch:'FS1'},
+  {date:'2026-08-30', view:'motogp', chip:'moto', series:'MotoGP', name:'Aragón GP', venue:'MotorLand Aragón, Spain', sessions:[{label:'Free Practice 1',time:'Fri 28 Aug · 10:45 CEST'},{label:'Practice',time:'Fri 28 Aug · 15:00 CEST'},{label:'Qualifying',time:'Sat 29 Aug · 11:50 CEST'},{label:'Sprint',time:'Sat 29 Aug · 15:00 CEST'},{label:'Warm-Up',time:'Sun 30 Aug · 9:40 CEST'},{label:'Race',time:'Sun 30 Aug · 14:00 CEST'}], watch:'FS1'},
+  {date:'2026-09-05', view:'nascar-oreilly', chip:'nascar', series:'O\'Reilly Series', name:'Race at Darlington', venue:'Darlington Raceway, SC — Chase opener', sessions:[{label:'Race',time:'Sat 5 Sep · 7:30 PM ET'}], watch:'The CW'},
+  {date:'2026-09-05', view:'indy-nxt', chip:'indy', series:'Indy NXT', name:'Laguna Seca — R1', venue:'WeatherTech Raceway Laguna Seca, Monterey, CA', sessions:[{label:'Race',time:'Sat 5 Sep · 6:30 PM PT'}], watch:'FS2'},
+  {date:'2026-09-06', view:'f1', chip:'f1', series:'F1', name:'Italian GP (Monza)', venue:'Autodromo Nazionale Monza, Italy', result:{winner:'Kimi Antonelli', note:'Recovered from 19th on the grid (after an engine-change penalty) to win his home race, passing George Russell in the closing laps. Max Verstappen completed the podium. Antonelli now leads Russell by 66 points in the championship.'}},
+  {date:'2026-09-06', view:'nascar-cup', chip:'nascar', series:'NASCAR Cup', name:'Southern 500 (Darlington) — Playoffs R1', venue:'Darlington Raceway, SC', sessions:[{label:'Practice/Qualifying',time:'Sat 5 Sep · 4:30 PM ET'},{label:'Race',time:'Sun 6 Sep · 5:00 PM ET'}], watch:'USA Network'},
+  {date:'2026-09-06', view:'indycar', chip:'indy', series:'IndyCar', name:'Laguna Seca — Championship', venue:'WeatherTech Raceway Laguna Seca — season finale', sessions:[{label:'Practice',time:'Fri 4 Sep · 2:00 PM PT'},{label:'Qualifying',time:'Sat 5 Sep · 1:30 PM PT'},{label:'Race',time:'Sun 6 Sep · 11:30 AM PT'}], watch:'FOX (national)'},
+  {date:'2026-09-06', view:'indy-nxt', chip:'indy', series:'Indy NXT', name:'Laguna Seca — Championship', venue:'WeatherTech Raceway Laguna Seca — title-deciding finale', sessions:[{label:'Race',time:'Sun 6 Sep · 9:30 AM PT'}], watch:'FS1'},
+  {date:'2026-09-06', view:'wec', chip:'wec', series:'WEC', name:'Lone Star Le Mans (COTA)', venue:'Circuit of the Americas, Austin, TX', sessions:[{label:'Free Practice 1',time:'Fri 4 Sep · 11:00 AM CT'},{label:'Free Practice 2',time:'Fri 4 Sep · 3:35 PM CT'},{label:'Hyperpole',time:'Sat 5 Sep · 2:15 PM CT'},{label:'Warm-Up',time:'Sun 6 Sep · 8:30 AM CT'},{label:'Race',time:'Sun 6 Sep · 12:00 PM CT'}], watch:'truTV (full) / HBO Max'},
+  {date:'2026-09-06', view:'arca', chip:'nascar', series:'ARCA', name:'DuQuoin State Fairgrounds', venue:'DuQuoin State Fairgrounds, IL — dirt mile', sessions:[{label:'Race',time:'Sun 6 Sep · 7:30 PM CT'}], watch:'FS1'},
+  {date:'2026-09-12', view:'nascar-oreilly', chip:'nascar', series:'O\'Reilly Series', name:'Race at WWT Raceway', venue:'World Wide Technology Raceway, Madison, IL', sessions:[{label:'Practice',time:'Sat 12 Sep · 12:00 PM CT'},{label:'Qualifying',time:'Sat 12 Sep · 1:05 PM CT'},{label:'Race',time:'Sat 12 Sep · 6:30 PM CT'}], watch:'The CW'},
+  {date:'2026-09-12', view:'arca', chip:'nascar', series:'ARCA', name:'Race at Salem', venue:'Salem Speedway, IN', sessions:[{label:'Race',time:'Sat 12 Sep · 8:00 PM ET'}], watch:'FOX (national)'},
+  {date:'2026-09-13', view:'f1', chip:'f1', series:'F1', name:'Spanish GP (Madrid, debut)', venue:'Madrid Street Circuit ("Madring"), Spain — inaugural', sessions:[{label:'Practice 1',time:'Fri 11 Sep · 13:30 CEST'},{label:'Practice 2',time:'Fri 11 Sep · 17:00 CEST'},{label:'Practice 3',time:'Sat 12 Sep · 12:30 CEST'},{label:'Qualifying',time:'Sat 12 Sep · 16:00 CEST'},{label:'Race',time:'Sun 13 Sep · 15:00 CEST'}], watch:'Apple TV (exclusive)'},
+  {date:'2026-09-13', view:'nascar-cup', chip:'nascar', series:'NASCAR Cup', name:'Enjoy Illinois 300 (WWT)', venue:'World Wide Technology Raceway, Madison, IL', sessions:[{label:'Practice',time:'Sat 12 Sep · 7:30 PM CT'},{label:'Qualifying',time:'Sat 12 Sep · 8:40 PM CT'},{label:'Race',time:'Sun 13 Sep · 2:00 PM CT'}], watch:'USA Network'},
+  {date:'2026-09-13', view:'motogp', chip:'moto', series:'MotoGP', name:'San Marino GP (Misano)', venue:'Misano World Circuit, Italy', sessions:[{label:'Free Practice 1',time:'Fri 11 Sep · 10:45 CEST'},{label:'Free Practice 2',time:'Fri 11 Sep · 15:00 CEST'},{label:'Free Practice 3',time:'Sat 12 Sep · 10:10 CEST'},{label:'Qualifying',time:'Sat 12 Sep · 11:15 CEST'},{label:'Sprint',time:'Sat 12 Sep · 15:00 CEST'},{label:'Warm-Up',time:'Sun 13 Sep · 9:40 CEST'},{label:'Race',time:'Sun 13 Sep · 14:00 CEST'}], watch:'FS1'},
+  {date:'2026-09-17', view:'arca', chip:'nascar', series:'ARCA', name:'Race at Bristol', venue:'Bristol Motor Speedway, TN', sessions:[{label:'Qualifying',time:'Thu 17 Sep · 2:00 PM ET'},{label:'Race',time:'Thu 17 Sep · 5:30 PM ET'}], watch:'FS1'},
+  {date:'2026-09-17', view:'nascar-truck', chip:'nascar', series:'Truck Series', name:'UNOH 250 (Bristol)', venue:'Bristol Motor Speedway, TN', sessions:[{label:'Race',time:'Thu 17 Sep · 8:00 PM ET'}], watch:'FS1'},
+  {date:'2026-09-18', view:'nascar-oreilly', chip:'nascar', series:'O\'Reilly Series', name:'Race at Bristol', venue:'Bristol Motor Speedway, TN', sessions:[{label:'Practice',time:'Fri 18 Sep · 2:00 PM ET'},{label:'Qualifying',time:'Fri 18 Sep · 3:05 PM ET'},{label:'Race',time:'Fri 18 Sep · 7:30 PM ET'}], watch:'The CW'},
+  {date:'2026-09-19', view:'nascar-cup', chip:'nascar', series:'NASCAR Cup', name:'Bristol Night Race — R1 elim.', venue:'Bristol Motor Speedway, TN', sessions:[{label:'Practice',time:'Fri 18 Sep · 4:30 PM ET'},{label:'Qualifying',time:'Fri 18 Sep · 5:40 PM ET'},{label:'Race',time:'Sat 19 Sep · 7:30 PM ET'}], watch:'USA Network'},
+  {date:'2026-09-20', view:'motogp', chip:'moto', series:'MotoGP', name:'Austrian GP (Red Bull Ring)', venue:'Red Bull Ring, Austria', sessions:[{label:'Free Practice 1',time:'Fri 18 Sep · 10:45 CEST'},{label:'Free Practice 2',time:'Fri 18 Sep · 15:00 CEST'},{label:'Free Practice 3',time:'Sat 19 Sep · 10:10 CEST'},{label:'Qualifying',time:'Sat 19 Sep · 11:15 CEST'},{label:'Sprint',time:'Sat 19 Sep · 15:00 CEST'},{label:'Warm-Up',time:'Sun 20 Sep · 9:40 CEST'},{label:'Race',time:'Sun 20 Sep · 14:00 CEST'}], watch:'FS1'},
+  {date:'2026-09-25', view:'arca', chip:'nascar', series:'ARCA', name:'Kansas — Championship', venue:'Kansas Speedway, KS — championship finale', sessions:[{label:'Race',time:'Fri 25 Sep · 7:00 PM CT'}], watch:'FS1'},
+  {date:'2026-09-26', view:'f1', chip:'f1', series:'F1', name:'Azerbaijan GP (Baku)', venue:'Baku City Circuit, Azerbaijan', sessions:[{label:'Practice 1',time:'Thu 24 Sep · 12:30 AZT'},{label:'Practice 2',time:'Thu 24 Sep · 16:00 AZT'},{label:'Practice 3',time:'Fri 25 Sep · 12:30 AZT'},{label:'Qualifying',time:'Fri 25 Sep · 16:00 AZT'},{label:'Race',time:'Sat 26 Sep · 15:00 AZT'}], watch:'Apple TV (exclusive)'},
+  {date:'2026-09-26', view:'nascar-truck', chip:'nascar', series:'Truck Series', name:'RaceToStopSuicide.com 200 (Kansas)', venue:'Kansas Speedway, KS', sessions:[{label:'Race',time:'Sat 26 Sep · 12:00 PM CT'}], watch:'FS1'},
+  {date:'2026-09-27', view:'nascar-cup', chip:'nascar', series:'NASCAR Cup', name:'Hollywood Casino 400 (Kansas)', venue:'Kansas Speedway, KS — Round of 12 opens', sessions:[{label:'Race',time:'Sun 27 Sep · 2:00 PM CT'}], watch:'USA Network'},
+  {date:'2026-09-27', view:'wec', chip:'wec', series:'WEC', name:'6 Hours of Fuji', venue:'Fuji Speedway, Japan', sessions:[{label:'Free Practice 1',time:'Fri 25 Sep · 10:15 JST'},{label:'Free Practice 2',time:'Fri 25 Sep · 14:30 JST'},{label:'Free Practice 3',time:'Sat 26 Sep · 9:50 JST'},{label:'Hyperpole',time:'Sat 26 Sep · 15:20 JST'},{label:'Race',time:'Sun 27 Sep · 11:00 JST'}], watch:'HBO Max'},
+  {date:'2026-10-04', view:'nascar-cup', chip:'nascar', series:'NASCAR Cup', name:'South Point 400 (Las Vegas)', venue:'Las Vegas Motor Speedway, NV', sessions:[{label:'Practice',time:'Sat 3 Oct · 1:30 PM PT'},{label:'Qualifying',time:'Sat 3 Oct · 2:40 PM PT'},{label:'Race',time:'Sun 4 Oct · 2:30 PM PT'}], watch:'USA Network'},
+  {date:'2026-10-04', view:'motogp', chip:'moto', series:'MotoGP', name:'Japanese GP (Motegi)', venue:'Mobility Resort Motegi, Japan', sessions:[{label:'Free Practice 1',time:'Fri 2 Oct · 10:45 JST'},{label:'Free Practice 2',time:'Fri 2 Oct · 15:00 JST'},{label:'Free Practice 3',time:'Sat 3 Oct · 10:10 JST'},{label:'Qualifying',time:'Sat 3 Oct · 11:15 JST'},{label:'Sprint',time:'Sat 3 Oct · 15:00 JST'},{label:'Warm-Up',time:'Sun 4 Oct · 9:40 JST'},{label:'Race',time:'Sun 4 Oct · 14:00 JST'}], watch:'FS1'},
+  {date:'2026-10-09', view:'nascar-truck', chip:'nascar', series:'Truck Series', name:'Ecosave 200 (Charlotte)', venue:'Charlotte Motor Speedway, NC — oval', sessions:[{label:'Race',time:'Fri 9 Oct · 5:00 PM ET'}], watch:'FOX (national)'},
+  {date:'2026-10-11', view:'f1', chip:'f1', series:'F1', name:'Singapore GP', venue:'Marina Bay Street Circuit, Singapore — sprint weekend', sessions:[{label:'Practice 1',time:'Fri 9 Oct · 16:30 SGT'},{label:'Sprint Qualifying',time:'Fri 9 Oct · 20:30 SGT'},{label:'Sprint',time:'Sat 10 Oct · 17:00 SGT'},{label:'Qualifying',time:'Sat 10 Oct · 21:00 SGT'},{label:'Race',time:'Sun 11 Oct · 20:00 SGT'}], watch:'Apple TV (exclusive)'},
+  {date:'2026-10-11', view:'motogp', chip:'moto', series:'MotoGP', name:'Indonesian GP (Mandalika)', venue:'Pertamina Mandalika Circuit, Indonesia', sessions:[{label:'Free Practice 1',time:'Fri 9 Oct · 10:45 WITA'},{label:'Free Practice 2',time:'Fri 9 Oct · 15:00 WITA'},{label:'Free Practice 3',time:'Sat 10 Oct · 10:10 WITA'},{label:'Qualifying',time:'Sat 10 Oct · 10:50 WITA'},{label:'Sprint',time:'Sat 10 Oct · 15:00 WITA'},{label:'Warm-Up',time:'Sun 11 Oct · 10:40 WITA'},{label:'Race',time:'Sun 11 Oct · 15:00 WITA'}], watch:'FS1'},
+  {date:'2026-10-16', view:'nascar-truck', chip:'nascar', series:'Truck Series', name:'Craftsman 150 (Phoenix)', venue:'Phoenix Raceway, AZ', sessions:[{label:'Race',time:'Fri 16 Oct · 4:30 PM MST'}], watch:'FS1'},
+  {date:'2026-10-18', view:'wec', chip:'wec', series:'WEC', name:'6 Hours of Barcelona', venue:'Circuit de Barcelona-Catalunya, Spain — inaugural', sessions:[{label:'Race',time:'Sun 18 Oct · time TBC (CEST)'}], watch:'HBO Max'},
+  {date:'2026-10-23', view:'nascar-truck', chip:'nascar', series:'Truck Series', name:'Love\'s RV Stop 225 (Talladega)', venue:'Talladega Superspeedway, AL', sessions:[{label:'Race',time:'Fri 23 Oct · 3:00 PM CT'}], watch:'FS1'},
+  {date:'2026-10-25', view:'f1', chip:'f1', series:'F1', name:'United States GP (Austin)', venue:'Circuit of the Americas, Austin, TX', sessions:[{label:'Practice 1',time:'Fri 23 Oct · 12:30 PM CT'},{label:'Practice 2',time:'Fri 23 Oct · 4:00 PM CT'},{label:'Practice 3',time:'Sat 24 Oct · 11:00 AM CT'},{label:'Qualifying',time:'Sat 24 Oct · 3:00 PM CT'},{label:'Race',time:'Sun 25 Oct · 3:00 PM CT'}], watch:'Apple TV (exclusive)'},
+  {date:'2026-10-25', view:'motogp', chip:'moto', series:'MotoGP', name:'Australian GP (Phillip Island)', venue:'Phillip Island Grand Prix Circuit, Australia', sessions:[{label:'Free Practice 1',time:'Fri 23 Oct · 10:45 AEDT'},{label:'Free Practice 2',time:'Fri 23 Oct · 15:00 AEDT'},{label:'Free Practice 3',time:'Sat 24 Oct · 10:10 AEDT'},{label:'Qualifying',time:'Sat 24 Oct · 11:15 AEDT'},{label:'Sprint',time:'Sat 24 Oct · 15:00 AEDT'},{label:'Warm-Up',time:'Sun 25 Oct · 9:40 AEDT'},{label:'Race',time:'Sun 25 Oct · 14:00 AEDT'}], watch:'FS1 (US) / Network 10 (AU)'},
+  {date:'2026-10-30', view:'nascar-truck', chip:'nascar', series:'Truck Series', name:'Slim Jim 200 (Martinsville)', venue:'Martinsville Speedway, VA', sessions:[{label:'Race',time:'Fri 30 Oct · 6:00 PM ET'}], watch:'FS1'},
+  {date:'2026-11-01', view:'f1', chip:'f1', series:'F1', name:'Mexico City GP', venue:'Autódromo Hermanos Rodríguez, Mexico City', sessions:[{label:'Practice 1',time:'Fri 30 Oct · 12:30 CST'},{label:'Practice 2',time:'Fri 30 Oct · 16:00 CST'},{label:'Practice 3',time:'Sat 31 Oct · 11:30 CST'},{label:'Qualifying',time:'Sat 31 Oct · 15:00 CST'},{label:'Race',time:'Sun 1 Nov · 14:00 CST'}], watch:'Apple TV (exclusive)'},
+  {date:'2026-11-06', view:'nascar-truck', chip:'nascar', series:'Truck Series', name:'Baptist Health 200 — Championship', venue:'Homestead-Miami Speedway, FL — championship finale', sessions:[{label:'Race',time:'Fri 6 Nov · 7:30 PM ET'}], watch:'FS1'},
+  {date:'2026-11-07', view:'nascar-oreilly', chip:'nascar', series:'O\'Reilly Series', name:'Homestead — Championship', venue:'Homestead-Miami Speedway, FL — championship finale', sessions:[{label:'Race',time:'Sat 7 Nov · 5:00 PM ET'}], watch:'The CW'},
+  {date:'2026-11-08', view:'f1', chip:'f1', series:'F1', name:'São Paulo GP', venue:'Autódromo José Carlos Pace, Interlagos, Brazil', sessions:[{label:'Practice 1',time:'Fri 6 Nov · 16:30 BRT'},{label:'Practice 2',time:'Fri 6 Nov · 20:00 BRT'},{label:'Practice 3',time:'Sat 7 Nov · 15:30 BRT'},{label:'Qualifying',time:'Sat 7 Nov · 19:00 BRT'},{label:'Race',time:'Sun 8 Nov · 18:00 BRT'}], watch:'Apple TV (exclusive)'},
+  {date:'2026-11-08', view:'nascar-cup', chip:'nascar', series:'NASCAR Cup', name:'Homestead — Championship', venue:'Homestead-Miami Speedway, FL — championship race', sessions:[{label:'Race',time:'Sun 8 Nov · 3:00 PM ET'}], watch:'NBC (Peacock stream)'},
+  {date:'2026-11-08', view:'wec', chip:'wec', series:'WEC', name:'6 Hours of Monza — Season Finale', venue:'Autodromo Nazionale Monza, Italy — title-deciding finale', sessions:[{label:'Race',time:'Sun 8 Nov · time TBC (CET)'}], watch:'HBO Max'},
+  {date:'2026-11-21', view:'f1', chip:'f1', series:'F1', name:'Las Vegas GP', venue:'Las Vegas Strip Circuit, NV', sessions:[{label:'Practice 1',time:'Thu 19 Nov · 6:30 PM PT'},{label:'Practice 2',time:'Thu 19 Nov · 10:00 PM PT'},{label:'Practice 3',time:'Fri 20 Nov · 6:30 PM PT'},{label:'Qualifying',time:'Fri 20 Nov · 10:00 PM PT'},{label:'Race',time:'Sat 21 Nov · 10:00 PM PT'}], watch:'Apple TV (exclusive)'},
+  {date:'2026-09-13', view:'wrc', chip:'wrc', series:'WRC', name:'Rally Chile Biobío', venue:'Concepción, Biobío, Chile — gravel', sessions:[{label:'Shakedown',time:'Wed 9 Sep'},{label:'Leg 1',time:'Thu–Fri 10–11 Sep'},{label:'Leg 2',time:'Sat 12 Sep'},{label:'Leg 3 + Power Stage',time:'Sun 13 Sep'}], watch:'WRC+ (streaming)'},
+  {date:'2026-10-04', view:'wrc', chip:'wrc', series:'WRC', name:'Rally Italia Sardegna', venue:'Sardinia, Italy — gravel', sessions:[{label:'Leg 1–3',time:'Thu–Sun 1–4 Oct'}], watch:'WRC+ (streaming)'},
+  {date:'2026-11-14', view:'wrc', chip:'wrc', series:'WRC', name:'Rally Saudi Arabia — Season Finale', venue:'Jeddah, Saudi Arabia — gravel', sessions:[{label:'Leg 1–3',time:'Wed–Sat 11–14 Nov'}], watch:'WRC+ (streaming)'},
+  {date:'2026-12-19', view:'formula-e', chip:'formula-e', series:'Formula E', name:'Jeddah E-Prix Double-Header — Season Opener', venue:'Jeddah Corniche Circuit, Saudi Arabia — GEN4 debut', sessions:[{label:'Race 1 — E-PrixUnleashed',time:'Fri 18 Dec, night'},{label:'Race 2 — E-Prix',time:'Sat 19 Dec, night'}], watch:'TBC'}
 ];
 
 const CAL_EVENTS_BY_DATE = {};
