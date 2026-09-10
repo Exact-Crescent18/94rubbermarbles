@@ -53,7 +53,7 @@ function parseIssueForm(body) {
   return fields;
 }
 
-async function askGroq(prompt) {
+async function askGroq(prompt, attempt = 1) {
   const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
     signal: AbortSignal.timeout(60000), // full Compound can search more deeply than Mini, allow longer
@@ -67,6 +67,19 @@ async function askGroq(prompt) {
       temperature: 0.4,
     }),
   });
+
+  // 429/5xx are transient, worth one retry. 413 ("request too large") is a
+  // known Groq-side Compound issue — its own web search results can
+  // balloon the request server-side — and retrying the identical prompt
+  // just reproduces it, so fail that one immediately.
+  if ((res.status === 429 || res.status >= 500) && attempt < 2) {
+    const bodyText = await res.text();
+    const waitHint = bodyText.match(/try again in ([\d.]+)s/i);
+    const waitMs = waitHint ? Math.ceil(parseFloat(waitHint[1]) * 1000) + 500 : 8000;
+    await new Promise((r) => setTimeout(r, waitMs));
+    return askGroq(prompt, attempt + 1);
+  }
+
   if (!res.ok) {
     throw new Error(`Groq API error ${res.status}: ${await res.text()}`);
   }

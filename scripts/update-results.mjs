@@ -20,7 +20,8 @@ import { parseNamedLiteral } from './lib/html-utils.mjs';
 const FILE = new URL('../index.html', import.meta.url);
 const GROQ_KEY = process.env.GROQ_API_KEY;
 const BLACKTOP_KEY = process.env.BLACKTOP_API_KEY; // optional — falls back to Groq-only if absent
-const MODEL = 'groq/compound-mini';
+const MODEL = 'groq/compound-mini'; // search-capable — only for real "did this happen" lookups
+const PLAIN_MODEL = 'llama-3.3-70b-versatile'; // no search — for phrasing facts we already have
 const CALL_SPACING_MS = 4000; // spread requests out so we don't burst the free-tier TPM limit
 
 // Ticker <img alt="..."> text -> CAL_EVENTS `view` key, so the ticker
@@ -52,7 +53,7 @@ function sleep(ms) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
-async function askGroq(prompt, attempt = 1) {
+async function askGroqModel(model, prompt, attempt = 1) {
   const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
     signal: AbortSignal.timeout(45000), // compound's web search can be slow, but never indefinite
@@ -61,21 +62,26 @@ async function askGroq(prompt, attempt = 1) {
       Authorization: `Bearer ${GROQ_KEY}`,
     },
     body: JSON.stringify({
-      model: MODEL,
+      model,
       messages: [{ role: 'user', content: prompt }],
       temperature: 0,
     }),
   });
 
-  // Transient errors (rate limit, oversized request, server hiccup): back
-  // off and retry a couple of times before giving up on this one call.
-  if ((res.status === 429 || res.status === 413 || res.status >= 500) && attempt < 3) {
+  // 429/5xx are transient — worth a backed-off retry. 413 ("request too
+  // large") is NOT transient for Compound: it's a known Groq-side issue
+  // where the model's own web-search results balloon the request server
+  // side, and retrying the identical prompt just gets the same 413 again
+  // (see community.groq.com "compound-mini returning request too large on
+  // fairly basic web searches"). Fail that one immediately instead of
+  // wasting ~24s retrying something that can't succeed.
+  if ((res.status === 429 || res.status >= 500) && attempt < 3) {
     const bodyText = await res.text();
     const waitHint = bodyText.match(/try again in ([\d.]+)s/i);
     const waitMs = waitHint ? Math.ceil(parseFloat(waitHint[1]) * 1000) + 500 : 8000 * attempt;
     console.log(`Groq ${res.status}, retrying in ${Math.round(waitMs / 1000)}s (attempt ${attempt + 1})...`);
     await sleep(waitMs);
-    return askGroq(prompt, attempt + 1);
+    return askGroqModel(model, prompt, attempt + 1);
   }
 
   if (!res.ok) {
@@ -83,6 +89,22 @@ async function askGroq(prompt, attempt = 1) {
   }
   const data = await res.json();
   return data.choices?.[0]?.message?.content ?? '';
+}
+
+// Search-capable — only for genuinely open-ended "did this happen, what
+// was the result" lookups. Everything else (phrasing already-known facts)
+// should use askGroqPlain instead, to avoid Compound's search-result-size
+// 413s entirely.
+function askGroq(prompt) {
+  return askGroqModel(MODEL, prompt);
+}
+
+// Plain completion, no search tooling — for phrasing real facts we
+// already have (from Blacktop or elsewhere) into prose. Much less prone
+// to the Compound 413 issue since there's no web search inflating the
+// request.
+function askGroqPlain(prompt) {
+  return askGroqModel(PLAIN_MODEL, prompt);
 }
 
 function extractJson(text) {
@@ -142,7 +164,7 @@ Series: ${ev.series}. Race: ${ev.name}. Winner: ${result.winner}. Podium: ${resu
 Respond with ONLY the sentence, no preamble.`;
     let note = `Winner: ${result.podium.join(', ')}.`;
     try {
-      const reply = (await askGroq(notePrompt)).trim();
+      const reply = (await askGroqPlain(notePrompt)).trim();
       if (reply && reply.length < 300) note = reply;
     } catch (e) {
       console.log(`Groq note-phrasing failed for ${ev.name}, using plain podium line:`, e.message);
@@ -180,7 +202,7 @@ Respond with ONLY this JSON shape:
 {"title": "short headline, no clickbait", "dek": "one-sentence subhead", "body": ["paragraph 1", "paragraph 2", "paragraph 3"], "category": "Race Report", "readTime": "4 min read"}`;
 
   try {
-    const reply = await askGroq(prompt);
+    const reply = await askGroqPlain(prompt);
     const parsed = extractJson(reply);
     if (parsed?.title && parsed?.dek && Array.isArray(parsed.body) && parsed.body.length) {
       return parsed;
@@ -288,7 +310,7 @@ async function main() {
             const phrasePrompt = `Write one terse news-ticker sentence about this real, current standings situation. Do not invent anything beyond what's given.
 Series: ${seriesAlt}. Points leader: ${standings.leader}${standings.leaderPoints != null ? ` (${standings.leaderPoints} pts)` : ''}. 2nd: ${standings.second}${standings.gap != null ? `, ${standings.gap} points back` : ''}.
 Respond with ONLY the sentence, no preamble.`;
-            reply = (await askGroq(phrasePrompt)).trim();
+            reply = (await askGroqPlain(phrasePrompt)).trim();
           }
         } catch (e) {
           console.log(`Blacktop standings failed for ${seriesAlt}, falling back to Groq search:`, e.message);
