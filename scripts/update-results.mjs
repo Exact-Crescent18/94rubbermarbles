@@ -38,6 +38,7 @@ function sleep(ms) {
 async function askGroq(prompt, attempt = 1) {
   const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
+    signal: AbortSignal.timeout(45000), // compound's web search can be slow, but never indefinite
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${GROQ_KEY}`,

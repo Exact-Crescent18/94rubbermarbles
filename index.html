@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>94rubbermarbles — Motorsport, Every Series, Every Session</title>
-<link rel="icon" type="image/png" href="assets/favicon-94.png">
+<link rel="icon" type="image/png" href="Logos/number_logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -26,7 +26,7 @@
 }
 @font-face{
   font-family:'Race Sport';
-  src:url(assets/race-sport.ttf) format('truetype');
+  src:url('Fonts/race-sport/Race Sport.ttf') format('truetype');
   font-weight:normal;
   font-style:normal;
   font-display:swap;
@@ -81,12 +81,15 @@ header.site{
   padding-bottom:18px; border-bottom:1px solid var(--rule);
   flex-wrap:wrap; gap:16px;
 }
-.brand{
-  font-family:'Race Sport',sans-serif; font-weight:400; font-size:30px;
-  letter-spacing:0.01em; text-transform:uppercase;
-  display:flex; align-items:center; gap:9px; text-decoration:none;
+.brand{ display:flex; align-items:center; text-decoration:none; }
+.brand-mark-wrap{ position:relative; display:inline-flex; align-items:center; height:46px; }
+.brand-numlogo{ height:100%; width:auto; object-fit:contain; display:block; position:relative; z-index:1; }
+.brand-word{
+  font-family:'Race Sport',sans-serif; font-weight:400; font-size:28px;
+  letter-spacing:0.01em; text-transform:uppercase; color:var(--text);
+  margin-left:-20px; position:relative; z-index:2;
+  -webkit-text-stroke:1px #000; paint-order:stroke fill; white-space:nowrap;
 }
-.brand .mark{display:block; width:30px; height:30px; flex-shrink:0;}
 .brand-sub{font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text-faint); letter-spacing:0.12em; text-transform:uppercase; margin-top:4px;}
 nav.primary{display:flex; gap:22px; font-family:'JetBrains Mono',monospace; font-size:11.5px; letter-spacing:0.05em; text-transform:uppercase; color:var(--text-dim); flex-wrap:wrap;}
 nav.primary a{text-decoration:none; transition:color .15s; white-space:nowrap;}
@@ -559,7 +562,12 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 <header class="site">
   <div class="header-top">
     <div>
-      <a class="brand" href="#home" data-view="home"><img class="mark" src="assets/brand-logo-94.png" alt="94 logo" style="height:42px;width:auto;object-fit:contain;margin-right:-32.3px;position:relative;z-index:0;"><span style="position:relative;z-index:2;top:4px;-webkit-text-stroke:1.5px #000;text-shadow:1px 0 0 #000,-1px 0 0 #000,0 1px 0 #000,0 -1px 0 #000,1px 1px 0 #000,-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000;">&#xF010;ubbe&#xF010;ma&#xF010;bles</span></a>
+      <a class="brand" href="#home" data-view="home">
+        <span class="brand-mark-wrap">
+          <img class="brand-numlogo" src="Logos/number_logo.png" alt="94">
+          <span class="brand-word">&#xF010;UBBE&#xF010;MA&#xF010;BLES</span>
+        </span>
+      </a>
       <div class="brand-sub">Every series. Every session. One line.</div>
     </div>
     <nav class="primary">

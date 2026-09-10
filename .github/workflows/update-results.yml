@@ -11,6 +11,7 @@ permissions:
 jobs:
   update:
     runs-on: ubuntu-latest
+    timeout-minutes: 8 # safety net — normal runs take under 2 min even with retries
     steps:
       - uses: actions/checkout@v4
 

@@ -10,6 +10,7 @@ jobs:
   write-article:
     if: contains(github.event.issue.labels.*.name, 'write-article')
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
 

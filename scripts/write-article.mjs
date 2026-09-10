@@ -56,6 +56,7 @@ function parseIssueForm(body) {
 async function askGroq(prompt) {
   const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
+    signal: AbortSignal.timeout(60000), // full Compound can search more deeply than Mini, allow longer
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${GROQ_KEY}`,

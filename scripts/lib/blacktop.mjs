@@ -31,6 +31,7 @@ export function isBlacktopCovered(view) {
 async function blacktopFetch(path, apiKey) {
   const res = await fetch(`${BASE}${path}`, {
     headers: { 'x-api-key': apiKey },
+    signal: AbortSignal.timeout(15000), // never hang indefinitely on a slow/unresponsive endpoint
   });
   if (!res.ok) {
     throw new Error(`Blacktop API error ${res.status} on ${path}: ${await res.text()}`);
