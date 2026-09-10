@@ -13,7 +13,7 @@
 // Usage: GROQ_API_KEY=... [BLACKTOP_API_KEY=...] node scripts/update-results.mjs
 
 import { readFileSync, writeFileSync } from 'node:fs';
-import { isBlacktopCovered, findEvent, getRaceResult } from './lib/blacktop.mjs';
+import { isBlacktopCovered, findEvent, getRaceResult, getStandingsSummary } from './lib/blacktop.mjs';
 import { addArticle, publishDueArticles } from './lib/articles.mjs';
 import { parseNamedLiteral } from './lib/html-utils.mjs';
 
@@ -22,6 +22,23 @@ const GROQ_KEY = process.env.GROQ_API_KEY;
 const BLACKTOP_KEY = process.env.BLACKTOP_API_KEY; // optional — falls back to Groq-only if absent
 const MODEL = 'groq/compound-mini';
 const CALL_SPACING_MS = 4000; // spread requests out so we don't burst the free-tier TPM limit
+
+// Ticker <img alt="..."> text -> CAL_EVENTS `view` key, so the ticker
+// refresher can check Blacktop coverage per series the same way the
+// results loop does.
+const TICKER_ALT_TO_VIEW = {
+  F1: 'f1',
+  'NASCAR Cup': 'nascar-cup',
+  "O'Reilly Series": 'nascar-oreilly',
+  'Truck Series': 'nascar-truck',
+  ARCA: 'arca',
+  'NTT IndyCar': 'indycar',
+  'Indy NXT': 'indy-nxt',
+  MotoGP: 'motogp',
+  WEC: 'wec',
+  WRC: 'wrc',
+  'Formula E': 'formula-e',
+};
 
 if (!GROQ_KEY) {
   console.error('GROQ_API_KEY is not set.');
@@ -260,21 +277,43 @@ async function main() {
 
     for (const m of seriesMatches) {
       const [full, seriesAlt, oldLine] = m;
-      const prompt = `Give me one current, verifiable, real racing news headline about ${seriesAlt} as of today — a race result, standings shift, or notable development. One short factual sentence, no preamble, suitable for a news ticker. If you can't confirm anything current, respond with exactly: NO_UPDATE`;
-      let reply;
-      try {
-        reply = (await askGroq(prompt)).trim();
-      } catch (e) {
-        console.error(`Groq ticker call failed for ${seriesAlt}:`, e.message);
+      const view = TICKER_ALT_TO_VIEW[seriesAlt];
+      let reply = null;
+
+      // Try real Blacktop standings first for covered series.
+      if (view && BLACKTOP_KEY && isBlacktopCovered(view)) {
+        try {
+          const standings = await getStandingsSummary(view, BLACKTOP_KEY);
+          if (standings?.leader && standings?.second) {
+            const phrasePrompt = `Write one terse news-ticker sentence about this real, current standings situation. Do not invent anything beyond what's given.
+Series: ${seriesAlt}. Points leader: ${standings.leader}${standings.leaderPoints != null ? ` (${standings.leaderPoints} pts)` : ''}. 2nd: ${standings.second}${standings.gap != null ? `, ${standings.gap} points back` : ''}.
+Respond with ONLY the sentence, no preamble.`;
+            reply = (await askGroq(phrasePrompt)).trim();
+          }
+        } catch (e) {
+          console.log(`Blacktop standings failed for ${seriesAlt}, falling back to Groq search:`, e.message);
+        }
         await sleep(CALL_SPACING_MS);
-        continue;
       }
+
+      // Fall back to Groq web search (uncovered series, or Blacktop miss).
+      if (!reply) {
+        const prompt = `Give me one current, verifiable, real racing news headline about ${seriesAlt} as of today — a race result, standings shift, or notable development. One short factual sentence, no preamble, suitable for a news ticker. If you can't confirm anything current, respond with exactly: NO_UPDATE`;
+        try {
+          reply = (await askGroq(prompt)).trim();
+        } catch (e) {
+          console.error(`Groq ticker call failed for ${seriesAlt}:`, e.message);
+          await sleep(CALL_SPACING_MS);
+          continue;
+        }
+        await sleep(CALL_SPACING_MS);
+      }
+
       if (reply && reply !== 'NO_UPDATE' && reply.length <= 220 && reply !== oldLine.trim()) {
         newTickerBlock = newTickerBlock.replace(full, full.replace(oldLine, reply));
         tickerChanged = true;
-        console.log(`Ticker updated: ${seriesAlt}`);
+        console.log(`Ticker updated (${view && BLACKTOP_KEY && isBlacktopCovered(view) ? 'blacktop' : 'groq'}): ${seriesAlt}`);
       }
-      await sleep(CALL_SPACING_MS);
     }
 
     if (tickerChanged) {
