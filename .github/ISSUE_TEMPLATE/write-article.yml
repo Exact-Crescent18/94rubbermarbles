@@ -1,0 +1,39 @@
+name: Write an article
+description: Prompt Groq to draft and publish (or schedule) a new ApexWire article.
+title: "[article] "
+labels: ["write-article"]
+body:
+  - type: dropdown
+    id: series
+    attributes:
+      label: Series
+      options:
+        - f1
+        - nascar-cup
+        - nascar-oreilly
+        - nascar-truck
+        - arca
+        - indycar
+        - indy-nxt
+        - motogp
+        - wec
+        - wrc
+        - formula-e
+    validations:
+      required: true
+  - type: textarea
+    id: prompt
+    attributes:
+      label: What should the article say?
+      description: Describe the angle, facts to include, and tone. Groq will research real, current facts via web search — don't ask it to invent anything.
+      placeholder: e.g. "Preview piece on this weekend's Bristol night race — focus on the Chase elimination stakes."
+    validations:
+      required: true
+  - type: input
+    id: publishAt
+    attributes:
+      label: Publish at (optional)
+      description: 'ISO date/time to schedule publishing, e.g. 2026-09-15T18:00:00Z. Leave blank to publish immediately once drafted.'
+      placeholder: "2026-09-15T18:00:00Z"
+    validations:
+      required: false

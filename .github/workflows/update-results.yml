@@ -21,6 +21,7 @@ jobs:
       - name: Run updater
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          BLACKTOP_API_KEY: ${{ secrets.BLACKTOP_API_KEY }}
         run: node scripts/update-results.mjs
 
       - name: Commit and push if changed

@@ -1,0 +1,67 @@
+"on":
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  write-article:
+    if: contains(github.event.issue.labels.*.name, 'write-article')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Draft and insert article
+        id: draft
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+        run: |
+          if node scripts/write-article.mjs > draft_output.txt 2> draft_error.txt; then
+            echo "success=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "success=false" >> "$GITHUB_OUTPUT"
+          fi
+          cat draft_output.txt draft_error.txt
+
+      - name: Commit and push
+        if: steps.draft.outputs.success == 'true'
+        run: |
+          git config user.name "apexwire-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add index.html
+          SLUG=$(grep '^SLUG=' draft_output.txt | cut -d= -f2-)
+          git commit -m "Add article: ${SLUG}"
+          git push
+
+      - name: Comment success
+        if: steps.draft.outputs.success == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TITLE=$(grep '^TITLE=' draft_output.txt | cut -d= -f2-)
+          SCHEDULED=$(grep '^SCHEDULED=' draft_output.txt | cut -d= -f2-)
+          SLUG=$(grep '^SLUG=' draft_output.txt | cut -d= -f2-)
+          if [ -n "$SCHEDULED" ]; then
+            MSG="Drafted **${TITLE}** (slug: \`${SLUG}\`) and scheduled it to publish at ${SCHEDULED}. It'll go live automatically at that time."
+          else
+            MSG="Drafted and published **${TITLE}** (slug: \`${SLUG}\`) — pull the latest \`main\` to see it in index.html."
+          fi
+          gh issue comment "${{ github.event.issue.number }}" --body "$MSG"
+          gh issue close "${{ github.event.issue.number }}"
+
+      - name: Comment failure
+        if: steps.draft.outputs.success == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo '```' > comment_body.txt
+          cat draft_error.txt >> comment_body.txt
+          echo '```' >> comment_body.txt
+          gh issue comment "${{ github.event.issue.number }}" --body-file comment_body.txt

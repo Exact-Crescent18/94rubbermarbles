@@ -1,21 +1,34 @@
-// Checks CAL_EVENTS in index.html for races that have no `result` yet,
-// asks Groq's Compound Mini (which has real built-in web search) whether
-// each one has actually happened and what the real result was, and
-// refreshes the news ticker. Never invents a result — if Groq can't
-// confirm one cleanly, the event is left untouched for a later run.
+// Hourly automation for ApexWire:
+//  1. Checks CAL_EVENTS for races with no `result` yet. Tries Orange Cat
+//     Blacktop (real structured data, free tier) first for the 9 series
+//     it covers; falls back to Groq Compound Mini's web search for the
+//     rest (ARCA, Indy NXT aren't covered by Blacktop at all) and for
+//     anything Blacktop can't resolve yet.
+//  2. When a result is newly confirmed, drafts a short recap article via
+//     Groq from the real facts and posts it to that series' "On the
+//     Wire" section.
+//  3. Refreshes the news ticker with current headlines.
+//  4. Publishes any scheduled (publishAt) articles whose time has come.
 //
-// Usage: GROQ_API_KEY=... node scripts/update-results.mjs
+// Usage: GROQ_API_KEY=... [BLACKTOP_API_KEY=...] node scripts/update-results.mjs
 
 import { readFileSync, writeFileSync } from 'node:fs';
+import { isBlacktopCovered, findEvent, getRaceResult } from './lib/blacktop.mjs';
+import { addArticle, publishDueArticles } from './lib/articles.mjs';
+import { parseNamedLiteral } from './lib/html-utils.mjs';
 
 const FILE = new URL('../index.html', import.meta.url);
 const GROQ_KEY = process.env.GROQ_API_KEY;
+const BLACKTOP_KEY = process.env.BLACKTOP_API_KEY; // optional — falls back to Groq-only if absent
 const MODEL = 'groq/compound-mini';
 const CALL_SPACING_MS = 4000; // spread requests out so we don't burst the free-tier TPM limit
 
 if (!GROQ_KEY) {
   console.error('GROQ_API_KEY is not set.');
   process.exit(1);
+}
+if (!BLACKTOP_KEY) {
+  console.log('BLACKTOP_API_KEY not set — using Groq web search for all series.');
 }
 
 function sleep(ms) {
@@ -71,6 +84,10 @@ function daysSince(dateStr) {
   return (Date.now() - eventDate.getTime()) / 86400000;
 }
 
+function slugify(s) {
+  return String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+}
+
 // Serializes a single CAL_EVENTS object back to the file's existing
 // single-quote JS-literal style. Keeps key order stable and predictable.
 function serializeEvent(ev) {
@@ -89,6 +106,73 @@ function serializeEvent(ev) {
   return `  {${parts.join(', ')}}`;
 }
 
+// Tries Blacktop (real data) first for covered series; returns
+// { winner, note } or null. Never guesses — a miss just returns null so
+// the caller can fall back to Groq.
+async function resultFromBlacktop(ev) {
+  if (!BLACKTOP_KEY || !isBlacktopCovered(ev.view)) return null;
+  try {
+    const event = await findEvent(ev.view, ev.date, BLACKTOP_KEY);
+    if (!event) return null;
+    const result = await getRaceResult(ev.view, event, BLACKTOP_KEY);
+    if (!result?.winner) return null;
+
+    // Blacktop gives us the real facts; ask Groq (no search needed, just
+    // phrasing) for one terse sentence in the site's existing style.
+    const notePrompt = `Write one terse, factual news-ticker-style sentence (margin of victory, notable storyline, or standings implication) about this real race result. Do not invent anything beyond what's given.
+Series: ${ev.series}. Race: ${ev.name}. Winner: ${result.winner}. Podium: ${result.podium.join(', ')}.
+Respond with ONLY the sentence, no preamble.`;
+    let note = `Winner: ${result.podium.join(', ')}.`;
+    try {
+      const reply = (await askGroq(notePrompt)).trim();
+      if (reply && reply.length < 300) note = reply;
+    } catch (e) {
+      console.log(`Groq note-phrasing failed for ${ev.name}, using plain podium line:`, e.message);
+    }
+    return { winner: result.winner, note, podium: result.podium, source: 'blacktop' };
+  } catch (e) {
+    console.log(`Blacktop lookup failed for ${ev.name}:`, e.message);
+    return null;
+  }
+}
+
+async function resultFromGroq(ev) {
+  const prompt = `Real-world race lookup. Series: ${ev.series}. Race: ${ev.name}. Venue: ${ev.venue || 'unknown'}. Scheduled date: ${ev.date}.
+Has this specific real race actually taken place yet, and if so, who won? Search for it.
+Respond with ONLY strict JSON, no other text:
+{"happened": true, "winner": "Full Name", "note": "one terse factual sentence — margin of victory, notable storyline, or standings implication"}
+or if it hasn't happened yet, or you cannot find a clearly confirmed result from a reliable source:
+{"happened": false}
+Never guess or invent a winner. Only report "happened": true if you found a real, verifiable result.`;
+
+  const reply = await askGroq(prompt);
+  const parsed = extractJson(reply);
+  if (parsed?.happened && parsed.winner && parsed.note) {
+    return { winner: parsed.winner, note: parsed.note, podium: [parsed.winner], source: 'groq' };
+  }
+  return null;
+}
+
+async function draftRecapArticle(ev, result) {
+  const prompt = `Write a short motorsport recap article as strict JSON, in the style of a terse, factual racing news site (not breathless or promotional). Base it ONLY on these confirmed real facts — do not invent additional details, quotes, or statistics beyond them.
+Series: ${ev.series}. Race: ${ev.name}. Venue: ${ev.venue || 'unknown'}. Date: ${ev.date}.
+Winner: ${result.winner}. Podium: ${result.podium.join(', ')}. Key fact: ${result.note}
+
+Respond with ONLY this JSON shape:
+{"title": "short headline, no clickbait", "dek": "one-sentence subhead", "body": ["paragraph 1", "paragraph 2", "paragraph 3"], "category": "Race Report", "readTime": "4 min read"}`;
+
+  try {
+    const reply = await askGroq(prompt);
+    const parsed = extractJson(reply);
+    if (parsed?.title && parsed?.dek && Array.isArray(parsed.body) && parsed.body.length) {
+      return parsed;
+    }
+  } catch (e) {
+    console.log(`Groq recap drafting failed for ${ev.name}:`, e.message);
+  }
+  return null;
+}
+
 async function main() {
   let html = readFileSync(FILE, 'utf8');
 
@@ -105,6 +189,8 @@ async function main() {
   // third-party input — so evaluating it as JS is safe here.
   const events = new Function(`return ${arrayLiteral}`)();
 
+  const CAL_SERIES = parseNamedLiteral(html, 'CAL_SERIES')?.value || {};
+
   let changed = 0;
   const changedNames = [];
 
@@ -112,39 +198,54 @@ async function main() {
     if (ev.result) continue;
     if (daysSince(ev.date) < 0.5) continue; // too soon, don't even ask
 
-    const prompt = `Real-world race lookup. Series: ${ev.series}. Race: ${ev.name}. Venue: ${ev.venue || 'unknown'}. Scheduled date: ${ev.date}.
-Has this specific real race actually taken place yet, and if so, who won? Search for it.
-Respond with ONLY strict JSON, no other text:
-{"happened": true, "winner": "Full Name", "note": "one terse factual sentence — margin of victory, notable storyline, or standings implication"}
-or if it hasn't happened yet, or you cannot find a clearly confirmed result from a reliable source:
-{"happened": false}
-Never guess or invent a winner. Only report "happened": true if you found a real, verifiable result.`;
-
-    let parsed;
-    try {
-      const reply = await askGroq(prompt);
-      parsed = extractJson(reply);
-    } catch (e) {
-      console.error(`Groq call failed for ${ev.name}:`, e.message);
-      await sleep(CALL_SPACING_MS);
-      continue;
+    let result = await resultFromBlacktop(ev);
+    if (!result) {
+      try {
+        result = await resultFromGroq(ev);
+      } catch (e) {
+        console.error(`Groq call failed for ${ev.name}:`, e.message);
+      }
     }
+    await sleep(CALL_SPACING_MS);
 
-    if (parsed?.happened && parsed.winner && parsed.note) {
-      ev.result = { winner: parsed.winner, note: parsed.note };
+    if (result) {
+      ev.result = { winner: result.winner, note: result.note };
       delete ev.sessions;
       delete ev.watch;
       changed++;
       changedNames.push(ev.name);
-      console.log(`Updated: ${ev.name} — ${parsed.winner}`);
-    }
-    await sleep(CALL_SPACING_MS);
-  }
+      console.log(`Updated (${result.source}): ${ev.name} — ${result.winner}`);
 
-  if (changed > 0) {
-    const newLiteral = `[\n${events.map(serializeEvent).join(',\n')}\n]`;
-    html = html.slice(0, start) + 'const CAL_EVENTS = ' + newLiteral + html.slice(end + 2);
-    writeFileSync(FILE, html, 'utf8');
+      // Rewrite CAL_EVENTS now so the recap-article step below (which
+      // touches ARTICLES/HTML separately) works off up-to-date content.
+      const newLiteral = `[\n${events.map(serializeEvent).join(',\n')}\n]`;
+      html = html.slice(0, start) + 'const CAL_EVENTS = ' + newLiteral + html.slice(end + 2);
+      writeFileSync(FILE, html, 'utf8');
+
+      const draft = await draftRecapArticle(ev, result);
+      await sleep(CALL_SPACING_MS);
+      if (draft) {
+        const slug = `${ev.view}-${slugify(ev.name)}-${ev.date}`;
+        const dateLabel = new Date(ev.date + 'T12:00:00Z').toLocaleDateString('en-US', {
+          day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC',
+        });
+        html = addArticle(html, slug, {
+          view: ev.view,
+          chip: ev.chip,
+          chipLogo: CAL_SERIES[ev.view]?.logo || '',
+          chipText: ev.series,
+          title: draft.title,
+          category: draft.category || 'Race Report',
+          readTime: draft.readTime || '4 min read',
+          date: dateLabel,
+          track: '',
+          dek: draft.dek,
+          body: draft.body,
+        });
+        writeFileSync(FILE, html, 'utf8');
+        console.log(`Posted recap article: ${slug}`);
+      }
+    }
   }
 
   // --- Ticker refresh: one current headline per series, best-effort ---
@@ -182,6 +283,15 @@ Never guess or invent a winner. Only report "happened": true if you found a real
     }
   }
 
+  // --- Publish any scheduled articles whose time has come ---
+  const { html: publishedHtml, publishedSlugs } = publishDueArticles(html);
+  if (publishedSlugs.length) {
+    html = publishedHtml;
+    writeFileSync(FILE, html, 'utf8');
+    changed++;
+    console.log(`Published scheduled articles: ${publishedSlugs.join(', ')}`);
+  }
+
   if (changed === 0) {
     console.log('Nothing to update this run.');
     return;
@@ -204,7 +314,7 @@ Never guess or invent a winner. Only report "happened": true if you found a real
     process.exit(1);
   }
 
-  console.log(`Validation passed. ${changedNames.length ? 'Results: ' + changedNames.join(', ') : 'Ticker refreshed.'}`);
+  console.log(`Validation passed. ${changedNames.length ? 'Results: ' + changedNames.join(', ') : 'Ticker/articles refreshed.'}`);
 }
 
 main().catch((e) => {
