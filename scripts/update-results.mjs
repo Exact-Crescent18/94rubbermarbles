@@ -9,6 +9,10 @@
 //     Wire" section.
 //  3. Refreshes the news ticker with current headlines.
 //  4. Publishes any scheduled (publishAt) articles whose time has come.
+//  5. Rebuilds any series' "Next Up" panel + schedule table that's fallen
+//     out of sync with CAL_EVENTS (its featured race already has a result,
+//     or the season just ended) — see lib/nextup.mjs for the staleness
+//     rules and why there's no live countdown in rebuilt panels.
 //
 // Usage: GROQ_API_KEY=... [BLACKTOP_API_KEY=...] node scripts/update-results.mjs
 
@@ -16,6 +20,8 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { isBlacktopCovered, findEvent, getRaceResult, getStandingsSummary } from './lib/blacktop.mjs';
 import { addArticle, publishDueArticles } from './lib/articles.mjs';
 import { parseNamedLiteral } from './lib/html-utils.mjs';
+import { refreshAllNextUpPanels } from './lib/nextup.mjs';
+import { SERIES_META } from './lib/series-meta.mjs';
 
 const FILE = new URL('../index.html', import.meta.url);
 const GROQ_KEY = process.env.GROQ_API_KEY;
@@ -352,6 +358,19 @@ Respond with ONLY the sentence, no preamble.`;
     writeFileSync(FILE, html, 'utf8');
     changed++;
     console.log(`Published scheduled articles: ${publishedSlugs.join(', ')}`);
+  }
+
+  // --- Rebuild any series' Next Up panel that's fallen out of sync ---
+  const freshCalSeries = parseNamedLiteral(html, 'CAL_SERIES')?.value || {};
+  const freshEvents = parseNamedLiteral(html, 'CAL_EVENTS')?.value || [];
+  const { html: nextUpHtml, changedViews } = await refreshAllNextUpPanels(
+    html, freshEvents, SERIES_META, freshCalSeries, askGroqPlain
+  );
+  if (changedViews.length) {
+    html = nextUpHtml;
+    writeFileSync(FILE, html, 'utf8');
+    changed++;
+    console.log(`Rebuilt Next-Up panels for: ${changedViews.join(', ')}`);
   }
 
   if (changed === 0) {
