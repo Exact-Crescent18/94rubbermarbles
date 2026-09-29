@@ -20,7 +20,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { isBlacktopCovered, findEvent, getRaceResult, getStandingsSummary } from './lib/blacktop.mjs';
 import { addArticle, publishDueArticles } from './lib/articles.mjs';
 import { parseNamedLiteral } from './lib/html-utils.mjs';
-import { refreshAllNextUpPanels } from './lib/nextup.mjs';
+import { refreshAllNextUpPanels, refreshHomeEventsGrid } from './lib/nextup.mjs';
 import { SERIES_META } from './lib/series-meta.mjs';
 
 const FILE = new URL('../index.html', import.meta.url);
@@ -59,7 +59,16 @@ function sleep(ms) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
+// Tallied across the whole run so we can tell "nothing needed doing" apart
+// from "every single Groq call failed" — the latter used to be swallowed
+// silently by the per-call try/catches below, leaving a misleadingly green
+// workflow run for days while nothing actually updated. See the check at
+// the end of main().
+let groqAttempts = 0;
+let groqErrors = 0;
+
 async function askGroqModel(model, prompt, attempt = 1) {
+  if (attempt === 1) groqAttempts++;
   const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
     signal: AbortSignal.timeout(45000), // compound's web search can be slow, but never indefinite
@@ -91,7 +100,9 @@ async function askGroqModel(model, prompt, attempt = 1) {
   }
 
   if (!res.ok) {
-    throw new Error(`Groq API error ${res.status}: ${await res.text()}`);
+    groqErrors++;
+    const bodyText = await res.text();
+    throw new Error(`Groq API error ${res.status}: ${bodyText.slice(0, 300)}`);
   }
   const data = await res.json();
   return data.choices?.[0]?.message?.content ?? '';
@@ -371,6 +382,31 @@ Respond with ONLY the sentence, no preamble.`;
     writeFileSync(FILE, html, 'utf8');
     changed++;
     console.log(`Rebuilt Next-Up panels for: ${changedViews.join(', ')}`);
+  }
+
+  // --- Rebuild the homepage's separate "On Track Next" grid if stale ---
+  const homeGridEvents = parseNamedLiteral(html, 'CAL_EVENTS')?.value || [];
+  const homeGridCalSeries = parseNamedLiteral(html, 'CAL_SERIES')?.value || {};
+  const homeGridResult = refreshHomeEventsGrid(html, homeGridEvents, SERIES_META, homeGridCalSeries);
+  if (homeGridResult.changed) {
+    html = homeGridResult.html;
+    writeFileSync(FILE, html, 'utf8');
+    changed++;
+    console.log(`Rebuilt homepage event grid: ${homeGridResult.featuredViews.join(', ')}`);
+  }
+
+  // If we actually asked Groq anything this run and every single call
+  // failed, that's not "nothing needed doing" — it's GROQ_API_KEY being
+  // invalid/expired, out of quota, or a model name Groq has since removed.
+  // Surfacing that as a hard failure (red X in Actions) beats a green
+  // checkmark that silently hides a 100% failure rate for days.
+  if (groqAttempts > 0 && groqErrors === groqAttempts) {
+    console.error(
+      `All ${groqAttempts} Groq API call(s) failed this run. GROQ_API_KEY is likely invalid, expired, ` +
+      `out of quota, or one of the model names (${MODEL} / ${PLAIN_MODEL}) is no longer available. ` +
+      `Check https://console.groq.com and the GROQ_API_KEY secret in the repo's Actions settings.`
+    );
+    process.exit(1);
   }
 
   if (changed === 0) {

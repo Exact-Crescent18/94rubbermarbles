@@ -40,9 +40,16 @@ export function computeSeriesState(events, view) {
 // images so a newly-featured race can reuse a real one instead of the
 // script guessing a URL. Matches loosely on shared significant words
 // between the target venue string and each image's alt text.
+// Includes not just venue/generic terms but also series-template words
+// ("race", "rally") that recur across every event name in a series —
+// without these, e.g. "Race at Salem" and "Race at WWT Raceway" (or
+// "Rally Chile Biobío" and "Rally Italia Sardegna") share only that one
+// generic word and sameRace() below would wrongly call them the same
+// event, since they have no numeric tokens to disambiguate with.
 const STOPWORDS = new Set([
   'circuit', 'raceway', 'speedway', 'international', 'diagram', 'track', 'map', 'the',
   'street', 'course', 'motor', 'grand', 'prix', 'of', 'at', 'route', 'layout', 'of,',
+  'race', 'rally',
 ]);
 
 function significantWords(s) {
@@ -325,6 +332,108 @@ Respond with ONLY the sentence(s), no preamble.`;
   }
 
   return { html, changedViews };
+}
+
+// The homepage's "On Track Next" grid is a separate, hand-authored
+// section (4 <div class="event-card"> blocks, different markup than the
+// per-series next-up-panel) that refreshAllNextUpPanels above never
+// touches — it only looks inside id="view-X" sections. That gap is why
+// it can sit stale (e.g. still showing a series whose season already
+// ended) even while every per-series page is current. This picks the
+// first 4 series from HOME_FEATURED_PRIORITY that still have a genuine
+// upcoming race, so a season ending automatically rotates it out instead
+// of leaving a dead card behind.
+const HOME_FEATURED_PRIORITY = [
+  'f1', 'nascar-cup', 'motogp', 'indycar', 'wec', 'nascar-oreilly',
+  'wrc', 'nascar-truck', 'arca', 'formula-e', 'indy-nxt',
+];
+
+// No live countdown here either, for the same reason as the per-series
+// panels: parsing a session time string back into a precise timezone-
+// aware timestamp is exactly the bug class that's bitten this project
+// repeatedly. Cells render as "--" (already the site's own convention
+// for "no live countdown", per tickCountdowns()'s FIN state) and the
+// static date/time line underneath carries the real info.
+export function renderEventCard({ chip, chipLogo, chipText, roundLabel, next, trackImg }) {
+  const raceSession = next.sessions?.find((s) => s.label === 'Race');
+  const dateLine = raceSession ? raceSession.time : '';
+  return `    <div class="event-card">
+      <div class="series-row"><span class="chip ${chip}"><img class="chip-logo" src="${chipLogo}" alt="${chipText} logo">${chipText}</span><span class="round-num">${roundLabel}</span></div>
+      <div class="track-svg"><img class="diagram" src="${trackImg.src}" alt="${trackImg.alt}"></div>
+      <h3>${next.name}</h3>
+      <div class="venue">${next.venue || ''}</div>
+      <div class="countdown">
+        <div class="cell"><span class="n dd">--</span><span class="u">DAYS</span></div>
+        <div class="cell"><span class="n hh">--</span><span class="u">HRS</span></div>
+        <div class="cell"><span class="n mm">--</span><span class="u">MIN</span></div>
+        <div class="cell"><span class="n ss">--</span><span class="u">SEC</span></div>
+      </div>
+      <div class="event-date"><span>${next.date}</span><span>${dateLine}</span></div>
+    </div>`;
+}
+
+function splitEventCards(gridHtml) {
+  const marker = '<div class="event-card">';
+  const idxs = [];
+  let i = gridHtml.indexOf(marker);
+  while (i !== -1) {
+    idxs.push(i);
+    i = gridHtml.indexOf(marker, i + marker.length);
+  }
+  return idxs.map((start, n) => gridHtml.slice(start, idxs[n + 1] ?? gridHtml.length));
+}
+
+// Rebuilds the homepage grid only if what's currently there doesn't
+// match the 4 series/races it should be showing right now — same
+// sameRace() staleness check used for the per-series panels, so a purely
+// cosmetic difference (sponsor suffix, etc.) doesn't trigger a rebuild.
+export function refreshHomeEventsGrid(html, events, seriesMeta, calSeries) {
+  const gridMarker = '<section class="events-grid">';
+  const gridStart = html.indexOf(gridMarker);
+  if (gridStart === -1) return { html, changed: false };
+  const gridEnd = html.indexOf('</section>', gridStart) + '</section>'.length;
+  const oldGrid = html.slice(gridStart, gridEnd);
+
+  const featured = [];
+  for (const view of HOME_FEATURED_PRIORITY) {
+    const state = computeSeriesState(events, view);
+    if (state?.mode === 'ongoing') featured.push({ view, state });
+    if (featured.length === 4) break;
+  }
+
+  const existingCards = splitEventCards(oldGrid).map((chunk) => {
+    const title = chunk.match(/<h3>([^<]*)<\/h3>/)?.[1] || null;
+    const date = chunk.match(/data-target="(\d{4}-\d{2}-\d{2})/)?.[1] || null;
+    return { title, date };
+  });
+
+  const allCurrent = featured.length > 0 && featured.every(({ state }) =>
+    existingCards.some((c) => sameRace(c.title, state.next.name, c.date, state.next.date))
+  ) && existingCards.length === featured.length;
+
+  if (allCurrent) return { html, changed: false };
+
+  const images = harvestTrackImages(html);
+  const cards = featured.map(({ view, state }) => {
+    const meta = seriesMeta[view];
+    const seriesInfo = calSeries[view];
+    const trackImg = findTrackImage(images, state.next.venue || state.next.name) || {
+      src: seriesInfo?.logo || '',
+      alt: `${meta?.chipText || view} logo`,
+    };
+    return renderEventCard({
+      chip: meta?.chip || view,
+      chipLogo: seriesInfo?.logo || '',
+      chipText: meta?.chipText || view,
+      roundLabel: `Round ${state.round} / ${state.total}`,
+      next: state.next,
+      trackImg,
+    });
+  });
+
+  const newGrid = `${gridMarker}\n${cards.join('\n')}\n  </section>`;
+  const newHtml = html.slice(0, gridStart) + newGrid + html.slice(gridEnd);
+  return { html: newHtml, changed: true, featuredViews: featured.map((f) => f.view) };
 }
 
 export function renderScheduleTable(state) {
