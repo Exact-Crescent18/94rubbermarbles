@@ -11,7 +11,10 @@ permissions:
 jobs:
   update:
     runs-on: ubuntu-latest
-    timeout-minutes: 8 # safety net — normal runs take under 2 min even with retries
+    timeout-minutes: 25 # safety net against a genuine hang; raised from 8 since a real backlog
+                         # (many unresolved events x up to 3 retries x 4-16s backoff, plus 11
+                         # series' worth of ticker calls) can legitimately take a while to churn
+                         # through in one run — 8 min was killing runs mid-backlog, not just hangs
     steps:
       - uses: actions/checkout@v4
 
