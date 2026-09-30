@@ -682,9 +682,7 @@ document.getElementById('token-input').addEventListener('keydown', e => { if (e.
 
 document.getElementById('discard-btn').addEventListener('click', () => {
   if (!confirm('Discard all staged changes? This cannot be undone.')) return;
-  workingHtml = originalHtml;
-  setStatus('', '');
-  loadFrame();
+  location.href = 'index.html';
 });
 
 document.getElementById('publish-btn').addEventListener('click', async () => {
@@ -694,7 +692,8 @@ document.getElementById('publish-btn').addEventListener('click', async () => {
   try {
     await ghSaveFile(FILE_PATH, workingHtml, 'Edit via site editor', false);
     originalHtml = workingHtml;
-    setStatus('Published — the live site will update within a minute or two.', 'ok');
+    setStatus('Published — taking you to the site…', 'ok');
+    setTimeout(() => { location.href = 'index.html'; }, 1400);
   } catch (e) {
     setStatus(e.message, 'error');
   }

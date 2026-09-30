@@ -162,9 +162,18 @@ footer .social-links{margin-left:4px;}
 .hero-art img{width:100%; height:100%; object-fit:cover;}
 
 /* ---------- HERO CAROUSEL (Sector 01 — Lead Stories) ---------- */
-.hero-carousel{position:relative;}
-.hero-carousel .hero{display:none;}
-.hero-carousel .hero.active{display:grid;}
+.hero-carousel{position:relative; overflow:hidden;}
+.hero-carousel .hero{
+  position:absolute; top:0; left:0; right:0;
+  opacity:0; pointer-events:none;
+  transition:opacity .6s ease;
+}
+.hero-carousel .hero.active{
+  position:relative; opacity:1; pointer-events:auto;
+}
+@media (prefers-reduced-motion:reduce){
+  .hero-carousel .hero{transition:none;}
+}
 .hero-dots{display:flex; gap:8px; justify-content:center; margin-top:18px;}
 .hero-dot{width:8px; height:8px; border-radius:50%; background:var(--rule); border:none; cursor:pointer; padding:0;}
 .hero-dot.active{background:var(--amber);}
@@ -653,58 +662,58 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
   </div>
 
   <!-- HERO_CAROUSEL_START -->
-  <div class="hero-carousel">
-    <section class="hero active" data-slug="f1-antonelli-monza">
-      <div>
-        <div class="hero-tag">Race Report</div>
-        <h1>19th to 1st: Antonelli's home win rewrites the title fight</h1>
-        <p class="deck">A grid penalty put him at the back. A virtual safety car and a late pass on his own teammate put him on top of the podium — and 66 points clear in the standings.</p>
-        <div class="hero-meta">
-          <span><b>Formula 1</b></span>
-          <span>6 Sep 2026</span>
-        </div>
+<div class="hero-carousel">
+  <section class="hero active" data-slug="f1-baku-russell-thriller">
+    <div>
+      <div class="hero-tag">Race Report</div>
+      <h1>Russell holds off Verstappen by 0.196s in the closest finish since 1986</h1>
+      <p class="deck">George Russell converted pole into a win at Baku, beating Max Verstappen to the line by less than two tenths — the tightest margin in a Formula 1 race in nearly four decades.</p>
+      <div class="hero-meta">
+        <span><b>Formula 1</b></span>
+        <span>26 Sep 2026</span>
       </div>
-      <div class="hero-art">
-        <span class="corner-tag">TRACK MAP</span>
-        <span class="corner-tag br">SECTOR 1 · 2 · 3</span>
-        <img src="https://upload.wikimedia.org/wikipedia/commons/8/8d/Monza_Map-2021.png" alt="Formula 1 art">
+    </div>
+    <div class="hero-art">
+      <span class="corner-tag">TRACK MAP</span>
+      <span class="corner-tag br">SECTOR 1 · 2 · 3</span>
+      <img src="https://upload.wikimedia.org/wikipedia/commons/2/2d/Formula_One_logo.svg" alt="Formula 1 art">
+    </div>
+  </section>
+  <section class="hero" data-slug="cup-kansas-larson-form">
+    <div>
+      <div class="hero-tag">Race Report</div>
+      <h1>Larson doubles down: two Round of 12 wins in four races</h1>
+      <p class="deck">A late pass on Chase Briscoe at Kansas gives Larson his second Chase win in four races, with a 51-race winless streak now a distant memory.</p>
+      <div class="hero-meta">
+        <span><b>NASCAR Cup</b></span>
+        <span>27 Sep 2026</span>
       </div>
-    </section>
-    <section class="hero" data-slug="cup-homestead">
-      <div>
-        <div class="hero-tag">Explainer</div>
-        <h1>Homestead returns: inside the new Championship Weekend</h1>
-        <p class="deck">The title decider moves back to Homestead-Miami for the first time since 2019.</p>
-        <div class="hero-meta">
-          <span><b>NASCAR Cup</b></span>
-          <span>17 Aug 2026</span>
-        </div>
+    </div>
+    <div class="hero-art">
+      <span class="corner-tag">TRACK MAP</span>
+      <span class="corner-tag br">SECTOR 1 · 2 · 3</span>
+      <img src="https://upload.wikimedia.org/wikipedia/commons/4/48/Kansas_Speedway_2024.svg" alt="NASCAR Cup art">
+    </div>
+  </section>
+  <section class="hero" data-slug="motogp-acosta-breakthrough">
+    <div>
+      <div class="hero-tag">Race Report</div>
+      <h1>Acosta finally breaks through — KTM's first MotoGP win since 2022</h1>
+      <p class="deck">Pedro Acosta won the Austrian Grand Prix for his first premier-class victory after a record 15 podiums without a win, while Marc Márquez took over the championship lead a week earlier at Misano.</p>
+      <div class="hero-meta">
+        <span><b>MotoGP</b></span>
+        <span>20 Sep 2026</span>
       </div>
-      <div class="hero-art">
-        <span class="corner-tag">TRACK MAP</span>
-        <span class="corner-tag br">SECTOR 1 · 2 · 3</span>
-        <img src="https://upload.wikimedia.org/wikipedia/commons/c/c7/Homestead_Miami_Speedway_2024.svg" alt="NASCAR Cup art">
-      </div>
-    </section>
-    <section class="hero" data-slug="wec-qatar-bahrain">
-      <div>
-        <div class="hero-tag">Explainer</div>
-        <h1>Qatar and Bahrain are out — Barcelona and Monza are in</h1>
-        <p class="deck">Regional travel disruptions forced a late reshuffle of the season's final two rounds.</p>
-        <div class="hero-meta">
-          <span><b>WEC</b></span>
-          <span>17 Aug 2026</span>
-        </div>
-      </div>
-      <div class="hero-art">
-        <span class="corner-tag">TRACK MAP</span>
-        <span class="corner-tag br">SECTOR 1 · 2 · 3</span>
-        <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Austin_circuit.svg" alt="WEC art">
-      </div>
-    </section>
-    <div class="hero-dots"><button class="hero-dot active" data-index="0" aria-label="Story 1"></button><button class="hero-dot" data-index="1" aria-label="Story 2"></button><button class="hero-dot" data-index="2" aria-label="Story 3"></button></div>
-  </div>
-  <!-- HERO_CAROUSEL_END -->
+    </div>
+    <div class="hero-art">
+      <span class="corner-tag">TRACK MAP</span>
+      <span class="corner-tag br">SECTOR 1 · 2 · 3</span>
+      <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/Red_Bull_Ring_moto_2022.svg" alt="MotoGP art">
+    </div>
+  </section>
+  <div class="hero-dots"><button class="hero-dot active" data-index="0" aria-label="Story 1"></button><button class="hero-dot" data-index="1" aria-label="Story 2"></button><button class="hero-dot" data-index="2" aria-label="Story 3"></button></div>
+</div>
+<!-- HERO_CAROUSEL_END -->
 
   <div class="sector-label" id="home-upcoming">
     <span class="num">S2</span>
@@ -1169,6 +1178,16 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 
   <div class="sector-label"><span class="num">S5</span><span class="name">Sector 05 — On the Wire</span><span class="line"></span></div>
   <section class="news-grid flat" style="margin-bottom:20px;">
+    <a class="story" href="#article:f1-baku-russell-thriller" data-view="article">
+      <div class="art"><img class="diagram" src="https://upload.wikimedia.org/wikipedia/commons/a/af/2023_F1_CourseLayout_Azerbaijan.svg" alt="Formula 1 art"></div>
+      <div class="story-body">
+        <span class="chip f1"><img class="chip-logo" src="https://upload.wikimedia.org/wikipedia/commons/2/2d/Formula_One_logo.svg" alt="Formula 1 logo">Formula 1</span>
+        <h4>Russell holds off Verstappen by 0.196s in the closest finish since 1986</h4>
+        <p>George Russell converted pole into a win at Baku, beating Max Verstappen to the line by less than two tenths — the tightest margin in a Formula 1 race in nearly four decades.</p>
+        <div class="meta"><span>Race Report</span><span>4 min</span></div>
+      </div>
+    </a>
+
     
     <a class="story" href="#article:f1-antonelli-monza" data-view="article">
       <div class="art"><img class="diagram" src="https://upload.wikimedia.org/wikipedia/commons/8/8d/Monza_Map-2021.png" alt="Autodromo Nazionale Monza circuit diagram"></div>
@@ -1286,6 +1305,16 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 
   <div class="sector-label"><span class="num">S5</span><span class="name">Sector 05 — On the Wire</span><span class="line"></span></div>
   <section class="news-grid flat" style="margin-bottom:20px;">
+    <a class="story" href="#article:cup-kansas-larson-form" data-view="article">
+      <div class="art"><img class="diagram" src="https://upload.wikimedia.org/wikipedia/commons/c/cb/NASCAR_Cup_Series_logo.svg" alt="NASCAR Cup art"></div>
+      <div class="story-body">
+        <span class="chip nascar"><img class="chip-logo" src="https://upload.wikimedia.org/wikipedia/commons/c/cb/NASCAR_Cup_Series_logo.svg" alt="NASCAR Cup logo">NASCAR Cup</span>
+        <h4>Larson doubles down: two Round of 12 wins in four races</h4>
+        <p>A late pass on Chase Briscoe at Kansas gives Larson his second Chase win in four races, with a 51-race winless streak now a distant memory.</p>
+        <div class="meta"><span>Race Report</span><span>4 min</span></div>
+      </div>
+    </a>
+
     
     <a class="story" href="#article:cup-bubble" data-view="article">
       <div class="art"><img class="diagram" src="https://upload.wikimedia.org/wikipedia/commons/8/8e/New_Hampshire_Motor_Speedway_2024.svg" alt="New Hampshire Motor Speedway circuit diagram"></div>
@@ -1810,6 +1839,16 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 
   <div class="sector-label"><span class="num">S5</span><span class="name">Sector 05 — On the Wire</span><span class="line"></span></div>
   <section class="news-grid flat" style="margin-bottom:20px;">
+    <a class="story" href="#article:motogp-acosta-breakthrough" data-view="article">
+      <div class="art"><img class="diagram" src="https://upload.wikimedia.org/wikipedia/commons/f/f9/MotoGP_logo_%282024%29.svg" alt="MotoGP art"></div>
+      <div class="story-body">
+        <span class="chip moto"><img class="chip-logo" src="https://upload.wikimedia.org/wikipedia/commons/f/f9/MotoGP_logo_%282024%29.svg" alt="MotoGP logo">MotoGP</span>
+        <h4>Acosta finally breaks through — KTM's first MotoGP win since 2022</h4>
+        <p>Pedro Acosta won the Austrian Grand Prix for his first premier-class victory after a record 15 podiums without a win, while Marc Márquez took over the championship lead a week earlier at Misano.</p>
+        <div class="meta"><span>Race Report</span><span>4 min</span></div>
+      </div>
+    </a>
+
     
     <a class="story" href="#article:moto-aragon" data-view="article">
       <div class="art"><img class="diagram" src="https://upload.wikimedia.org/wikipedia/commons/c/c9/Circuito_-_Ciudad_del_Motor_de_Aragon_Alca%C3%B1iz_Spain.svg" alt="MotorLand Aragón circuit diagram"></div>
@@ -2406,7 +2445,7 @@ const TRACKS = {
 // scripts/lib/articles.mjs's addArticle() pushes every freshly-published
 // article here (capped, oldest dropped) whenever a recap or prompted
 // article goes live.
-const LEAD_STORIES = ['f1-antonelli-monza', 'cup-homestead', 'wec-qatar-bahrain'];
+const LEAD_STORIES = ['f1-baku-russell-thriller', 'cup-kansas-larson-form', 'motogp-acosta-breakthrough'];
 
 const ARTICLES = {
   'f1-back-from-break': {
@@ -2480,7 +2519,7 @@ const ARTICLES = {
     ],
   },
   'oreilly-xfinity-gone': {
-    view:'nascar-oreilly', chip:'nascar', chipLogo:"https://upload.wikimedia.org/wikipedia/commons/4/4f/NASCAR_OAP_SERIES_Logo.svg", chipText:"O'Reilly Series",
+    view:'nascar-oreilly', chip:'nascar', chipLogo:'https://upload.wikimedia.org/wikipedia/commons/4/4f/NASCAR_OAP_SERIES_Logo.svg', chipText:'O\'Reilly Series',
     title:"Xfinity is gone: inside NASCAR's new second-tier name", category:'Explainer', readTime:'3 min read', date:'17 Aug 2026',
     track:'daytona',
     dek:"O'Reilly Auto Parts takes over title sponsorship in 2026, ending an 11-year run for Xfinity.",
@@ -2491,7 +2530,7 @@ const ARTICLES = {
     ],
   },
   'oreilly-road-to-homestead': {
-    view:'nascar-oreilly', chip:'nascar', chipLogo:"https://upload.wikimedia.org/wikipedia/commons/4/4f/NASCAR_OAP_SERIES_Logo.svg", chipText:"O'Reilly Series",
+    view:'nascar-oreilly', chip:'nascar', chipLogo:'https://upload.wikimedia.org/wikipedia/commons/4/4f/NASCAR_OAP_SERIES_Logo.svg', chipText:'O\'Reilly Series',
     title:"The road to Homestead: this year's title contenders", category:'Analysis', readTime:'4 min read', date:'17 Aug 2026',
     track:'homestead',
     dek:"A season of Saturday racing builds to a single championship weekend in South Florida.",
@@ -2661,6 +2700,7 @@ const ARTICLES = {
   'wrc-pajari-hattrick': {
     view:'wrc', chip:'wrc', chipLogo:'https://upload.wikimedia.org/wikipedia/commons/b/bb/WRC_logo.svg', chipText:'WRC',
     title:"Pajari's hat-trick puts Evans on notice", category:'Analysis', readTime:'4 min read', date:'31 Aug 2026',
+    track:'',
     dek:"Three wins in a row is a WRC first — and it's turned a comfortable title lead into a genuine fight.",
     body:[
       "Sami Pajari's victory at Rally del Paraguay was his third in a row, following wins in Estonia and his home event in Finland — the first time any driver has opened a run of consecutive WRC victories with their first three career wins. Fittingly, it came the hard way: a water leak on his GR Yaris on Friday morning, then a composed recovery once Elfyn Evans and Hayden Paddon both picked up tyre trouble on Saturday's brutal stage seven.",
@@ -2672,6 +2712,7 @@ const ARTICLES = {
   'wrc-super-sunday': {
     view:'wrc', chip:'wrc', chipLogo:'https://upload.wikimedia.org/wikipedia/commons/b/bb/WRC_logo.svg', chipText:'WRC',
     title:"Power Stage and Super Sunday, explained", category:'Explainer', readTime:'3 min read', date:'17 Aug 2026',
+    track:'',
     dek:"Up to 10 extra points are on the table before the rally even technically ends.",
     body:[
       "Rally results have always rewarded outright pace — 25 points down to 1 for the top ten classified crews — but the modern WRC scoring system layers two more bonus opportunities on top, both confined to the final day of competition.",
@@ -2682,6 +2723,7 @@ const ARTICLES = {
   'formula-e-gen4': {
     view:'formula-e', chip:'formula-e', chipLogo:'https://upload.wikimedia.org/wikipedia/commons/a/a4/FIA_Formula_E_World_Championship_Logo.svg', chipText:'Formula E',
     title:"GEN4 is coming: everything that's changing", category:'Explainer', readTime:'4 min read', date:'24 Jun 2026',
+    track:'',
     dek:"More power, permanent all-wheel drive, and a night race in Jeddah to kick it all off.",
     body:[
       "Formula E's Gen3 Evo era wrapped up in London in mid-August, and the championship now has four months to build anticipation for its biggest technical leap yet. The GEN4 car doubles down on the areas that made Gen3 distinctive — all-wheel drive, heavy regeneration, street-circuit agility — while adding a genuine jump in outright performance.",
@@ -2693,11 +2735,45 @@ const ARTICLES = {
   'formula-e-calendar': {
     view:'formula-e', chip:'formula-e', chipLogo:'https://upload.wikimedia.org/wikipedia/commons/a/a4/FIA_Formula_E_World_Championship_Logo.svg', chipText:'Formula E',
     title:"Inside Formula E's biggest-ever calendar", category:'Preview', readTime:'3 min read', date:'24 Jun 2026',
+    track:'',
     dek:"21 races, 13 cities, three brand-new venues — what's driving the expansion.",
     body:[
       "The 2026-27 season will run 21 races across 13 events in 11 countries — the largest footprint in Formula E's history, up from 17 races at 11 venues the previous season. The championship is leaning into that scale deliberately: eight of the thirteen events are now double-headers, pairing back-to-back race weekends in the same city for the first time in the sport's history at venues like Berlin and Monaco.",
       "Geographically, the calendar clusters races by continent to cut down on travel between rounds — the season opens in the Middle East (Jeddah), swings through the Americas in the new year (Mexico City, the series' first visit to Austin's Circuit of the Americas, Miami, and São Paulo), then spends the back half of the season working through Europe and Asia before finishing in Tokyo.",
       "The three new venues say a lot about where the series is heading. Brands Hatch takes over as Formula E's UK home from London's ExCeL circuit, while COTA and Zandvoort mark a broader shift toward permanent, higher-speed circuits — a deliberate response to the GEN4 car's extra performance, which needs more room to stretch its legs than a tight downtown street course can offer.",
+    ],
+  },
+  'cup-kansas-larson-form': {
+    view:'nascar-cup', chip:'nascar', chipLogo:'https://upload.wikimedia.org/wikipedia/commons/c/cb/NASCAR_Cup_Series_logo.svg', chipText:'NASCAR Cup',
+    title:"Larson doubles down: two Round of 12 wins in four races", category:'Race Report', readTime:'4 min read', date:'27 Sep 2026',
+    track:'kansas',
+    dek:"A late pass on Chase Briscoe at Kansas gives Larson his second Chase win in four races, with a 51-race winless streak now a distant memory.",
+    body:[
+      "Kyle Larson passed Chase Briscoe with seven laps to go at Kansas Speedway and led 235 laps to win the Hollywood Casino 400, his second Round of 12 victory in four Chase races.",
+      "It capped a turnaround that started two weeks earlier at World Wide Technology Raceway, where Larson snapped a 51-race winless streak by holding off teammate Alex Bowman for the Enjoy Illinois 300.",
+      "With two wins already banked in the Round of 12, Larson heads to the next cutoff race in control of his own seeding rather than racing on points alone.",
+    ],
+  },
+  'f1-baku-russell-thriller': {
+    view:'f1', chip:'f1', chipLogo:'https://upload.wikimedia.org/wikipedia/commons/2/2d/Formula_One_logo.svg', chipText:'Formula 1',
+    title:"Russell holds off Verstappen by 0.196s in the closest finish since 1986", category:'Race Report', readTime:'4 min read', date:'26 Sep 2026',
+    track:'',
+    dek:"George Russell converted pole into a win at Baku, beating Max Verstappen to the line by less than two tenths — the tightest margin in a Formula 1 race in nearly four decades.",
+    body:[
+      "George Russell won the Azerbaijan Grand Prix from pole position, crossing the line just 0.196 seconds ahead of Max Verstappen after a Baku street race that came down to the final lap.",
+      "It is the closest finish in Formula 1 since the 1986 Spanish Grand Prix, a margin so thin that Verstappen had a run at the line in the final sector before Russell held the position through the last corner.",
+      "The result keeps Russell in the thick of the title picture alongside Mercedes teammate Kimi Antonelli, with the championship fight remaining unsettled heading into the next rounds.",
+    ],
+  },
+  'motogp-acosta-breakthrough': {
+    view:'motogp', chip:'moto', chipLogo:'https://upload.wikimedia.org/wikipedia/commons/f/f9/MotoGP_logo_%282024%29.svg', chipText:'MotoGP',
+    title:"Acosta finally breaks through — KTM's first MotoGP win since 2022", category:'Race Report', readTime:'4 min read', date:'20 Sep 2026',
+    track:'redbullring',
+    dek:"Pedro Acosta won the Austrian Grand Prix for his first premier-class victory after a record 15 podiums without a win, while Marc Márquez took over the championship lead a week earlier at Misano.",
+    body:[
+      "Pedro Acosta won the Austrian Grand Prix at the Red Bull Ring, his first victory in the MotoGP premier class after a record 15 podium finishes without a win — and KTM's first MotoGP win since Thailand in 2022.",
+      "The breakthrough came a week after Marc Márquez took over the championship points lead at the San Marino Grand Prix in Misano, where early leader Marco Bezzecchi crashed out on the opening lap.",
+      "Between Márquez's title-fight resurgence and Acosta's first win finally landing, the last month has reshuffled MotoGP's season in ways the standings alone don't fully capture.",
     ],
   },
 };
