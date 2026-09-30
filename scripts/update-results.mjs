@@ -21,6 +21,7 @@ import { isBlacktopCovered, findEvent, getRaceResult, getStandingsSummary } from
 import { addArticle, publishDueArticles } from './lib/articles.mjs';
 import { parseNamedLiteral } from './lib/html-utils.mjs';
 import { refreshAllNextUpPanels, refreshHomeEventsGrid } from './lib/nextup.mjs';
+import { parseCalEvents, writeCalEvents } from './lib/cal-events.mjs';
 import { SERIES_META } from './lib/series-meta.mjs';
 
 const FILE = new URL('../index.html', import.meta.url);
@@ -145,24 +146,6 @@ function slugify(s) {
   return String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 }
 
-// Serializes a single CAL_EVENTS object back to the file's existing
-// single-quote JS-literal style. Keeps key order stable and predictable.
-function serializeEvent(ev) {
-  const q = (s) => `'${String(s).replace(/'/g, "\\'")}'`;
-  const parts = [`date:${q(ev.date)}`, `view:${q(ev.view)}`, `chip:${q(ev.chip)}`, `series:${q(ev.series)}`, `name:${q(ev.name)}`];
-  if (ev.venue) parts.push(`venue:${q(ev.venue)}`);
-  if (ev.result) {
-    parts.push(`result:{winner:${q(ev.result.winner)}, note:${q(ev.result.note)}}`);
-  } else {
-    if (ev.sessions) {
-      const sessions = ev.sessions.map((s) => `{label:${q(s.label)},time:${q(s.time)}}`).join(',');
-      parts.push(`sessions:[${sessions}]`);
-    }
-    if (ev.watch) parts.push(`watch:${q(ev.watch)}`);
-  }
-  return `  {${parts.join(', ')}}`;
-}
-
 // Tries Blacktop (real data) first for covered series; returns
 // { winner, note } or null. Never guesses — a miss just returns null so
 // the caller can fall back to Groq.
@@ -233,18 +216,13 @@ Respond with ONLY this JSON shape:
 async function main() {
   let html = readFileSync(FILE, 'utf8');
 
-  const startMarker = 'const CAL_EVENTS = [';
-  const start = html.indexOf(startMarker);
-  const end = html.indexOf('\n];\n\nconst CAL_EVENTS_BY_DATE', start);
-  if (start === -1 || end === -1) {
-    console.error('Could not locate CAL_EVENTS block.');
+  let events;
+  try {
+    events = parseCalEvents(html);
+  } catch (e) {
+    console.error(e.message);
     process.exit(1);
   }
-
-  const arrayLiteral = html.slice(start + 'const CAL_EVENTS = '.length, end + 2);
-  // Trusted, self-authored content (this project's own data file) — not
-  // third-party input — so evaluating it as JS is safe here.
-  const events = new Function(`return ${arrayLiteral}`)();
 
   const CAL_SERIES = parseNamedLiteral(html, 'CAL_SERIES')?.value || {};
 
@@ -275,8 +253,7 @@ async function main() {
 
       // Rewrite CAL_EVENTS now so the recap-article step below (which
       // touches ARTICLES/HTML separately) works off up-to-date content.
-      const newLiteral = `[\n${events.map(serializeEvent).join(',\n')}\n]`;
-      html = html.slice(0, start) + 'const CAL_EVENTS = ' + newLiteral + html.slice(end + 2);
+      html = writeCalEvents(html, events);
       writeFileSync(FILE, html, 'utf8');
 
       const draft = await draftRecapArticle(ev, result);
