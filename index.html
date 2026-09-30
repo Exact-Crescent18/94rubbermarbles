@@ -159,6 +159,16 @@ footer .social-links{margin-left:4px;}
 .hero-art .corner-tag{position:absolute; top:14px; left:14px; font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text-faint); letter-spacing:0.1em; z-index:2;}
 .hero-art .corner-tag.br{top:auto; bottom:14px; right:14px; left:auto; text-align:right;}
 .hero-art .corner-tag.shadow{color:#fff; text-shadow:0 1px 4px rgba(0,0,0,.8);}
+.hero-art img{width:100%; height:100%; object-fit:cover;}
+
+/* ---------- HERO CAROUSEL (Sector 01 — Lead Stories) ---------- */
+.hero-carousel{position:relative;}
+.hero-carousel .hero{display:none;}
+.hero-carousel .hero.active{display:grid;}
+.hero-dots{display:flex; gap:8px; justify-content:center; margin-top:18px;}
+.hero-dot{width:8px; height:8px; border-radius:50%; background:var(--rule); border:none; cursor:pointer; padding:0;}
+.hero-dot.active{background:var(--amber);}
+.hero-dot:hover{background:var(--text-dim);}
 
 /* ---------- SERIES PAGE HERO (banner) ---------- */
 .series-hero{
@@ -638,35 +648,63 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 <section class="view active" id="view-home">
   <div class="sector-label">
     <span class="num">S1</span>
-    <span class="name">Sector 01 — Lead Story</span>
+    <span class="name">Sector 01 — Lead Stories</span>
     <span class="line"></span>
   </div>
 
-  <section class="hero">
-    <div>
-      <div class="hero-tag">Breaking · Championship</div>
-      <h1>Larson's Kansas double keeps the Chase field guessing as title fights rage <em>everywhere</em>.</h1>
-      <p class="deck">Kyle Larson won the Hollywood Casino 400 at Kansas — his second Round of 12 win in four races — while George Russell held off Max Verstappen by just 0.196s in Baku, the closest F1 finish since 1986. MotoGP has a first-time premier-class winner in Pedro Acosta, and Toyota took a home win at the 6 Hours of Fuji. Every series, one page.</p>
-      <div class="hero-meta">
-        <span><b>9</b> series tracked</span>
-        <span><b>9</b> race weekends this month</span>
-        <span>Updated <b id="updated-time">just now</b></span>
+  <!-- HERO_CAROUSEL_START -->
+  <div class="hero-carousel">
+    <section class="hero active" data-slug="f1-antonelli-monza">
+      <div>
+        <div class="hero-tag">Race Report</div>
+        <h1>19th to 1st: Antonelli's home win rewrites the title fight</h1>
+        <p class="deck">A grid penalty put him at the back. A virtual safety car and a late pass on his own teammate put him on top of the podium — and 66 points clear in the standings.</p>
+        <div class="hero-meta">
+          <span><b>Formula 1</b></span>
+          <span>6 Sep 2026</span>
+        </div>
       </div>
-    </div>
-    <div class="hero-art">
-      <span class="corner-tag">TRACK MAP</span>
-      <span class="corner-tag br">SECTOR 1 · 2 · 3</span>
-      <svg viewBox="0 0 300 300" fill="none">
-        <path d="M40 200 C 40 130, 70 80, 130 70 C 170 63, 190 90, 175 120 C 160 150, 190 155, 220 140 C 260 120, 270 160, 250 190 C 225 226, 170 220, 150 240 C 125 265, 70 260, 55 230 C 45 218, 40 210, 40 200 Z"
-          stroke="#ffb300" stroke-width="3" stroke-dasharray="2 10" stroke-linecap="round"/>
-        <path d="M40 200 C 40 130, 70 80, 130 70 C 170 63, 190 90, 175 120 C 160 150, 190 155, 220 140 C 260 120, 270 160, 250 190 C 225 226, 170 220, 150 240 C 125 265, 70 260, 55 230 C 45 218, 40 210, 40 200 Z"
-          stroke="#e8402a" stroke-width="1" stroke-dasharray="1 3" opacity="0.6"/>
-        <circle cx="40" cy="200" r="5" fill="#f1efe9"/>
-        <line x1="30" y1="200" x2="50" y2="200" stroke="#f1efe9" stroke-width="2"/>
-        <text x="46" y="192" fill="#686e75" font-family="JetBrains Mono" font-size="8">S/F</text>
-      </svg>
-    </div>
-  </section>
+      <div class="hero-art">
+        <span class="corner-tag">TRACK MAP</span>
+        <span class="corner-tag br">SECTOR 1 · 2 · 3</span>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/8/8d/Monza_Map-2021.png" alt="Formula 1 art">
+      </div>
+    </section>
+    <section class="hero" data-slug="cup-homestead">
+      <div>
+        <div class="hero-tag">Explainer</div>
+        <h1>Homestead returns: inside the new Championship Weekend</h1>
+        <p class="deck">The title decider moves back to Homestead-Miami for the first time since 2019.</p>
+        <div class="hero-meta">
+          <span><b>NASCAR Cup</b></span>
+          <span>17 Aug 2026</span>
+        </div>
+      </div>
+      <div class="hero-art">
+        <span class="corner-tag">TRACK MAP</span>
+        <span class="corner-tag br">SECTOR 1 · 2 · 3</span>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/c/c7/Homestead_Miami_Speedway_2024.svg" alt="NASCAR Cup art">
+      </div>
+    </section>
+    <section class="hero" data-slug="wec-qatar-bahrain">
+      <div>
+        <div class="hero-tag">Explainer</div>
+        <h1>Qatar and Bahrain are out — Barcelona and Monza are in</h1>
+        <p class="deck">Regional travel disruptions forced a late reshuffle of the season's final two rounds.</p>
+        <div class="hero-meta">
+          <span><b>WEC</b></span>
+          <span>17 Aug 2026</span>
+        </div>
+      </div>
+      <div class="hero-art">
+        <span class="corner-tag">TRACK MAP</span>
+        <span class="corner-tag br">SECTOR 1 · 2 · 3</span>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Austin_circuit.svg" alt="WEC art">
+      </div>
+    </section>
+    <div class="hero-dots"><button class="hero-dot active" data-index="0" aria-label="Story 1"></button><button class="hero-dot" data-index="1" aria-label="Story 2"></button><button class="hero-dot" data-index="2" aria-label="Story 3"></button></div>
+  </div>
+  <!-- HERO_CAROUSEL_END -->
 
   <div class="sector-label" id="home-upcoming">
     <span class="num">S2</span>
@@ -2363,6 +2401,13 @@ const TRACKS = {
   dc: {src:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Freedom_250_Grand_Prix_Route_Map.jpg/960px-Freedom_250_Grand_Prix_Route_Map.jpg', alt:'Freedom 250 Grand Prix of Washington, D.C. route map', cap:'STREETS OF WASHINGTON, D.C. · TRACK MAP', diagram:true},
 };
 
+// Ordered slugs into ARTICLES, newest first — drives the homepage
+// "Sector 01 — Lead Stories" carousel. Kept up to date automatically:
+// scripts/lib/articles.mjs's addArticle() pushes every freshly-published
+// article here (capped, oldest dropped) whenever a recap or prompted
+// article goes live.
+const LEAD_STORIES = ['f1-antonelli-monza', 'cup-homestead', 'wec-qatar-bahrain'];
+
 const ARTICLES = {
   'f1-back-from-break': {
     view:'f1', chip:'f1', chipLogo:'https://upload.wikimedia.org/wikipedia/commons/2/2d/Formula_One_logo.svg', chipText:'Formula 1',
@@ -2725,6 +2770,25 @@ document.addEventListener('click', function(e){
 
 window.addEventListener('hashchange', routeFromHash);
 routeFromHash();
+
+// ---- Hero carousel (Sector 01 — Lead Stories) ----
+(function initHeroCarousel(){
+  const carousel = document.querySelector('.hero-carousel');
+  if(!carousel) return;
+  const slides = [...carousel.querySelectorAll('.hero')];
+  const dots = [...carousel.querySelectorAll('.hero-dot')];
+  if(slides.length <= 1) return;
+  let idx = 0;
+  function show(i){
+    idx = (i + slides.length) % slides.length;
+    slides.forEach((s,j)=>s.classList.toggle('active', j===idx));
+    dots.forEach((d,j)=>d.classList.toggle('active', j===idx));
+  }
+  dots.forEach((d,i)=>d.addEventListener('click', ()=>show(i)));
+  let timer = setInterval(()=>show(idx+1), 9000);
+  carousel.addEventListener('mouseenter', ()=>clearInterval(timer));
+  carousel.addEventListener('mouseleave', ()=>{ timer = setInterval(()=>show(idx+1), 9000); });
+})();
 
 // ---- Calendar view ----
 const CAL_SERIES = {

@@ -6,6 +6,8 @@
 // CAL_EVENTS: evaluate the object literal as real JS (trusted,
 // self-authored content), mutate in memory, re-serialize deterministically.
 
+import { addToLeadCarousel } from './hero-carousel.mjs';
+
 const ARTICLES_START = 'const ARTICLES = {';
 const ARTICLES_CLOSE = '\n};\n\nfunction renderArticle(slug){';
 
@@ -99,6 +101,10 @@ export function addArticle(html, slug, article) {
     delete articles[slug].publishAt;
     html = writeArticles(html, articles);
     html = insertStoryCard(html, slug, article);
+    // Every freshly-published article (auto-recap or prompted) becomes
+    // the new featured lead story, so Sector 01 stays current without
+    // needing a separate manual step.
+    html = addToLeadCarousel(html, slug, parseArticles(html));
   }
   return html;
 }
@@ -117,6 +123,7 @@ export function publishDueArticles(html) {
   html = writeArticles(html, articles);
   for (const [slug, a] of due) {
     html = insertStoryCard(html, slug, a);
+    html = addToLeadCarousel(html, slug, parseArticles(html));
   }
   return { html, publishedSlugs: due.map(([slug]) => slug) };
 }
