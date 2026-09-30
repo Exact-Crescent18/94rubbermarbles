@@ -1,17 +1,21 @@
 // Keeps each series' "Next Up" hero panel and "Remaining Schedule" table
 // in sync with CAL_EVENTS, instead of the manual one-off rebuilds that
 // kept falling behind. Two states per series:
-//   - ongoing: next unresolved event -> panel shows venue/sessions/round
-//     and a static date/time (no live countdown — see note below).
+//   - ongoing: next unresolved event -> panel shows venue/sessions/round,
+//     a static date/time, and (when the "Race" session's time string
+//     resolves to one precise instant — see lib/racetime.mjs) a live
+//     countdown.
 //   - complete: every CAL_EVENTS entry for that view has a result ->
 //     panel shows a season-wrap recap from the real, already-confirmed
 //     results.
 //
-// Deliberately NOT rebuilding a live JS countdown here: parsing session
-// time strings back into precise timezone-aware timestamps is exactly
-// the class of bug that's bitten this project repeatedly. A static
-// "10 Sep 2026 · 9:00 AM ET" is always correct; a countdown risks being
-// confidently wrong.
+// The countdown only renders when parseSessionDateTime() can turn the
+// session's time string into a real UTC-offset instant. Earlier this
+// project shipped fabricated/mis-parsed countdowns and had to rip them
+// out; the fix wasn't to avoid countdowns, it was to only build one from
+// an unambiguous timestamp and render nothing (not a guess) otherwise.
+
+import { parseSessionDateTime } from './racetime.mjs';
 
 const TIMEZONE_ABBR = {
   ET: 'Eastern', CT: 'Central', MT: 'Mountain', PT: 'Pacific', MST: 'Arizona (no DST)',
@@ -41,15 +45,20 @@ export function computeSeriesState(events, view) {
 // script guessing a URL. Matches loosely on shared significant words
 // between the target venue string and each image's alt text.
 // Includes not just venue/generic terms but also series-template words
-// ("race", "rally") that recur across every event name in a series —
-// without these, e.g. "Race at Salem" and "Race at WWT Raceway" (or
-// "Rally Chile Biobío" and "Rally Italia Sardegna") share only that one
+// ("race", "rally", "hours") that recur across every event name in a
+// series — without these, e.g. "Race at Salem" and "Race at WWT
+// Raceway", "Rally Chile Biobío" and "Rally Italia Sardegna", or WEC's
+// "6 Hours of Fuji" and "6 Hours of Barcelona" (which even share the
+// numeric token "6", since both are 6-hour races) share only that one
 // generic word and sameRace() below would wrongly call them the same
-// event, since they have no numeric tokens to disambiguate with.
+// event. This list has grown reactively as each new series' naming
+// template surfaced this same false-positive — if a new series' events
+// all follow "<generic word> <venue>", assume its generic word needs
+// adding here too rather than assuming the existing list is complete.
 const STOPWORDS = new Set([
   'circuit', 'raceway', 'speedway', 'international', 'diagram', 'track', 'map', 'the',
   'street', 'course', 'motor', 'grand', 'prix', 'of', 'at', 'route', 'layout', 'of,',
-  'race', 'rally',
+  'race', 'rally', 'hours',
 ]);
 
 function significantWords(s) {
@@ -107,10 +116,35 @@ ${rows}
       </div>`;
 }
 
+// Renders the .countdown block used by both the per-series panel and the
+// homepage grid cards. With a real target instant it carries
+// data-target for tickCountdowns() (index.html's own client-side timer)
+// to pick up; without one — the session time didn't resolve to a single
+// precise instant — it renders static "--" cells instead of a live
+// countdown, exactly matching tickCountdowns()'s own "finished/unknown"
+// display convention rather than a fabricated running clock.
+export function countdownHTML(isoTarget) {
+  if (!isoTarget) {
+    return `      <div class="countdown">
+        <div class="cell"><span class="n dd">--</span><span class="u">DAYS</span></div>
+        <div class="cell"><span class="n hh">--</span><span class="u">HRS</span></div>
+        <div class="cell"><span class="n mm">--</span><span class="u">MIN</span></div>
+        <div class="cell"><span class="n ss">--</span><span class="u">SEC</span></div>
+      </div>`;
+  }
+  return `      <div class="countdown" data-target="${isoTarget}">
+        <div class="cell"><span class="n dd">00</span><span class="u">DAYS</span></div>
+        <div class="cell"><span class="n hh">00</span><span class="u">HRS</span></div>
+        <div class="cell"><span class="n mm">00</span><span class="u">MIN</span></div>
+        <div class="cell"><span class="n ss">00</span><span class="u">SEC</span></div>
+      </div>`;
+}
+
 // Builds the full "Next Up" panel (ongoing-season state) as HTML.
 export function renderOngoingPanel({ chip, chipLogo, chipText, next, round, total, trackImg, watchText }) {
   const raceSession = next.sessions?.find((s) => s.label === 'Race');
   const dateLine = raceSession ? raceSession.time : next.date;
+  const target = raceSession ? parseSessionDateTime(raceSession.time, next.date) : null;
   return `  <section class="next-up-panel">
     <div class="track">
       <img class="diagram" src="${trackImg.src}" alt="${trackImg.alt}">
@@ -120,6 +154,7 @@ export function renderOngoingPanel({ chip, chipLogo, chipText, next, round, tota
       <div class="series-row"><span class="chip ${chip}"><img class="chip-logo" src="${chipLogo}" alt="${chipText} logo">${chipText}</span><span class="round-num">Round ${round} / ${total}</span></div>
       <h3>${next.name}</h3>
       <div class="venue">${next.venue || ''}</div>
+${countdownHTML(target)}
       <div class="event-date"><span>${dateLine}</span></div>
 ${sessionsTableHTML(next.sessions)}
       <div class="watch-block">
@@ -239,11 +274,15 @@ function sameRace(titleA, titleB, dateA, dateB) {
 // Main entry point. Rebuilds any series whose panel is out of sync with
 // the real "next race" (or season-complete state) in CAL_EVENTS. Returns
 // { html, changedViews }.
-export async function refreshAllNextUpPanels(html, events, seriesMeta, calSeries, phrase) {
+// force=true skips every "already correct" staleness check and rebuilds
+// every panel unconditionally — meant for a one-time template migration
+// (e.g. adding the countdown block below), not for the normal hourly run.
+export async function refreshAllNextUpPanels(html, events, seriesMeta, calSeries, phrase, force = false, skipViews = []) {
   const changedViews = [];
   const views = [...new Set(events.map((e) => e.view))];
 
   for (const view of views) {
+    if (skipViews.includes(view)) continue;
     const state = computeSeriesState(events, view);
     if (!state) continue;
     const expectedTitle = state.mode === 'ongoing' ? state.next.name : `${state.last.name} — Final Race`;
@@ -258,11 +297,14 @@ export async function refreshAllNextUpPanels(html, events, seriesMeta, calSeries
     // (no live countdown left over) — trust whatever's there, even if
     // it doesn't textually match our generated title. A hand-written
     // recap is not "stale" just because it's not our template's wording.
+    // force only applies to the ongoing branch below (it's the only one
+    // the countdown-template migration touches) — a season-wrap recap is
+    // never force-regenerated, so a hand-curated one is never clobbered.
     if (state.mode === 'complete' && loc.currentlyComplete && !loc.hasCountdown) continue;
 
     // Ongoing season: only rebuild if the panel is actually pointing at
     // a different race, not just worded differently from the same one.
-    if (state.mode === 'ongoing' && !loc.currentlyComplete && sameRace(loc.currentTitle, state.next.name, loc.currentDate, state.next.date)) continue;
+    if (!force && state.mode === 'ongoing' && !loc.currentlyComplete && sameRace(loc.currentTitle, state.next.name, loc.currentDate, state.next.date)) continue;
 
     const meta = seriesMeta[view];
     const seriesInfo = calSeries[view];
@@ -348,26 +390,16 @@ const HOME_FEATURED_PRIORITY = [
   'wrc', 'nascar-truck', 'arca', 'formula-e', 'indy-nxt',
 ];
 
-// No live countdown here either, for the same reason as the per-series
-// panels: parsing a session time string back into a precise timezone-
-// aware timestamp is exactly the bug class that's bitten this project
-// repeatedly. Cells render as "--" (already the site's own convention
-// for "no live countdown", per tickCountdowns()'s FIN state) and the
-// static date/time line underneath carries the real info.
 export function renderEventCard({ chip, chipLogo, chipText, roundLabel, next, trackImg }) {
   const raceSession = next.sessions?.find((s) => s.label === 'Race');
   const dateLine = raceSession ? raceSession.time : '';
+  const target = raceSession ? parseSessionDateTime(raceSession.time, next.date) : null;
   return `    <div class="event-card">
       <div class="series-row"><span class="chip ${chip}"><img class="chip-logo" src="${chipLogo}" alt="${chipText} logo">${chipText}</span><span class="round-num">${roundLabel}</span></div>
       <div class="track-svg"><img class="diagram" src="${trackImg.src}" alt="${trackImg.alt}"></div>
       <h3>${next.name}</h3>
       <div class="venue">${next.venue || ''}</div>
-      <div class="countdown">
-        <div class="cell"><span class="n dd">--</span><span class="u">DAYS</span></div>
-        <div class="cell"><span class="n hh">--</span><span class="u">HRS</span></div>
-        <div class="cell"><span class="n mm">--</span><span class="u">MIN</span></div>
-        <div class="cell"><span class="n ss">--</span><span class="u">SEC</span></div>
-      </div>
+${countdownHTML(target)}
       <div class="event-date"><span>${next.date}</span><span>${dateLine}</span></div>
     </div>`;
 }
@@ -387,7 +419,7 @@ function splitEventCards(gridHtml) {
 // match the 4 series/races it should be showing right now — same
 // sameRace() staleness check used for the per-series panels, so a purely
 // cosmetic difference (sponsor suffix, etc.) doesn't trigger a rebuild.
-export function refreshHomeEventsGrid(html, events, seriesMeta, calSeries) {
+export function refreshHomeEventsGrid(html, events, seriesMeta, calSeries, force = false) {
   const gridMarker = '<section class="events-grid">';
   const gridStart = html.indexOf(gridMarker);
   if (gridStart === -1) return { html, changed: false };
@@ -407,7 +439,7 @@ export function refreshHomeEventsGrid(html, events, seriesMeta, calSeries) {
     return { title, date };
   });
 
-  const allCurrent = featured.length > 0 && featured.every(({ state }) =>
+  const allCurrent = !force && featured.length > 0 && featured.every(({ state }) =>
     existingCards.some((c) => sameRace(c.title, state.next.name, c.date, state.next.date))
   ) && existingCards.length === featured.length;
 
