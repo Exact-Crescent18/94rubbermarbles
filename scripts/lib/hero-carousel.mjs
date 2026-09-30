@@ -32,7 +32,18 @@ function heroImageFor(article, tracks) {
   return article.trackImg || (article.track && tracks[article.track]?.src) || article.chipLogo || '';
 }
 
+// Every image currently used here is a real Wikimedia Commons upload
+// (verified live before use, per this project's standing discipline —
+// see feedback-apexwire-safety-discipline in memory) — crediting by
+// hostname rather than asserting a specific license variant per image,
+// since that detail isn't tracked per-entry in TRACKS/article data.
+function creditFor(trackSrc) {
+  if (trackSrc && trackSrc.includes('wikimedia.org')) return 'Wikimedia Commons';
+  return '';
+}
+
 function slideHTML(slug, article, trackSrc, active) {
+  const credit = creditFor(trackSrc);
   return `  <section class="hero${active ? ' active' : ''}" data-slug="${slug}">
     <div>
       <div class="hero-tag">${article.category || 'Feature'}</div>
@@ -44,9 +55,8 @@ function slideHTML(slug, article, trackSrc, active) {
       </div>
     </div>
     <div class="hero-art">
-      <span class="corner-tag">TRACK MAP</span>
-      <span class="corner-tag br">SECTOR 1 · 2 · 3</span>
       ${trackSrc ? `<img src="${trackSrc}" alt="${article.chipText} art">` : ''}
+      ${credit ? `<span class="src">${credit}</span>` : ''}
     </div>
   </section>`;
 }

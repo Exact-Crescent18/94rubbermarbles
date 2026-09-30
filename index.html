@@ -160,7 +160,7 @@ footer .social-links{margin-left:4px;}
 .hero-art .corner-tag{position:absolute; top:14px; left:14px; font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text-faint); letter-spacing:0.1em; z-index:2;}
 .hero-art .corner-tag.br{top:auto; bottom:14px; right:14px; left:auto; text-align:right;}
 .hero-art .corner-tag.shadow{color:#fff; text-shadow:0 1px 4px rgba(0,0,0,.8);}
-.hero-art img{width:100%; height:100%; object-fit:cover;}
+.hero-art .src{position:absolute; bottom:10px; right:12px; font-family:'JetBrains Mono',monospace; font-size:8.5px; color:rgba(241,239,233,.55); background:rgba(11,12,14,.6); padding:2px 6px; letter-spacing:.04em; z-index:2;}
 
 /* ---------- HERO CAROUSEL (Sector 01 — Lead Stories) ---------- */
 .hero-carousel{position:relative; overflow:hidden;}
@@ -674,9 +674,8 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
       </div>
     </div>
     <div class="hero-art">
-      <span class="corner-tag">TRACK MAP</span>
-      <span class="corner-tag br">SECTOR 1 · 2 · 3</span>
-      <img src="https://upload.wikimedia.org/wikipedia/commons/2/2d/Formula_One_logo.svg" alt="Formula 1 art">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/a/af/2023_F1_CourseLayout_Azerbaijan.svg" alt="Formula 1 art">
+      <span class="src">Wikimedia Commons</span>
     </div>
   </section>
   <section class="hero" data-slug="cup-kansas-larson-form">
@@ -690,9 +689,8 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
       </div>
     </div>
     <div class="hero-art">
-      <span class="corner-tag">TRACK MAP</span>
-      <span class="corner-tag br">SECTOR 1 · 2 · 3</span>
       <img src="https://upload.wikimedia.org/wikipedia/commons/4/48/Kansas_Speedway_2024.svg" alt="NASCAR Cup art">
+      <span class="src">Wikimedia Commons</span>
     </div>
   </section>
   <section class="hero" data-slug="motogp-acosta-breakthrough">
@@ -706,9 +704,8 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
       </div>
     </div>
     <div class="hero-art">
-      <span class="corner-tag">TRACK MAP</span>
-      <span class="corner-tag br">SECTOR 1 · 2 · 3</span>
       <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/Red_Bull_Ring_moto_2022.svg" alt="MotoGP art">
+      <span class="src">Wikimedia Commons</span>
     </div>
   </section>
   <div class="hero-dots"><button class="hero-dot active" data-index="0" aria-label="Story 1"></button><button class="hero-dot" data-index="1" aria-label="Story 2"></button><button class="hero-dot" data-index="2" aria-label="Story 3"></button></div>
@@ -2758,6 +2755,7 @@ const ARTICLES = {
     view:'f1', chip:'f1', chipLogo:'https://upload.wikimedia.org/wikipedia/commons/2/2d/Formula_One_logo.svg', chipText:'Formula 1',
     title:"Russell holds off Verstappen by 0.196s in the closest finish since 1986", category:'Race Report', readTime:'4 min read', date:'26 Sep 2026',
     track:'',
+    trackImg:'https://upload.wikimedia.org/wikipedia/commons/a/af/2023_F1_CourseLayout_Azerbaijan.svg',
     dek:"George Russell converted pole into a win at Baku, beating Max Verstappen to the line by less than two tenths — the tightest margin in a Formula 1 race in nearly four decades.",
     body:[
       "George Russell won the Azerbaijan Grand Prix from pole position, crossing the line just 0.196 seconds ahead of Max Verstappen after a Baku street race that came down to the final lap.",

@@ -35,10 +35,16 @@ export function parseArticles(html) {
 function serializeOne(slug, a) {
   const bodyLines = a.body.map((p) => `      ${dq(p)},`).join('\n');
   const publishLine = a.publishAt ? `\n    publishAt:${sq(a.publishAt)},` : '';
+  // trackImg/trackAlt are optional per-article image overrides (used by
+  // both storyCardHTML() below and scripts/lib/hero-carousel.mjs) — only
+  // emitted when actually set, so this stays a no-op for the common case
+  // of relying on `track` (a TRACKS-lookup key) instead.
+  const trackImgLine = a.trackImg ? `\n    trackImg:${sq(a.trackImg)},` : '';
+  const trackAltLine = a.trackAlt ? `\n    trackAlt:${sq(a.trackAlt)},` : '';
   return `  ${sq(slug)}: {
     view:${sq(a.view)}, chip:${sq(a.chip)}, chipLogo:${sq(a.chipLogo)}, chipText:${sq(a.chipText)},
     title:${dq(a.title)}, category:${sq(a.category)}, readTime:${sq(a.readTime)}, date:${sq(a.date)},
-    track:${sq(a.track || '')},
+    track:${sq(a.track || '')},${trackImgLine}${trackAltLine}
     dek:${dq(a.dek)},${publishLine}
     body:[
 ${bodyLines}
