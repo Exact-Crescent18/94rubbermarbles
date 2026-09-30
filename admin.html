@@ -12,84 +12,69 @@
   --amber:#ffb300; --red:#e8402a; --green:#33c17d;
 }
 *{box-sizing:border-box;}
+html,body{height:100%;}
 body{
   background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,sans-serif;
-  margin:0; padding:0 20px 80px;
+  margin:0; display:flex; flex-direction:column;
 }
-header{max-width:900px; margin:0 auto; padding:28px 0 18px; border-bottom:1px solid var(--rule);}
-header h1{font-size:22px; margin:0 0 4px;}
-header p{color:var(--text-dim); font-size:13.5px; margin:0;}
-.wrap{max-width:900px; margin:0 auto;}
+input[type=password], input[type=text], textarea{
+  width:100%; background:var(--surface-2); border:1px solid var(--rule); color:var(--text);
+  padding:10px 12px; font-size:14px; border-radius:4px; font-family:inherit;
+}
+button{
+  background:var(--amber); color:var(--bg); border:none; padding:9px 16px;
+  font-size:13px; font-weight:600; border-radius:4px; cursor:pointer; letter-spacing:.01em; white-space:nowrap;
+}
+button:hover{background:#ffc633;}
+button.secondary{background:var(--surface-2); color:var(--text); border:1px solid var(--rule);}
+button.secondary:hover{background:#2a2f36;}
+button:disabled{opacity:.5; cursor:not-allowed;}
 
-#login-screen{max-width:520px; margin:60px auto; text-align:center;}
+/* ---------- login ---------- */
+#login-screen{max-width:520px; margin:60px auto; text-align:center; padding:0 20px;}
 #login-screen h2{font-size:19px; margin-bottom:10px;}
 #login-screen p{color:var(--text-dim); font-size:14px; line-height:1.6; margin-bottom:20px;}
 #login-screen ol{text-align:left; color:var(--text-dim); font-size:13.5px; line-height:1.8; margin-bottom:22px;}
 #login-screen a{color:var(--amber);}
 
-input[type=password], input[type=text], textarea{
-  width:100%; background:var(--surface-2); border:1px solid var(--rule); color:var(--text);
-  padding:10px 12px; font-size:14px; border-radius:4px; font-family:inherit;
+/* ---------- toolbar ---------- */
+#toolbar{
+  display:none; align-items:center; gap:14px; padding:10px 16px; background:var(--surface);
+  border-bottom:1px solid var(--rule); flex-shrink:0; z-index:50;
 }
-textarea{resize:vertical; line-height:1.5;}
-button{
-  background:var(--amber); color:var(--bg); border:none; padding:10px 18px;
-  font-size:13.5px; font-weight:600; border-radius:4px; cursor:pointer; letter-spacing:.01em;
+#toolbar .brand{font-weight:700; font-size:13.5px; flex-shrink:0;}
+#toolbar .hint{font-size:12px; color:var(--text-faint); flex:1; min-width:0;}
+#toolbar #status-msg{font-size:12.5px; color:var(--text-dim); flex-shrink:0;}
+#toolbar #status-msg.error{color:var(--red);}
+#toolbar #status-msg.ok{color:var(--green);}
+
+/* ---------- iframe canvas ---------- */
+#canvas-wrap{flex:1; min-height:0; display:none; position:relative;}
+#site-frame{width:100%; height:100%; border:none; display:block; background:#fff;}
+
+/* ---------- image edit modal ---------- */
+#img-modal-backdrop{
+  display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:200;
+  align-items:center; justify-content:center;
 }
-button:hover{background:#ffc633;}
-button.secondary{background:var(--surface-2); color:var(--text); border:1px solid var(--rule);}
-button.secondary:hover{background:var(--surface);}
-button:disabled{opacity:.5; cursor:not-allowed;}
-
-#editor-screen{display:none;}
-.tabs{display:flex; gap:2px; margin:18px 0; flex-wrap:wrap;}
-.tab-btn{
-  background:var(--surface); color:var(--text-dim); border:1px solid var(--rule);
-  padding:9px 16px; font-size:13px; font-weight:500; border-radius:4px; cursor:pointer;
+#img-modal{
+  background:var(--surface); border:1px solid var(--rule); border-radius:8px; padding:24px;
+  width:420px; max-width:90vw;
 }
-.tab-btn.active{background:var(--amber); color:var(--bg); border-color:var(--amber);}
-.tab-panel{display:none;}
-.tab-panel.active{display:block;}
-
-.field{background:var(--surface); border:1px solid var(--rule); border-radius:6px; padding:18px; margin-bottom:14px;}
-.field label{display:block; font-size:12px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.06em; margin-bottom:8px;}
-.field .hint{font-size:12px; color:var(--text-faint); margin-top:6px;}
-.field .row{display:flex; gap:10px; align-items:center; margin-top:10px;}
-.field.pending{border-color:var(--amber);}
-.field .pending-tag{display:none; float:right; font-size:10.5px; color:var(--amber); font-weight:700; letter-spacing:.06em;}
-.field.pending .pending-tag{display:inline;}
-
-.img-item{display:flex; gap:14px; align-items:center; background:var(--surface); border:1px solid var(--rule); border-radius:6px; padding:12px 14px; margin-bottom:8px;}
-.img-item img{width:52px; height:52px; object-fit:contain; background:#f1efe9; border-radius:4px; flex-shrink:0;}
-.img-item .meta{flex:1; min-width:0;}
-.img-item .meta .alt{font-size:12.5px; color:var(--text-dim); margin-bottom:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
-.img-item .meta .count{font-size:10.5px; color:var(--text-faint);}
-.img-item input{margin-top:6px;}
-
-.article-list{display:flex; flex-direction:column; gap:6px; margin-bottom:16px;}
-.article-list button{background:var(--surface); color:var(--text); border:1px solid var(--rule); text-align:left; width:100%; padding:10px 14px; font-weight:400;}
-.article-list button.active{border-color:var(--amber); color:var(--amber);}
-
-#status-bar{
-  position:fixed; bottom:0; left:0; right:0; background:var(--surface); border-top:1px solid var(--rule);
-  padding:14px 20px; display:flex; justify-content:center; align-items:center; gap:16px; z-index:10;
-}
-#status-bar .msg{font-size:13px; color:var(--text-dim);}
-#status-bar .msg.error{color:var(--red);}
-#status-bar .msg.ok{color:var(--green);}
-#search-box{margin-bottom:14px;}
+#img-modal h3{margin:0 0 14px; font-size:15px;}
+#img-modal .preview{width:100%; height:140px; background:#f1efe9; border-radius:4px; display:flex; align-items:center; justify-content:center; margin-bottom:14px; overflow:hidden;}
+#img-modal .preview img{max-width:100%; max-height:100%; object-fit:contain;}
+#img-modal label{display:block; font-size:11.5px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px; margin-top:14px;}
+#img-modal .row{display:flex; gap:10px; margin-top:20px; justify-content:flex-end;}
+#img-modal .or{font-size:11.5px; color:var(--text-faint); text-align:center; margin:14px 0;}
 </style>
 </head>
 <body>
 
-<header class="wrap">
-  <h1>94rubbermarbles — Site Editor</h1>
-  <p>Edit the live site without touching code. Changes are staged here, then published to GitHub in one step.</p>
-</header>
-
 <div id="login-screen">
-  <h2>Connect to the repo</h2>
-  <p>This page saves changes by committing directly to the <code>94rubbermarbles</code> GitHub repo on your behalf. It needs a personal access token — a password-like key you create once — to be allowed to do that.</p>
+  <h2>94rubbermarbles — Site Editor</h2>
+  <p>This edits the live site directly on the page — click any text or image to change it, drag cards to reorder them. Changes stay local until you publish.</p>
+  <p>To save, it commits straight to the <code>94rubbermarbles</code> GitHub repo on your behalf, which needs a personal access token — a password-like key you create once.</p>
   <ol>
     <li>Go to <a href="https://github.com/settings/tokens?type=beta" target="_blank" rel="noopener">github.com/settings/tokens</a> and create a new <b>fine-grained</b> token.</li>
     <li>Under "Repository access", choose <b>Only select repositories</b> and pick <b>94rubbermarbles</b>.</li>
@@ -101,24 +86,31 @@ button:disabled{opacity:.5; cursor:not-allowed;}
   <div id="login-status" style="margin-top:14px; font-size:13px; color:var(--red);"></div>
 </div>
 
-<div id="editor-screen" class="wrap">
-  <div class="tabs">
-    <button class="tab-btn active" data-tab="homepage">Homepage</button>
-    <button class="tab-btn" data-tab="blurbs">Series Blurbs</button>
-    <button class="tab-btn" data-tab="articles">Articles</button>
-    <button class="tab-btn" data-tab="images">Images</button>
-  </div>
-
-  <div class="tab-panel active" id="tab-homepage"></div>
-  <div class="tab-panel" id="tab-blurbs"></div>
-  <div class="tab-panel" id="tab-articles"></div>
-  <div class="tab-panel" id="tab-images"></div>
+<div id="toolbar">
+  <span class="brand">Site Editor</span>
+  <span class="hint">Click text or images on the page to edit them. Drag cards within a grid to reorder.</span>
+  <span id="status-msg"></span>
+  <button class="secondary" id="discard-btn">Discard changes</button>
+  <button id="publish-btn">Publish to GitHub</button>
+</div>
+<div id="canvas-wrap">
+  <iframe id="site-frame" title="Site preview"></iframe>
 </div>
 
-<div id="status-bar" style="display:none;">
-  <span class="msg" id="status-msg"></span>
-  <button class="secondary" id="discard-btn">Discard staged changes</button>
-  <button id="publish-btn">Publish to GitHub</button>
+<div id="img-modal-backdrop">
+  <div id="img-modal">
+    <h3>Change image</h3>
+    <div class="preview"><img id="img-modal-preview" src="" alt=""></div>
+    <label>Image URL</label>
+    <input type="text" id="img-modal-url">
+    <div class="or">— or —</div>
+    <label>Upload a file (adds it to the repo and points here to it)</label>
+    <input type="file" id="img-modal-file" accept="image/*">
+    <div class="row">
+      <button class="secondary" id="img-modal-cancel">Cancel</button>
+      <button id="img-modal-apply">Apply</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -143,12 +135,11 @@ const SERIES_META = {
 };
 
 let token = localStorage.getItem(TOKEN_KEY) || '';
-let originalHtml = null;   // exactly what GitHub has right now
-let workingHtml = null;    // originalHtml + staged edits, not yet published
+let originalHtml = null;
+let workingHtml = null;
 let currentSha = null;
-let pendingCount = 0;
 
-// ---------- utf8-safe base64 ----------
+// ================= utf8-safe base64 =================
 function b64ToUtf8(b64) {
   const bin = atob(b64.replace(/\n/g, ''));
   const bytes = Uint8Array.from(bin, c => c.charCodeAt(0));
@@ -161,30 +152,26 @@ function utf8ToB64(str) {
   return btoa(bin);
 }
 
-// ---------- GitHub API ----------
-async function ghFetchFile() {
-  const res = await fetch(API_URL, {
-    headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json' },
-  });
-  if (!res.ok) throw new Error(`Could not load the file from GitHub (${res.status}). Check the token's repo access.`);
-  const data = await res.json();
-  currentSha = data.sha;
-  return b64ToUtf8(data.content);
+// ================= GitHub API =================
+async function ghGetFile(path) {
+  const url = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${path}`;
+  const res = await fetch(url, { headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json' } });
+  if (!res.ok) throw new Error(`Could not load ${path} from GitHub (${res.status}). Check the token's repo access.`);
+  return res.json();
 }
-
-async function ghSaveFile(newHtml, message) {
-  // Re-fetch sha right before saving, in case the hourly bot committed
-  // in between — reduces (doesn't eliminate) the chance of a conflict.
-  const latest = await fetch(API_URL, {
-    headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json' },
-  }).then(r => r.json());
-  const res = await fetch(API_URL, {
+async function ghSaveFile(path, contentUtf8OrB64, message, isBase64) {
+  let sha;
+  try {
+    const latest = await ghGetFile(path);
+    sha = latest.sha;
+  } catch { sha = undefined; } // file may not exist yet (e.g. a new upload)
+  const res = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${path}`, {
     method: 'PUT',
     headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' },
     body: JSON.stringify({
       message,
-      content: utf8ToB64(newHtml),
-      sha: latest.sha,
+      content: isBase64 ? contentUtf8OrB64 : utf8ToB64(contentUtf8OrB64),
+      ...(sha ? { sha } : {}),
       committer: { name: 'rubbermarbles-editor', email: 'actions@users.noreply.github.com' },
     }),
   });
@@ -192,16 +179,11 @@ async function ghSaveFile(newHtml, message) {
     const t = await res.text();
     throw new Error(`GitHub rejected the save (${res.status}): ${t.slice(0, 300)}`);
   }
+  return res.json();
 }
 
-// ---------- validation, same discipline as the automation scripts ----------
+// ================= validation =================
 function validateHtml(html) {
-  // Written as '<\/script>' (not the literal 8-char sequence) — this
-  // file's own <script> block would otherwise be closed early by an
-  // HTML parser the instant it scans past that substring, since the
-  // browser's tokenizer looks for that byte sequence regardless of JS
-  // string context. Same reason index.html's automation scripts never
-  // need this trick: they run under Node, not a browser HTML parser.
   const scriptContent = html.slice(html.indexOf('<script>') + 8, html.lastIndexOf('<\/script>'));
   try { new Function(scriptContent); }
   catch (e) { return { ok: false, error: 'A change broke the page script: ' + e.message }; }
@@ -211,7 +193,7 @@ function validateHtml(html) {
   return { ok: true };
 }
 
-// ---------- Hero (homepage headline/deck) ----------
+// ================= Hero (homepage headline/deck) =================
 function getHero(html) {
   const secStart = html.indexOf('<section class="hero">');
   const secEnd = html.indexOf('</section>', secStart);
@@ -219,20 +201,17 @@ function getHero(html) {
   const h1m = slice.match(/<h1>([\s\S]*?)<\/h1>/);
   const dekm = slice.match(/<p class="deck">([\s\S]*?)<\/p>/);
   if (!h1m || !dekm) return null;
-  return {
-    h1: h1m[1], dek: dekm[1],
-    h1Full: h1m[0], dekFull: dekm[0],
-  };
+  return { h1: h1m[1], dek: dekm[1], h1Full: h1m[0], dekFull: dekm[0] };
 }
 function setHero(html, newH1, newDek) {
   const hero = getHero(html);
   if (!hero) return html;
-  html = html.replace(hero.h1Full, `<h1>${newH1}</h1>`);
-  html = html.replace(hero.dekFull, `<p class="deck">${newDek}</p>`);
+  if (newH1 != null) html = html.replace(hero.h1Full, `<h1>${newH1}</h1>`);
+  if (newDek != null) html = html.replace(getHero(html).dekFull, `<p class="deck">${newDek}</p>`);
   return html;
 }
 
-// ---------- Per-series "what to know" blurb ----------
+// ================= Per-series "what to know" blurb =================
 function viewBounds(html, view) {
   const marker = `id="view-${view}"`;
   const start = html.indexOf(marker);
@@ -257,32 +236,15 @@ function setBlurb(html, view, newText) {
   if (!blurb) return html;
   const before = html.slice(0, blurb.offset);
   const after = html.slice(blurb.offset + blurb.full.length);
-  const newBlock = `<h4>${blurb.label}</h4>\n        <p>${newText}</p>`;
-  return before + newBlock + after;
+  return before + `<h4>${blurb.label}</h4>\n        <p>${newText}</p>` + after;
 }
 
-// ---------- Images site-wide ----------
-function listImages(html) {
-  const re = /<img\b[^>]*>/g;
-  const seen = new Map();
-  let m;
-  while ((m = re.exec(html))) {
-    const tag = m[0];
-    const srcM = tag.match(/src="([^"]*)"/);
-    const altM = tag.match(/alt="([^"]*)"/);
-    if (!srcM) continue;
-    const src = srcM[1];
-    const alt = altM ? altM[1] : '';
-    if (seen.has(src)) seen.get(src).count++;
-    else seen.set(src, { src, alt, count: 1 });
-  }
-  return [...seen.values()].sort((a, b) => b.count - a.count);
-}
+// ================= Images site-wide =================
 function replaceImageSrc(html, oldSrc, newSrc) {
   return html.split(`src="${oldSrc}"`).join(`src="${newSrc}"`);
 }
 
-// ---------- Articles (mirrors scripts/lib/articles.mjs exactly) ----------
+// ================= Articles (mirrors scripts/lib/articles.mjs) =================
 const ARTICLES_START = 'const ARTICLES = {';
 const ARTICLES_CLOSE = '\n};\n\nfunction renderArticle(slug){';
 function dq(s) { return `"${String(s).replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`; }
@@ -317,209 +279,293 @@ function writeArticles(html, articles) {
   const newLiteral = `{\n${entries.join(',\n')},\n}`;
   return html.slice(0, start) + 'const ARTICLES = ' + newLiteral + html.slice(end + 2);
 }
-// Story-card previews (homepage, series pages, full Wire page) are static
-// HTML baked in at write-time elsewhere in the file — editing ARTICLES
-// alone won't update them. Since they embed the plain title/dek text
-// with no escaping, a global find-and-replace of the literal old text
-// (outside the ARTICLES block itself, which writeArticles already
-// handled correctly) catches every copy at once.
+// Story-card previews (homepage, series page, full Wire page) are static
+// HTML baked in at write-time, not re-rendered from ARTICLES at load —
+// so a title/dek change needs a plain-text find/replace outside the
+// ARTICLES block too, to reach every copy.
 function propagateArticleTextChange(html, oldText, newText) {
   if (!oldText || oldText === newText) return html;
   const { start, end } = locateArticles(html);
-  // Replace independently on each side and concatenate fresh — reusing
-  // the original start/end offsets after a length-changing replacement
-  // would misalign the re-insertion point (a real bug caught here: if
-  // oldText also appears in `before`, e.g. in a story-card preview, its
-  // replacement shifts everything after it, so `start` no longer points
-  // at the same place in the replaced string).
   const before = html.slice(0, start).split(oldText).join(newText);
   const articlesBlock = html.slice(start, end);
   const after = html.slice(end).split(oldText).join(newText);
   return before + articlesBlock + after;
 }
 
-// ---------- staging ----------
-function markPending(fieldEl) {
-  fieldEl.classList.add('pending');
-  updateStatusBar();
-}
-function updateStatusBar() {
-  const bar = document.getElementById('status-bar');
-  const dirty = workingHtml !== originalHtml;
-  bar.style.display = dirty ? 'flex' : 'none';
-  document.getElementById('status-msg').textContent = dirty ? 'You have unpublished changes.' : '';
-}
-
-// ---------- Homepage tab ----------
-function renderHomepageTab() {
-  const el = document.getElementById('tab-homepage');
-  const hero = getHero(workingHtml);
-  if (!hero) { el.innerHTML = '<p>Could not find the homepage headline section.</p>'; return; }
-  el.innerHTML = `
-    <div class="field" id="field-h1">
-      <span class="pending-tag">STAGED</span>
-      <label>Headline (you can wrap a word in &lt;em&gt;...&lt;/em&gt; for amber highlight)</label>
-      <textarea id="h1-input" rows="2">${hero.h1}</textarea>
-      <div class="row"><button data-action="apply-hero">Apply</button></div>
-    </div>
-    <div class="field" id="field-dek">
-      <span class="pending-tag">STAGED</span>
-      <label>Summary paragraph</label>
-      <textarea id="dek-input" rows="4">${hero.dek}</textarea>
-      <div class="row"><button data-action="apply-hero">Apply</button></div>
-    </div>
-  `;
-  el.querySelectorAll('[data-action="apply-hero"]').forEach(btn => btn.addEventListener('click', () => {
-    const newH1 = document.getElementById('h1-input').value;
-    const newDek = document.getElementById('dek-input').value;
-    workingHtml = setHero(workingHtml, newH1, newDek);
-    document.getElementById('field-h1').classList.add('pending');
-    document.getElementById('field-dek').classList.add('pending');
-    updateStatusBar();
-  }));
-}
-
-// ---------- Blurbs tab ----------
-function renderBlurbsTab() {
-  const el = document.getElementById('tab-blurbs');
-  el.innerHTML = '';
-  for (const view of Object.keys(SERIES_META)) {
-    const blurb = getBlurb(workingHtml, view);
-    if (!blurb) continue;
-    const field = document.createElement('div');
-    field.className = 'field';
-    field.id = 'field-blurb-' + view;
-    field.innerHTML = `
-      <span class="pending-tag">STAGED</span>
-      <label>${SERIES_META[view].chipText} — "${blurb.label}"</label>
-      <textarea rows="3" data-view="${view}">${blurb.text}</textarea>
-      <div class="row"><button data-action="apply-blurb" data-view="${view}">Apply</button></div>
-    `;
-    el.appendChild(field);
+// ================= Generic repeating-block grid containers =================
+// Locates every <section class="events-grid"> / <section class="news-grid...">
+// in document order — same order querySelectorAll returns them in the
+// iframe, so "the Nth one in the DOM" and "the Nth one here" refer to
+// the same container even after earlier text/image edits (those never
+// add or remove a grid section, only reorder/replace ones already found).
+function findAllGridContainers(html) {
+  // Some news-grid sections carry an extra style="..." attribute
+  // (e.g. the per-series "On the Wire" sections) — match any trailing
+  // attributes, not just an exact class="...">.
+  const re = /<section class="(events-grid|news-grid[^"]*)"[^>]*>/g;
+  const out = [];
+  let m;
+  while ((m = re.exec(html))) {
+    const openEnd = m.index + m[0].length;
+    const closeStart = html.indexOf('</section>', openEnd);
+    out.push({ cls: m[1], openTag: m[0], innerStart: openEnd, innerEnd: closeStart });
   }
-  el.querySelectorAll('[data-action="apply-blurb"]').forEach(btn => btn.addEventListener('click', () => {
-    const view = btn.dataset.view;
-    const textarea = el.querySelector(`textarea[data-view="${view}"]`);
-    workingHtml = setBlurb(workingHtml, view, textarea.value);
-    document.getElementById('field-blurb-' + view).classList.add('pending');
-    updateStatusBar();
-  }));
+  return out;
+}
+function splitBlocks(innerHtml, childMarkerRe) {
+  const idxs = [];
+  let m;
+  const re = new RegExp(childMarkerRe.source, 'g');
+  while ((m = re.exec(innerHtml))) idxs.push(m.index);
+  return idxs.map((start, i) => innerHtml.slice(start, idxs[i + 1] ?? innerHtml.length));
+}
+function blockKey(blockHtml) {
+  // event-cards use <h3>; story cards use <h4> and don't always link to
+  // an article (some link straight to a series page instead), so slug
+  // isn't always present — the title text is the one thing every block
+  // type reliably has and is unique within a single grid.
+  const slugM = blockHtml.match(/href="#article:([^"]+)"/);
+  if (slugM) return 'slug:' + slugM[1];
+  const h3m = blockHtml.match(/<h3>([^<]*)<\/h3>/);
+  if (h3m) return 'h3:' + h3m[1];
+  const h4m = blockHtml.match(/<h4>([^<]*)<\/h4>/);
+  if (h4m) return 'h4:' + h4m[1];
+  return null;
+}
+// newKeyOrder: array of blockKey() values in the desired new order.
+function reorderGridContainer(html, gridIndex, newKeyOrder) {
+  const containers = findAllGridContainers(html);
+  const c = containers[gridIndex];
+  if (!c) return html;
+  const inner = html.slice(c.innerStart, c.innerEnd);
+  const childMarkerRe = c.cls.startsWith('events-grid') ? /<div class="event-card">/ : /<a class="story"[^>]*>/;
+  const blocks = splitBlocks(inner, childMarkerRe);
+  const byKey = new Map(blocks.map(b => [blockKey(b), b]));
+  const reordered = newKeyOrder.map(k => byKey.get(k)).filter(Boolean);
+  if (reordered.length !== blocks.length) return html; // safety: don't apply a partial/mismatched reorder
+  const newInner = reordered.join('');
+  return html.slice(0, c.innerStart) + newInner + html.slice(c.innerEnd);
 }
 
-// ---------- Articles tab ----------
-let selectedArticleSlug = null;
-function renderArticlesTab() {
-  const el = document.getElementById('tab-articles');
-  const articles = parseArticles(workingHtml);
-  const slugs = Object.keys(articles);
-  if (!selectedArticleSlug) selectedArticleSlug = slugs[0];
+// ================= status / staging =================
+function setStatus(msg, cls) {
+  const el = document.getElementById('status-msg');
+  el.textContent = msg || '';
+  el.className = cls || '';
+}
+function markDirty() {
+  setStatus('You have unpublished changes.', '');
+}
 
-  const listHtml = `<div class="article-list">` + slugs.map(slug =>
-    `<button data-slug="${slug}" class="${slug === selectedArticleSlug ? 'active' : ''}">${articles[slug].title}</button>`
-  ).join('') + `</div>`;
+// ================= iframe instrumentation =================
+function instrumentFrame() {
+  const doc = document.getElementById('site-frame').contentDocument;
+  if (!doc) return;
 
-  const a = articles[selectedArticleSlug];
-  const formHtml = a ? `
-    <div class="field" id="field-article">
-      <span class="pending-tag">STAGED</span>
-      <label>Title</label>
-      <input type="text" id="art-title" value="${a.title.replace(/"/g, '&quot;')}">
-      <label style="margin-top:14px;">Dek (subhead)</label>
-      <input type="text" id="art-dek" value="${a.dek.replace(/"/g, '&quot;')}">
-      <label style="margin-top:14px;">Category</label>
-      <input type="text" id="art-category" value="${a.category}">
-      <label style="margin-top:14px;">Body (one paragraph per line)</label>
-      <textarea id="art-body" rows="10">${a.body.join('\n\n')}</textarea>
-      <div class="row"><button data-action="apply-article">Apply</button></div>
-    </div>
-  ` : '<p>No articles found.</p>';
+  const style = doc.createElement('style');
+  style.textContent = `
+    [data-editable]{ cursor:text; }
+    [data-editable]:hover{ outline:2px dashed #ffb300; outline-offset:2px; }
+    [data-editable][contenteditable="true"]{ outline:2px solid #ffb300; background:rgba(255,179,0,.08); }
+    img[data-edit-img]{ cursor:pointer; }
+    img[data-edit-img]:hover{ outline:3px dashed #ffb300; outline-offset:-3px; }
+    [data-drag-child]{ cursor:grab; }
+    [data-drag-child].dragging{ opacity:.35; }
+    [data-drag-child].drop-before{ box-shadow: -4px 0 0 0 #ffb300 inset; }
+    [data-drag-child].drop-after{ box-shadow: 4px 0 0 0 #ffb300 inset; }
+  `;
+  doc.head.appendChild(style);
 
-  el.innerHTML = listHtml + formHtml;
+  // ---- text: hero ----
+  const heroSection = doc.querySelector('section.hero');
+  if (heroSection) {
+    const h1 = heroSection.querySelector('h1');
+    const dek = heroSection.querySelector('p.deck');
+    if (h1) wireEditableText(h1, () => { workingHtml = setHero(workingHtml, h1.innerHTML.trim(), null); markDirty(); });
+    if (dek) wireEditableText(dek, () => { workingHtml = setHero(workingHtml, null, dek.innerHTML.trim()); markDirty(); });
+  }
 
-  el.querySelectorAll('.article-list button').forEach(btn => btn.addEventListener('click', () => {
-    selectedArticleSlug = btn.dataset.slug;
-    renderArticlesTab();
-  }));
-  const applyBtn = el.querySelector('[data-action="apply-article"]');
-  if (applyBtn) applyBtn.addEventListener('click', () => {
+  // ---- text: per-series blurbs ----
+  for (const view of Object.keys(SERIES_META)) {
+    const section = doc.getElementById('view-' + view);
+    if (!section) continue;
+    const p = section.querySelector('.watch-block p');
+    if (p) wireEditableText(p, () => { workingHtml = setBlurb(workingHtml, view, p.innerHTML.trim()); markDirty(); });
+  }
+
+  // ---- text: article view (populated dynamically by the site's own renderArticle()) ----
+  const artTitle = doc.getElementById('article-title');
+  const artDek = doc.getElementById('article-dek');
+  const artBody = doc.getElementById('article-body');
+  function currentArticleSlug() {
+    const raw = (doc.defaultView.location.hash || '').slice(1);
+    const [, anchor] = raw.split(':');
+    return anchor || null;
+  }
+  function applyArticleEdit(mutate) {
+    const slug = currentArticleSlug();
+    if (!slug) return;
     const articles = parseArticles(workingHtml);
-    const old = articles[selectedArticleSlug];
-    const oldTitle = old.title, oldDek = old.dek;
-    const newTitle = document.getElementById('art-title').value;
-    const newDek = document.getElementById('art-dek').value;
-    old.title = newTitle;
-    old.dek = newDek;
-    old.category = document.getElementById('art-category').value;
-    old.body = document.getElementById('art-body').value.split(/\n\s*\n/).map(p => p.trim()).filter(Boolean);
+    const a = articles[slug];
+    if (!a) return;
+    const oldTitle = a.title, oldDek = a.dek;
+    mutate(a);
     workingHtml = writeArticles(workingHtml, articles);
-    workingHtml = propagateArticleTextChange(workingHtml, oldTitle, newTitle);
-    workingHtml = propagateArticleTextChange(workingHtml, oldDek, newDek);
-    document.getElementById('field-article').classList.add('pending');
-    updateStatusBar();
+    workingHtml = propagateArticleTextChange(workingHtml, oldTitle, a.title);
+    workingHtml = propagateArticleTextChange(workingHtml, oldDek, a.dek);
+    markDirty();
+  }
+  if (artTitle) wireEditableText(artTitle, () => applyArticleEdit(a => { a.title = artTitle.textContent.trim(); }));
+  if (artDek) wireEditableText(artDek, () => applyArticleEdit(a => { a.dek = artDek.textContent.trim(); }));
+  if (artBody) wireEditableText(artBody, () => applyArticleEdit(a => {
+    a.body = [...artBody.querySelectorAll('p')].map(p => p.textContent.trim()).filter(Boolean);
+  }));
+
+  function wireEditableText(el, onCommit) {
+    el.setAttribute('data-editable', '1');
+    el.addEventListener('click', function (e) {
+      e.stopPropagation();
+      e.preventDefault();
+      el.setAttribute('contenteditable', 'true');
+      el.focus();
+    }, true);
+    el.addEventListener('blur', () => {
+      el.removeAttribute('contenteditable');
+      onCommit();
+    });
+    // Enter commits single-line-ish fields instead of inserting a line
+    // break; the article body is the one field meant to hold multiple
+    // paragraphs, so Enter there behaves normally.
+    el.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && el !== artBody) {
+        e.preventDefault();
+        el.blur();
+      }
+    });
+  }
+
+  // ---- images ----
+  doc.querySelectorAll('img').forEach(img => {
+    img.setAttribute('data-edit-img', '1');
+    img.addEventListener('click', function (e) {
+      e.stopPropagation();
+      e.preventDefault();
+      openImageModal(img.getAttribute('src'), (newSrc) => {
+        const oldSrc = img.getAttribute('src');
+        workingHtml = replaceImageSrc(workingHtml, oldSrc, newSrc);
+        doc.querySelectorAll(`img[src="${CSS.escape(oldSrc)}"]`).forEach(i => i.setAttribute('src', newSrc));
+        markDirty();
+      });
+    }, true);
+  });
+
+  // ---- drag-and-drop grid reordering ----
+  doc.querySelectorAll('.events-grid, .news-grid').forEach((grid, gridIndex) => {
+    grid.setAttribute('data-grid-index', String(gridIndex));
+    const children = [...grid.children];
+    let dragEl = null;
+    children.forEach(child => {
+      child.setAttribute('draggable', 'true');
+      child.setAttribute('data-drag-child', '1');
+      child.addEventListener('dragstart', (e) => {
+        dragEl = child;
+        child.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+      });
+      child.addEventListener('dragend', () => {
+        child.classList.remove('dragging');
+        grid.querySelectorAll('[data-drag-child]').forEach(c => c.classList.remove('drop-before', 'drop-after'));
+      });
+      child.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        if (!dragEl || dragEl === child) return;
+        const rect = child.getBoundingClientRect();
+        const before = (e.clientX - rect.left) < rect.width / 2;
+        grid.querySelectorAll('[data-drag-child]').forEach(c => c.classList.remove('drop-before', 'drop-after'));
+        child.classList.add(before ? 'drop-before' : 'drop-after');
+      });
+      child.addEventListener('drop', (e) => {
+        e.preventDefault();
+        if (!dragEl || dragEl === child) return;
+        const rect = child.getBoundingClientRect();
+        const before = (e.clientX - rect.left) < rect.width / 2;
+        grid.insertBefore(dragEl, before ? child : child.nextSibling);
+        grid.querySelectorAll('[data-drag-child]').forEach(c => c.classList.remove('drop-before', 'drop-after'));
+        const newKeyOrder = [...grid.children].map(c => blockKey(c.outerHTML));
+        const idx = Number(grid.getAttribute('data-grid-index'));
+        workingHtml = reorderGridContainer(workingHtml, idx, newKeyOrder);
+        markDirty();
+      });
+    });
+  });
+
+  // ---- image editor modal ----
+  let onApplyImage = null;
+  function openImageModal(currentSrc, onApply) {
+    onApplyImage = onApply;
+    document.getElementById('img-modal-preview').src = currentSrc;
+    document.getElementById('img-modal-url').value = currentSrc;
+    document.getElementById('img-modal-file').value = '';
+    document.getElementById('img-modal-backdrop').style.display = 'flex';
+  }
+  window.__closeImageModal = () => { document.getElementById('img-modal-backdrop').style.display = 'none'; onApplyImage = null; };
+  window.__applyImageModal = async () => {
+    const fileInput = document.getElementById('img-modal-file');
+    const urlInput = document.getElementById('img-modal-url');
+    if (fileInput.files && fileInput.files[0]) {
+      const file = fileInput.files[0];
+      const b64 = await fileToBase64(file);
+      const path = `uploads/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, '')}`;
+      setStatus('Uploading image…', '');
+      try {
+        await ghSaveFile(path, b64, `Upload ${path} via site editor`, true);
+        if (onApplyImage) onApplyImage(path);
+        setStatus('Image uploaded — remember to Publish.', 'ok');
+      } catch (e) {
+        setStatus(e.message, 'error');
+      }
+    } else if (urlInput.value.trim() && onApplyImage) {
+      onApplyImage(urlInput.value.trim());
+    }
+    window.__closeImageModal();
+  };
+}
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
   });
 }
 
-// ---------- Images tab ----------
-function renderImagesTab() {
-  const el = document.getElementById('tab-images');
-  el.innerHTML = `<input type="text" id="search-box" placeholder="Filter by image URL or alt text…">
-    <div id="image-list"></div>`;
-  function draw(filter) {
-    const images = listImages(workingHtml).filter(img =>
-      !filter || img.src.toLowerCase().includes(filter) || img.alt.toLowerCase().includes(filter)
-    ).slice(0, 60);
-    const list = document.getElementById('image-list');
-    list.innerHTML = images.map((img, i) => `
-      <div class="img-item">
-        <img src="${img.src}" alt="" onerror="this.style.opacity=0.15">
-        <div class="meta">
-          <div class="alt">${img.alt || '(no alt text)'}</div>
-          <div class="count">used ${img.count}× in the page</div>
-          <input type="text" data-old="${img.src}" value="${img.src}">
-        </div>
-        <button data-action="apply-image" data-old="${img.src}" data-index="${i}">Apply</button>
-      </div>
-    `).join('') || '<p style="color:var(--text-faint);">No matches.</p>';
-    list.querySelectorAll('[data-action="apply-image"]').forEach(btn => btn.addEventListener('click', () => {
-      const oldSrc = btn.dataset.old;
-      const input = list.querySelector(`input[data-old="${CSS.escape(oldSrc)}"]`);
-      const newSrc = input.value.trim();
-      if (!newSrc || newSrc === oldSrc) return;
-      workingHtml = replaceImageSrc(workingHtml, oldSrc, newSrc);
-      btn.closest('.img-item').style.borderColor = 'var(--amber)';
-      updateStatusBar();
-    }));
-  }
-  draw('');
-  document.getElementById('search-box').addEventListener('input', e => draw(e.target.value.trim().toLowerCase()));
-}
+document.getElementById('img-modal-cancel').addEventListener('click', () => window.__closeImageModal());
+document.getElementById('img-modal-apply').addEventListener('click', () => window.__applyImageModal());
 
-// ---------- tabs ----------
-document.querySelectorAll('.tab-btn').forEach(btn => btn.addEventListener('click', () => {
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b === btn));
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
-}));
-
-// ---------- connect / publish / discard ----------
+// ================= connect / publish / discard =================
 async function connect() {
   const statusEl = document.getElementById('login-status');
   token = document.getElementById('token-input').value.trim();
   if (!token) { statusEl.textContent = 'Paste a token first.'; return; }
   statusEl.textContent = 'Connecting…';
   try {
-    originalHtml = await ghFetchFile();
+    const data = await ghGetFile(FILE_PATH);
+    currentSha = data.sha;
+    originalHtml = b64ToUtf8(data.content);
     workingHtml = originalHtml;
     localStorage.setItem(TOKEN_KEY, token);
     document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('editor-screen').style.display = 'block';
-    renderHomepageTab();
-    renderBlurbsTab();
-    renderArticlesTab();
-    renderImagesTab();
+    document.getElementById('toolbar').style.display = 'flex';
+    document.getElementById('canvas-wrap').style.display = 'block';
+    loadFrame();
   } catch (e) {
     statusEl.textContent = e.message;
   }
+}
+function loadFrame() {
+  const frame = document.getElementById('site-frame');
+  frame.srcdoc = workingHtml;
+  frame.onload = () => instrumentFrame();
 }
 document.getElementById('connect-btn').addEventListener('click', connect);
 document.getElementById('token-input').addEventListener('keydown', e => { if (e.key === 'Enter') connect(); });
@@ -527,28 +573,23 @@ document.getElementById('token-input').addEventListener('keydown', e => { if (e.
 document.getElementById('discard-btn').addEventListener('click', () => {
   if (!confirm('Discard all staged changes? This cannot be undone.')) return;
   workingHtml = originalHtml;
-  renderHomepageTab(); renderBlurbsTab(); renderArticlesTab(); renderImagesTab();
-  updateStatusBar();
+  setStatus('', '');
+  loadFrame();
 });
 
 document.getElementById('publish-btn').addEventListener('click', async () => {
-  const statusEl = document.getElementById('status-msg');
   const v = validateHtml(workingHtml);
-  if (!v.ok) { statusEl.textContent = v.error; statusEl.className = 'msg error'; return; }
-  statusEl.textContent = 'Publishing…'; statusEl.className = 'msg';
+  if (!v.ok) { setStatus(v.error, 'error'); return; }
+  setStatus('Publishing…', '');
   try {
-    await ghSaveFile(workingHtml, 'Edit via site editor');
+    await ghSaveFile(FILE_PATH, workingHtml, 'Edit via site editor', false);
     originalHtml = workingHtml;
-    statusEl.textContent = 'Published. The live site will update within a minute or two.';
-    statusEl.className = 'msg ok';
-    document.querySelectorAll('.field.pending').forEach(f => f.classList.remove('pending'));
+    setStatus('Published — the live site will update within a minute or two.', 'ok');
   } catch (e) {
-    statusEl.textContent = e.message;
-    statusEl.className = 'msg error';
+    setStatus(e.message, 'error');
   }
 });
 
-// auto-connect if a token is already saved
 if (token) {
   document.getElementById('token-input').value = token;
   connect();
