@@ -52,20 +52,20 @@ button:disabled{opacity:.5; cursor:not-allowed;}
 #canvas-wrap{flex:1; min-height:0; display:none; position:relative;}
 #site-frame{width:100%; height:100%; border:none; display:block; background:#fff;}
 
-/* ---------- image edit modal ---------- */
-#img-modal-backdrop{
+/* ---------- modals ---------- */
+#img-modal-backdrop, #result-modal-backdrop{
   display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:200;
   align-items:center; justify-content:center;
 }
-#img-modal{
+#img-modal, #result-modal{
   background:var(--surface); border:1px solid var(--rule); border-radius:8px; padding:24px;
   width:420px; max-width:90vw;
 }
-#img-modal h3{margin:0 0 14px; font-size:15px;}
+#img-modal h3, #result-modal h3{margin:0 0 14px; font-size:15px;}
 #img-modal .preview{width:100%; height:140px; background:#f1efe9; border-radius:4px; display:flex; align-items:center; justify-content:center; margin-bottom:14px; overflow:hidden;}
 #img-modal .preview img{max-width:100%; max-height:100%; object-fit:contain;}
-#img-modal label{display:block; font-size:11.5px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px; margin-top:14px;}
-#img-modal .row{display:flex; gap:10px; margin-top:20px; justify-content:flex-end;}
+#img-modal label, #result-modal label{display:block; font-size:11.5px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px; margin-top:14px;}
+#img-modal .row, #result-modal .row{display:flex; gap:10px; margin-top:20px; justify-content:flex-end;}
 #img-modal .or{font-size:11.5px; color:var(--text-faint); text-align:center; margin:14px 0;}
 </style>
 </head>
@@ -88,7 +88,7 @@ button:disabled{opacity:.5; cursor:not-allowed;}
 
 <div id="toolbar">
   <span class="brand">Site Editor</span>
-  <span class="hint">Click text or images on the page to edit them. Drag cards within a grid to reorder.</span>
+  <span class="hint">Click text, images, or "Know the Rules" blocks to edit. Click a schedule row or calendar race to set/fix a result. Drag cards within a grid to reorder.</span>
   <span id="status-msg"></span>
   <button class="secondary" id="discard-btn">Discard changes</button>
   <button id="publish-btn">Publish to GitHub</button>
@@ -113,31 +113,39 @@ button:disabled{opacity:.5; cursor:not-allowed;}
   </div>
 </div>
 
-<script>
+<div id="result-modal-backdrop">
+  <div id="result-modal">
+    <h3 id="result-modal-title">Edit result</h3>
+    <p id="result-modal-sub" style="font-size:12.5px; color:var(--text-faint); margin-bottom:6px;"></p>
+    <label>Winner</label>
+    <input type="text" id="result-modal-winner" placeholder="e.g. Kyle Larson">
+    <label>Note (one factual sentence)</label>
+    <textarea id="result-modal-note" rows="3" placeholder="e.g. Snapped a 51-race winless streak, holding off teammate Alex Bowman."></textarea>
+    <div class="row">
+      <button class="secondary" id="result-modal-cancel">Cancel</button>
+      <button id="result-modal-apply">Apply</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { SERIES_META } from './scripts/lib/series-meta.mjs';
+import { parseNamedLiteral } from './scripts/lib/html-utils.mjs';
+import { parseCalEvents, writeCalEvents, setEventResult } from './scripts/lib/cal-events.mjs';
+import { parseArticles, writeArticles } from './scripts/lib/articles.mjs';
+import {
+  computeSeriesState, refreshAllNextUpPanels, refreshHomeEventsGrid,
+} from './scripts/lib/nextup.mjs';
+
 const OWNER = 'Exact-Crescent18';
 const REPO = '94rubbermarbles';
 const FILE_PATH = 'index.html';
-const API_URL = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${FILE_PATH}`;
 const TOKEN_KEY = 'rubbermarbles_admin_token';
-
-const SERIES_META = {
-  'f1': { chip: 'f1', chipText: 'Formula 1' },
-  'nascar-cup': { chip: 'nascar', chipText: 'NASCAR Cup' },
-  'nascar-oreilly': { chip: 'nascar', chipText: "O'Reilly Series" },
-  'nascar-truck': { chip: 'nascar', chipText: 'Truck Series' },
-  'arca': { chip: 'nascar', chipText: 'ARCA Menards' },
-  'indycar': { chip: 'indy', chipText: 'NTT IndyCar' },
-  'indy-nxt': { chip: 'indy', chipText: 'Indy NXT' },
-  'motogp': { chip: 'moto', chipText: 'MotoGP' },
-  'wec': { chip: 'wec', chipText: 'WEC' },
-  'wrc': { chip: 'wrc', chipText: 'WRC' },
-  'formula-e': { chip: 'formula-e', chipText: 'Formula E' },
-};
+const noopPhrase = async () => null; // no live Groq key here — falls back to plain generated text, same as the manual-catchup path used earlier this project
 
 let token = localStorage.getItem(TOKEN_KEY) || '';
 let originalHtml = null;
 let workingHtml = null;
-let currentSha = null;
 
 // ================= utf8-safe base64 =================
 function b64ToUtf8(b64) {
@@ -161,10 +169,7 @@ async function ghGetFile(path) {
 }
 async function ghSaveFile(path, contentUtf8OrB64, message, isBase64) {
   let sha;
-  try {
-    const latest = await ghGetFile(path);
-    sha = latest.sha;
-  } catch { sha = undefined; } // file may not exist yet (e.g. a new upload)
+  try { sha = (await ghGetFile(path)).sha; } catch { sha = undefined; } // file may not exist yet (a new upload)
   const res = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${path}`, {
     method: 'PUT',
     headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' },
@@ -183,7 +188,12 @@ async function ghSaveFile(path, contentUtf8OrB64, message, isBase64) {
 }
 
 // ================= validation =================
-function validateHtml(html) {
+// Validates index.html — the file actually being published — before
+// every save. Written as '<\/script>' (not the literal sequence): a
+// browser's HTML parser would otherwise close *this* file's own
+// <script> block early the instant it scans past that byte sequence,
+// regardless of JS string context.
+function validateIndexHtml(html) {
   const scriptContent = html.slice(html.indexOf('<script>') + 8, html.lastIndexOf('<\/script>'));
   try { new Function(scriptContent); }
   catch (e) { return { ok: false, error: 'A change broke the page script: ' + e.message }; }
@@ -191,24 +201,6 @@ function validateHtml(html) {
   const open = (css.match(/{/g) || []).length, close = (css.match(/}/g) || []).length;
   if (open !== close) return { ok: false, error: `A change broke the stylesheet (brace mismatch: ${open} vs ${close}).` };
   return { ok: true };
-}
-
-// ================= Hero (homepage headline/deck) =================
-function getHero(html) {
-  const secStart = html.indexOf('<section class="hero">');
-  const secEnd = html.indexOf('</section>', secStart);
-  const slice = html.slice(secStart, secEnd);
-  const h1m = slice.match(/<h1>([\s\S]*?)<\/h1>/);
-  const dekm = slice.match(/<p class="deck">([\s\S]*?)<\/p>/);
-  if (!h1m || !dekm) return null;
-  return { h1: h1m[1], dek: dekm[1], h1Full: h1m[0], dekFull: dekm[0] };
-}
-function setHero(html, newH1, newDek) {
-  const hero = getHero(html);
-  if (!hero) return html;
-  if (newH1 != null) html = html.replace(hero.h1Full, `<h1>${newH1}</h1>`);
-  if (newDek != null) html = html.replace(getHero(html).dekFull, `<p class="deck">${newDek}</p>`);
-  return html;
 }
 
 // ================= Per-series "what to know" blurb =================
@@ -239,76 +231,76 @@ function setBlurb(html, view, newText) {
   return before + `<h4>${blurb.label}</h4>\n        <p>${newText}</p>` + after;
 }
 
+// ================= "Know the Rules" blocks =================
+// Each .rules-block has a unique id (e.g. "f1-format"). Everything after
+// its <h4> label (which carries the numbered badge, kept fixed so it
+// can't be accidentally typed over) up to the block's own closing </div>
+// is the editable content — safe to find with a plain indexOf since
+// rules-blocks never nest another <div> inside themselves.
+function getRulesBlock(html, blockId) {
+  const idIdx = html.indexOf(`id="${blockId}"`);
+  if (idIdx === -1) return null;
+  const h4Close = html.indexOf('</h4>', idIdx);
+  if (h4Close === -1) return null;
+  const contentStart = h4Close + '</h4>'.length;
+  const contentEnd = html.indexOf('</div>', contentStart);
+  return { contentStart, contentEnd };
+}
+function setRulesBlock(html, blockId, newContent) {
+  const b = getRulesBlock(html, blockId);
+  if (!b) return html;
+  return html.slice(0, b.contentStart) + newContent + html.slice(b.contentEnd);
+}
+
 // ================= Images site-wide =================
 function replaceImageSrc(html, oldSrc, newSrc) {
   return html.split(`src="${oldSrc}"`).join(`src="${newSrc}"`);
 }
 
-// ================= Articles (mirrors scripts/lib/articles.mjs) =================
-const ARTICLES_START = 'const ARTICLES = {';
-const ARTICLES_CLOSE = '\n};\n\nfunction renderArticle(slug){';
-function dq(s) { return `"${String(s).replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`; }
-function sq(s) { return `'${String(s).replace(/'/g, "\\'")}'`; }
-function locateArticles(html) {
-  const start = html.indexOf(ARTICLES_START);
-  const end = html.indexOf(ARTICLES_CLOSE, start);
-  if (start === -1 || end === -1) throw new Error('Could not locate ARTICLES block.');
-  return { start, end };
+// ================= Hero carousel slide image (Track Map art) =================
+// Sets the article's own trackImg override field (see
+// scripts/lib/hero-carousel.mjs) and regenerates just the carousel block
+// — reuses the exact same render function the automation uses, so the
+// result is byte-consistent with what a bot-driven update would produce.
+async function setSlideImage(html, slug, newSrc) {
+  const { renderCarousel, getLeadStories, replaceCarousel } = await import('./scripts/lib/hero-carousel.mjs');
+  const articles = parseArticles(html);
+  if (!articles[slug]) return html;
+  articles[slug].trackImg = newSrc;
+  html = writeArticles(html, articles);
+  const tracks = parseNamedLiteral(html, 'TRACKS')?.value || {};
+  return replaceCarousel(html, renderCarousel(getLeadStories(html), articles, tracks));
 }
-function parseArticles(html) {
-  const { start, end } = locateArticles(html);
-  const literal = html.slice(start + 'const ARTICLES = '.length, end + 2);
-  return new Function(`return ${literal}`)();
-}
-function serializeOneArticle(slug, a) {
-  const bodyLines = a.body.map(p => `      ${dq(p)},`).join('\n');
-  const publishLine = a.publishAt ? `\n    publishAt:${sq(a.publishAt)},` : '';
-  return `  ${sq(slug)}: {
-    view:${sq(a.view)}, chip:${sq(a.chip)}, chipLogo:${sq(a.chipLogo)}, chipText:${sq(a.chipText)},
-    title:${dq(a.title)}, category:${sq(a.category)}, readTime:${sq(a.readTime)}, date:${sq(a.date)},
-    track:${sq(a.track || '')},
-    dek:${dq(a.dek)},${publishLine}
-    body:[
-${bodyLines}
-    ],
-  }`;
-}
-function writeArticles(html, articles) {
-  const { start, end } = locateArticles(html);
-  const entries = Object.entries(articles).map(([slug, a]) => serializeOneArticle(slug, a));
-  const newLiteral = `{\n${entries.join(',\n')},\n}`;
-  return html.slice(0, start) + 'const ARTICLES = ' + newLiteral + html.slice(end + 2);
-}
-// Story-card previews (homepage, series page, full Wire page) are static
-// HTML baked in at write-time, not re-rendered from ARTICLES at load —
-// so a title/dek change needs a plain-text find/replace outside the
-// ARTICLES block too, to reach every copy.
+
+// ================= Articles: propagate a title/dek edit to story-card previews =================
+// Story-card previews (homepage, series page, full Wire page, and now
+// the hero carousel) are static HTML baked in at write time, not
+// re-rendered from ARTICLES on load — so a title/dek change needs a
+// plain-text find/replace outside the ARTICLES block too, to reach every
+// copy. writeArticles() has already corrected the ARTICLES block itself
+// by the time this runs.
 function propagateArticleTextChange(html, oldText, newText) {
   if (!oldText || oldText === newText) return html;
-  const { start, end } = locateArticles(html);
+  const start = html.indexOf('const ARTICLES = {');
+  const end = html.indexOf('\n};\n\nfunction renderArticle(slug){', start);
+  if (start === -1 || end === -1) return html;
   const before = html.slice(0, start).split(oldText).join(newText);
   const articlesBlock = html.slice(start, end);
   const after = html.slice(end).split(oldText).join(newText);
   return before + articlesBlock + after;
 }
 
-// ================= Generic repeating-block grid containers =================
-// Locates every <section class="events-grid"> / <section class="news-grid...">
-// in document order — same order querySelectorAll returns them in the
-// iframe, so "the Nth one in the DOM" and "the Nth one here" refer to
-// the same container even after earlier text/image edits (those never
-// add or remove a grid section, only reorder/replace ones already found).
+// ================= Generic repeating-block grid containers (drag/drop) =================
 function findAllGridContainers(html) {
-  // Some news-grid sections carry an extra style="..." attribute
-  // (e.g. the per-series "On the Wire" sections) — match any trailing
-  // attributes, not just an exact class="...">.
+  // Some news-grid sections carry an extra style="..." attribute (the
+  // per-series "On the Wire" sections) — match any trailing attributes.
   const re = /<section class="(events-grid|news-grid[^"]*)"[^>]*>/g;
   const out = [];
   let m;
   while ((m = re.exec(html))) {
     const openEnd = m.index + m[0].length;
     const closeStart = html.indexOf('</section>', openEnd);
-    out.push({ cls: m[1], openTag: m[0], innerStart: openEnd, innerEnd: closeStart });
+    out.push({ cls: m[1], innerStart: openEnd, innerEnd: closeStart });
   }
   return out;
 }
@@ -321,9 +313,9 @@ function splitBlocks(innerHtml, childMarkerRe) {
 }
 function blockKey(blockHtml) {
   // event-cards use <h3>; story cards use <h4> and don't always link to
-  // an article (some link straight to a series page instead), so slug
-  // isn't always present — the title text is the one thing every block
-  // type reliably has and is unique within a single grid.
+  // an article (some link straight to a series page), so slug isn't
+  // always present — title text is the one thing every block type
+  // reliably has and is unique within a single grid.
   const slugM = blockHtml.match(/href="#article:([^"]+)"/);
   if (slugM) return 'slug:' + slugM[1];
   const h3m = blockHtml.match(/<h3>([^<]*)<\/h3>/);
@@ -332,7 +324,6 @@ function blockKey(blockHtml) {
   if (h4m) return 'h4:' + h4m[1];
   return null;
 }
-// newKeyOrder: array of blockKey() values in the desired new order.
 function reorderGridContainer(html, gridIndex, newKeyOrder) {
   const containers = findAllGridContainers(html);
   const c = containers[gridIndex];
@@ -343,8 +334,7 @@ function reorderGridContainer(html, gridIndex, newKeyOrder) {
   const byKey = new Map(blocks.map(b => [blockKey(b), b]));
   const reordered = newKeyOrder.map(k => byKey.get(k)).filter(Boolean);
   if (reordered.length !== blocks.length) return html; // safety: don't apply a partial/mismatched reorder
-  const newInner = reordered.join('');
-  return html.slice(0, c.innerStart) + newInner + html.slice(c.innerEnd);
+  return html.slice(0, c.innerStart) + reordered.join('') + html.slice(c.innerEnd);
 }
 
 // ================= status / staging =================
@@ -353,13 +343,116 @@ function setStatus(msg, cls) {
   el.textContent = msg || '';
   el.className = cls || '';
 }
-function markDirty() {
-  setStatus('You have unpublished changes.', '');
+function markDirty() { setStatus('You have unpublished changes.', ''); }
+
+// ================= result-edit modal (Remaining Schedule + Calendar) =================
+let resultModalTarget = null; // { view, date, name }
+function openResultModal({ view, date, name }, existing) {
+  resultModalTarget = { view, date, name };
+  document.getElementById('result-modal-sub').textContent = `${SERIES_META[view]?.chipText || view} — ${name}${date ? ' — ' + date : ''}`;
+  document.getElementById('result-modal-winner').value = existing?.winner || '';
+  document.getElementById('result-modal-note').value = existing?.note || '';
+  document.getElementById('result-modal-backdrop').style.display = 'flex';
+}
+function closeResultModal() {
+  document.getElementById('result-modal-backdrop').style.display = 'none';
+  resultModalTarget = null;
+}
+async function applyResultModal() {
+  if (!resultModalTarget) return;
+  const winner = document.getElementById('result-modal-winner').value.trim();
+  const note = document.getElementById('result-modal-note').value.trim();
+  if (!winner) { setStatus('Winner is required.', 'error'); return; }
+  closeResultModal();
+  setStatus('Updating…', '');
+  try {
+    workingHtml = setEventResult(workingHtml, resultModalTarget, { winner, note });
+    const events = parseCalEvents(workingHtml);
+    const calSeries = parseNamedLiteral(workingHtml, 'CAL_SERIES')?.value || {};
+    const r1 = await refreshAllNextUpPanels(workingHtml, events, SERIES_META, calSeries, noopPhrase);
+    workingHtml = r1.html;
+    const freshEvents = parseCalEvents(workingHtml);
+    const r2 = refreshHomeEventsGrid(workingHtml, freshEvents, SERIES_META, calSeries);
+    if (r2.changed) workingHtml = r2.html;
+    markDirty();
+    loadFrame(); // schedule table / next-up panel / homepage grid all potentially changed — reload rather than patch piecemeal
+  } catch (e) {
+    setStatus(e.message, 'error');
+  }
+}
+document.getElementById('result-modal-cancel').addEventListener('click', closeResultModal);
+document.getElementById('result-modal-apply').addEventListener('click', applyResultModal);
+
+// Schedule-table rows use plain view+name lookup (the visible date
+// column shows the *winner* once resolved, not the date, so name is the
+// reliable key across both states — and is unique within one series'
+// schedule in practice).
+function findEventByViewAndName(events, view, name) {
+  return events.find(e => e.view === view && e.name === name) || null;
 }
 
+// ================= image editor modal =================
+let onApplyImage = null;
+function openImageModal(currentSrc, onApply) {
+  onApplyImage = onApply;
+  document.getElementById('img-modal-preview').src = currentSrc;
+  document.getElementById('img-modal-url').value = currentSrc;
+  document.getElementById('img-modal-file').value = '';
+  document.getElementById('img-modal-backdrop').style.display = 'flex';
+}
+function closeImageModal() { document.getElementById('img-modal-backdrop').style.display = 'none'; onApplyImage = null; }
+async function applyImageModal() {
+  const fileInput = document.getElementById('img-modal-file');
+  const urlInput = document.getElementById('img-modal-url');
+  if (fileInput.files && fileInput.files[0]) {
+    const file = fileInput.files[0];
+    const b64 = await fileToBase64(file);
+    const path = `uploads/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, '')}`;
+    setStatus('Uploading image…', '');
+    try {
+      await ghSaveFile(path, b64, `Upload ${path} via site editor`, true);
+      if (onApplyImage) await onApplyImage(path);
+      setStatus('Image uploaded — remember to Publish.', 'ok');
+    } catch (e) { setStatus(e.message, 'error'); }
+  } else if (urlInput.value.trim() && onApplyImage) {
+    await onApplyImage(urlInput.value.trim());
+  }
+  closeImageModal();
+}
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+document.getElementById('img-modal-cancel').addEventListener('click', closeImageModal);
+document.getElementById('img-modal-apply').addEventListener('click', applyImageModal);
+
 // ================= iframe instrumentation =================
+function wireEditableText(el, onCommit, { multiline = false } = {}) {
+  el.setAttribute('data-editable', '1');
+  el.addEventListener('click', function (e) {
+    e.stopPropagation();
+    e.preventDefault();
+    el.setAttribute('contenteditable', 'true');
+    el.focus();
+  }, true);
+  el.addEventListener('blur', () => {
+    el.removeAttribute('contenteditable');
+    onCommit();
+  });
+  if (!multiline) {
+    el.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); el.blur(); }
+    });
+  }
+}
+
 function instrumentFrame() {
   const doc = document.getElementById('site-frame').contentDocument;
+  const win = document.getElementById('site-frame').contentWindow;
   if (!doc) return;
 
   const style = doc.createElement('style');
@@ -369,6 +462,10 @@ function instrumentFrame() {
     [data-editable][contenteditable="true"]{ outline:2px solid #ffb300; background:rgba(255,179,0,.08); }
     img[data-edit-img]{ cursor:pointer; }
     img[data-edit-img]:hover{ outline:3px dashed #ffb300; outline-offset:-3px; }
+    .hero-art[data-edit-img]:hover{ outline:3px dashed #ffb300; outline-offset:-3px; cursor:pointer; }
+    .schedule-table tbody tr{ cursor:pointer; }
+    .schedule-table tbody tr:hover{ outline:2px dashed #ffb300; outline-offset:-2px; }
+    .cal-race, .cal-week-race, .cal-race-item{ cursor: pointer !important; }
     [data-drag-child]{ cursor:grab; }
     [data-drag-child].dragging{ opacity:.35; }
     [data-drag-child].drop-before{ box-shadow: -4px 0 0 0 #ffb300 inset; }
@@ -376,14 +473,37 @@ function instrumentFrame() {
   `;
   doc.head.appendChild(style);
 
-  // ---- text: hero ----
-  const heroSection = doc.querySelector('section.hero');
-  if (heroSection) {
-    const h1 = heroSection.querySelector('h1');
-    const dek = heroSection.querySelector('p.deck');
-    if (h1) wireEditableText(h1, () => { workingHtml = setHero(workingHtml, h1.innerHTML.trim(), null); markDirty(); });
-    if (dek) wireEditableText(dek, () => { workingHtml = setHero(workingHtml, null, dek.innerHTML.trim()); markDirty(); });
-  }
+  // ---- text: hero carousel slides (each slide is one ARTICLES entry) ----
+  doc.querySelectorAll('.hero-carousel .hero[data-slug]').forEach(slide => {
+    const slug = slide.dataset.slug;
+    const h1 = slide.querySelector('h1');
+    const dek = slide.querySelector('p.deck');
+    async function applySlideEdit(field, value) {
+      const articles = parseArticles(workingHtml);
+      const a = articles[slug];
+      if (!a) return;
+      const old = a[field];
+      a[field] = value;
+      workingHtml = writeArticles(workingHtml, articles);
+      workingHtml = propagateArticleTextChange(workingHtml, old, value);
+      markDirty();
+    }
+    if (h1) wireEditableText(h1, () => applySlideEdit('title', h1.textContent.trim()));
+    if (dek) wireEditableText(dek, () => applySlideEdit('dek', dek.textContent.trim()));
+    const art = slide.querySelector('.hero-art');
+    if (art) {
+      art.setAttribute('data-edit-img', '1');
+      art.addEventListener('click', (e) => {
+        e.stopPropagation(); e.preventDefault();
+        const img = art.querySelector('img');
+        openImageModal(img?.getAttribute('src') || '', async (newSrc) => {
+          workingHtml = await setSlideImage(workingHtml, slug, newSrc);
+          markDirty();
+          loadFrame(); // the slide's <img> may not have existed yet (decorative-only slide)
+        });
+      }, true);
+    }
+  });
 
   // ---- text: per-series blurbs ----
   for (const view of Object.keys(SERIES_META)) {
@@ -393,16 +513,32 @@ function instrumentFrame() {
     if (p) wireEditableText(p, () => { workingHtml = setBlurb(workingHtml, view, p.innerHTML.trim()); markDirty(); });
   }
 
+  // ---- text: "Know the Rules" blocks ----
+  doc.querySelectorAll('.rules-block[id]').forEach(block => {
+    const h4 = block.querySelector('h4');
+    if (!h4) return;
+    const rest = [...block.children].filter(c => c !== h4);
+    if (!rest.length) return;
+    const wrapper = doc.createElement('div');
+    h4.after(wrapper);
+    rest.forEach(el => wrapper.appendChild(el));
+    const blockId = block.id;
+    wireEditableText(wrapper, () => {
+      workingHtml = setRulesBlock(workingHtml, blockId, wrapper.innerHTML.trim());
+      markDirty();
+    }, { multiline: true });
+  });
+
   // ---- text: article view (populated dynamically by the site's own renderArticle()) ----
   const artTitle = doc.getElementById('article-title');
   const artDek = doc.getElementById('article-dek');
   const artBody = doc.getElementById('article-body');
   function currentArticleSlug() {
-    const raw = (doc.defaultView.location.hash || '').slice(1);
+    const raw = (win.location.hash || '').slice(1);
     const [, anchor] = raw.split(':');
     return anchor || null;
   }
-  function applyArticleEdit(mutate) {
+  async function applyArticleEdit(mutate) {
     const slug = currentArticleSlug();
     if (!slug) return;
     const articles = parseArticles(workingHtml);
@@ -419,37 +555,14 @@ function instrumentFrame() {
   if (artDek) wireEditableText(artDek, () => applyArticleEdit(a => { a.dek = artDek.textContent.trim(); }));
   if (artBody) wireEditableText(artBody, () => applyArticleEdit(a => {
     a.body = [...artBody.querySelectorAll('p')].map(p => p.textContent.trim()).filter(Boolean);
-  }));
+  }), { multiline: true });
 
-  function wireEditableText(el, onCommit) {
-    el.setAttribute('data-editable', '1');
-    el.addEventListener('click', function (e) {
-      e.stopPropagation();
-      e.preventDefault();
-      el.setAttribute('contenteditable', 'true');
-      el.focus();
-    }, true);
-    el.addEventListener('blur', () => {
-      el.removeAttribute('contenteditable');
-      onCommit();
-    });
-    // Enter commits single-line-ish fields instead of inserting a line
-    // break; the article body is the one field meant to hold multiple
-    // paragraphs, so Enter there behaves normally.
-    el.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && el !== artBody) {
-        e.preventDefault();
-        el.blur();
-      }
-    });
-  }
-
-  // ---- images ----
+  // ---- images (everywhere else — event-cards, story cards, track diagrams) ----
   doc.querySelectorAll('img').forEach(img => {
+    if (img.closest('.hero-art')) return; // handled above, keyed to its article
     img.setAttribute('data-edit-img', '1');
     img.addEventListener('click', function (e) {
-      e.stopPropagation();
-      e.preventDefault();
+      e.stopPropagation(); e.preventDefault();
       openImageModal(img.getAttribute('src'), (newSrc) => {
         const oldSrc = img.getAttribute('src');
         workingHtml = replaceImageSrc(workingHtml, oldSrc, newSrc);
@@ -459,19 +572,60 @@ function instrumentFrame() {
     }, true);
   });
 
+  // ---- Remaining Schedule / Final Races tables ----
+  doc.querySelectorAll('.schedule-table').forEach(table => {
+    const view = table.closest('[id^="view-"]')?.id.replace('view-', '');
+    if (!view) return;
+    table.querySelectorAll('tbody tr').forEach(tr => {
+      tr.addEventListener('click', function (e) {
+        e.stopPropagation(); e.preventDefault();
+        const nameCell = tr.querySelector('td.name');
+        if (!nameCell) return;
+        const name = (nameCell.firstChild?.textContent || nameCell.textContent).trim();
+        const events = parseCalEvents(workingHtml);
+        const ev = findEventByViewAndName(events, view, name);
+        if (!ev) { setStatus(`Could not find "${name}" in CAL_EVENTS.`, 'error'); return; }
+        openResultModal({ view, date: ev.date, name: ev.name }, ev.result);
+      }, true);
+    });
+  });
+
+  // ---- Calendar: tag every rendered race link with a precise event key ----
+  // raceLink() is a plain top-level function declaration in the site's
+  // own (non-module) script, so it's reachable as win.raceLink. Wrapping
+  // it and forcing one re-render tags every currently-visible calendar
+  // cell; the wrapped version stays in effect for every later re-render
+  // (prev/next, mode switch, re-navigating to Calendar) for the rest of
+  // this iframe's lifetime.
+  if (typeof win.raceLink === 'function' && !win.raceLink.__wrapped) {
+    const orig = win.raceLink;
+    const wrapped = function (ev, extraClass) {
+      const a = orig(ev, extraClass);
+      a.dataset.eventKey = `${ev.view}|${ev.date}|${ev.name}`;
+      return a;
+    };
+    wrapped.__wrapped = true;
+    win.raceLink = wrapped;
+    if (typeof win.renderCalendar === 'function') win.renderCalendar();
+  }
+  doc.addEventListener('click', function (e) {
+    const a = e.target.closest('[data-event-key]');
+    if (!a) return;
+    e.stopPropagation(); e.preventDefault();
+    const [view, date, name] = a.dataset.eventKey.split('|');
+    const events = parseCalEvents(workingHtml);
+    const ev = events.find(ev2 => ev2.view === view && ev2.date === date && ev2.name === name);
+    openResultModal({ view, date, name }, ev?.result);
+  }, true);
+
   // ---- drag-and-drop grid reordering ----
   doc.querySelectorAll('.events-grid, .news-grid').forEach((grid, gridIndex) => {
     grid.setAttribute('data-grid-index', String(gridIndex));
-    const children = [...grid.children];
     let dragEl = null;
-    children.forEach(child => {
+    [...grid.children].forEach(child => {
       child.setAttribute('draggable', 'true');
       child.setAttribute('data-drag-child', '1');
-      child.addEventListener('dragstart', (e) => {
-        dragEl = child;
-        child.classList.add('dragging');
-        e.dataTransfer.effectAllowed = 'move';
-      });
+      child.addEventListener('dragstart', () => { dragEl = child; child.classList.add('dragging'); });
       child.addEventListener('dragend', () => {
         child.classList.remove('dragging');
         grid.querySelectorAll('[data-drag-child]').forEach(c => c.classList.remove('drop-before', 'drop-after'));
@@ -492,57 +646,19 @@ function instrumentFrame() {
         grid.insertBefore(dragEl, before ? child : child.nextSibling);
         grid.querySelectorAll('[data-drag-child]').forEach(c => c.classList.remove('drop-before', 'drop-after'));
         const newKeyOrder = [...grid.children].map(c => blockKey(c.outerHTML));
-        const idx = Number(grid.getAttribute('data-grid-index'));
-        workingHtml = reorderGridContainer(workingHtml, idx, newKeyOrder);
+        workingHtml = reorderGridContainer(workingHtml, Number(grid.getAttribute('data-grid-index')), newKeyOrder);
         markDirty();
       });
     });
   });
-
-  // ---- image editor modal ----
-  let onApplyImage = null;
-  function openImageModal(currentSrc, onApply) {
-    onApplyImage = onApply;
-    document.getElementById('img-modal-preview').src = currentSrc;
-    document.getElementById('img-modal-url').value = currentSrc;
-    document.getElementById('img-modal-file').value = '';
-    document.getElementById('img-modal-backdrop').style.display = 'flex';
-  }
-  window.__closeImageModal = () => { document.getElementById('img-modal-backdrop').style.display = 'none'; onApplyImage = null; };
-  window.__applyImageModal = async () => {
-    const fileInput = document.getElementById('img-modal-file');
-    const urlInput = document.getElementById('img-modal-url');
-    if (fileInput.files && fileInput.files[0]) {
-      const file = fileInput.files[0];
-      const b64 = await fileToBase64(file);
-      const path = `uploads/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, '')}`;
-      setStatus('Uploading image…', '');
-      try {
-        await ghSaveFile(path, b64, `Upload ${path} via site editor`, true);
-        if (onApplyImage) onApplyImage(path);
-        setStatus('Image uploaded — remember to Publish.', 'ok');
-      } catch (e) {
-        setStatus(e.message, 'error');
-      }
-    } else if (urlInput.value.trim() && onApplyImage) {
-      onApplyImage(urlInput.value.trim());
-    }
-    window.__closeImageModal();
-  };
 }
-function fileToBase64(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result.split(',')[1]);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
-
-document.getElementById('img-modal-cancel').addEventListener('click', () => window.__closeImageModal());
-document.getElementById('img-modal-apply').addEventListener('click', () => window.__applyImageModal());
 
 // ================= connect / publish / discard =================
+function loadFrame() {
+  const frame = document.getElementById('site-frame');
+  frame.srcdoc = workingHtml;
+  frame.onload = () => instrumentFrame();
+}
 async function connect() {
   const statusEl = document.getElementById('login-status');
   token = document.getElementById('token-input').value.trim();
@@ -550,7 +666,6 @@ async function connect() {
   statusEl.textContent = 'Connecting…';
   try {
     const data = await ghGetFile(FILE_PATH);
-    currentSha = data.sha;
     originalHtml = b64ToUtf8(data.content);
     workingHtml = originalHtml;
     localStorage.setItem(TOKEN_KEY, token);
@@ -561,11 +676,6 @@ async function connect() {
   } catch (e) {
     statusEl.textContent = e.message;
   }
-}
-function loadFrame() {
-  const frame = document.getElementById('site-frame');
-  frame.srcdoc = workingHtml;
-  frame.onload = () => instrumentFrame();
 }
 document.getElementById('connect-btn').addEventListener('click', connect);
 document.getElementById('token-input').addEventListener('keydown', e => { if (e.key === 'Enter') connect(); });
@@ -578,7 +688,7 @@ document.getElementById('discard-btn').addEventListener('click', () => {
 });
 
 document.getElementById('publish-btn').addEventListener('click', async () => {
-  const v = validateHtml(workingHtml);
+  const v = validateIndexHtml(workingHtml);
   if (!v.ok) { setStatus(v.error, 'error'); return; }
   setStatus('Publishing…', '');
   try {

@@ -23,6 +23,15 @@ export function locateCarousel(html) {
   return { start, end: end + END_MARKER.length };
 }
 
+// Image priority: an explicit per-article override (`trackImg` — the
+// same field name scripts/lib/articles.mjs's storyCardHTML() already
+// reads, though nothing currently sets it, so this is also the first
+// real writer of it) beats the TRACKS-lookup key, which beats the
+// series logo. Never a guessed URL.
+function heroImageFor(article, tracks) {
+  return article.trackImg || (article.track && tracks[article.track]?.src) || article.chipLogo || '';
+}
+
 function slideHTML(slug, article, trackSrc, active) {
   return `  <section class="hero${active ? ' active' : ''}" data-slug="${slug}">
     <div>
@@ -50,8 +59,7 @@ export function renderCarousel(leadStories, articles, tracks) {
     .map((slug, i) => {
       const a = articles[slug];
       if (!a) return '';
-      const trackSrc = (a.track && tracks[a.track]?.src) || a.chipLogo || '';
-      return slideHTML(slug, a, trackSrc, i === 0);
+      return slideHTML(slug, a, heroImageFor(a, tracks), i === 0);
     })
     .filter(Boolean);
   const dots = leadStories
