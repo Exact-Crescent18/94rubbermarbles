@@ -106,6 +106,10 @@ button:disabled{opacity:.5; cursor:not-allowed;}
     <div class="or">— or —</div>
     <label>Upload a file (adds it to the repo and points here to it)</label>
     <input type="file" id="img-modal-file" accept="image/*">
+    <div id="img-modal-credit-field" style="display:none;">
+      <label>Source / credit (shown in the corner of the image)</label>
+      <input type="text" id="img-modal-credit" placeholder="e.g. Wikimedia Commons">
+    </div>
     <div class="row">
       <button class="secondary" id="img-modal-cancel">Cancel</button>
       <button id="img-modal-apply">Apply</button>
@@ -262,11 +266,12 @@ function replaceImageSrc(html, oldSrc, newSrc) {
 // scripts/lib/hero-carousel.mjs) and regenerates just the carousel block
 // — reuses the exact same render function the automation uses, so the
 // result is byte-consistent with what a bot-driven update would produce.
-async function setSlideImage(html, slug, newSrc) {
+async function setSlideImage(html, slug, newSrc, newCredit) {
   const { renderCarousel, getLeadStories, replaceCarousel } = await import('./scripts/lib/hero-carousel.mjs');
   const articles = parseArticles(html);
   if (!articles[slug]) return html;
   articles[slug].trackImg = newSrc;
+  articles[slug].trackCredit = newCredit || '';
   html = writeArticles(html, articles);
   const tracks = parseNamedLiteral(html, 'TRACKS')?.value || {};
   return replaceCarousel(html, renderCarousel(getLeadStories(html), articles, tracks));
@@ -393,17 +398,25 @@ function findEventByViewAndName(events, view, name) {
 
 // ================= image editor modal =================
 let onApplyImage = null;
-function openImageModal(currentSrc, onApply) {
+// options.credit: current credit text to prefill (pass '' if none yet).
+// options.showCredit: whether this image type has anywhere to display a
+// credit at all (right now, only the hero carousel's .hero-art does) —
+// hidden otherwise so the field never looks like it does something it
+// can't. onApply receives (newSrc, newCredit).
+function openImageModal(currentSrc, onApply, options = {}) {
   onApplyImage = onApply;
   document.getElementById('img-modal-preview').src = currentSrc;
   document.getElementById('img-modal-url').value = currentSrc;
   document.getElementById('img-modal-file').value = '';
+  document.getElementById('img-modal-credit-field').style.display = options.showCredit ? 'block' : 'none';
+  document.getElementById('img-modal-credit').value = options.credit || '';
   document.getElementById('img-modal-backdrop').style.display = 'flex';
 }
 function closeImageModal() { document.getElementById('img-modal-backdrop').style.display = 'none'; onApplyImage = null; }
 async function applyImageModal() {
   const fileInput = document.getElementById('img-modal-file');
   const urlInput = document.getElementById('img-modal-url');
+  const credit = document.getElementById('img-modal-credit').value.trim();
   if (fileInput.files && fileInput.files[0]) {
     const file = fileInput.files[0];
     const b64 = await fileToBase64(file);
@@ -411,11 +424,11 @@ async function applyImageModal() {
     setStatus('Uploading image…', '');
     try {
       await ghSaveFile(path, b64, `Upload ${path} via site editor`, true);
-      if (onApplyImage) await onApplyImage(path);
+      if (onApplyImage) await onApplyImage(path, credit);
       setStatus('Image uploaded — remember to Publish.', 'ok');
     } catch (e) { setStatus(e.message, 'error'); }
   } else if (urlInput.value.trim() && onApplyImage) {
-    await onApplyImage(urlInput.value.trim());
+    await onApplyImage(urlInput.value.trim(), credit);
   }
   closeImageModal();
 }
@@ -496,11 +509,12 @@ function instrumentFrame() {
       art.addEventListener('click', (e) => {
         e.stopPropagation(); e.preventDefault();
         const img = art.querySelector('img');
-        openImageModal(img?.getAttribute('src') || '', async (newSrc) => {
-          workingHtml = await setSlideImage(workingHtml, slug, newSrc);
+        const currentCredit = art.querySelector('.src')?.textContent || '';
+        openImageModal(img?.getAttribute('src') || '', async (newSrc, newCredit) => {
+          workingHtml = await setSlideImage(workingHtml, slug, newSrc, newCredit);
           markDirty();
           loadFrame(); // the slide's <img> may not have existed yet (decorative-only slide)
-        });
+        }, { showCredit: true, credit: currentCredit });
       }, true);
     }
   });
