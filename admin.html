@@ -1,0 +1,558 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>94rubbermarbles — Site Editor</title>
+<link rel="icon" type="image/png" href="Logos/number_logo.png">
+<style>
+:root{
+  --bg:#101214; --surface:#1a1d22; --surface-2:#22262c; --rule:#31363d;
+  --text:#f1efe9; --text-dim:#9aa0a6; --text-faint:#686e75;
+  --amber:#ffb300; --red:#e8402a; --green:#33c17d;
+}
+*{box-sizing:border-box;}
+body{
+  background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,sans-serif;
+  margin:0; padding:0 20px 80px;
+}
+header{max-width:900px; margin:0 auto; padding:28px 0 18px; border-bottom:1px solid var(--rule);}
+header h1{font-size:22px; margin:0 0 4px;}
+header p{color:var(--text-dim); font-size:13.5px; margin:0;}
+.wrap{max-width:900px; margin:0 auto;}
+
+#login-screen{max-width:520px; margin:60px auto; text-align:center;}
+#login-screen h2{font-size:19px; margin-bottom:10px;}
+#login-screen p{color:var(--text-dim); font-size:14px; line-height:1.6; margin-bottom:20px;}
+#login-screen ol{text-align:left; color:var(--text-dim); font-size:13.5px; line-height:1.8; margin-bottom:22px;}
+#login-screen a{color:var(--amber);}
+
+input[type=password], input[type=text], textarea{
+  width:100%; background:var(--surface-2); border:1px solid var(--rule); color:var(--text);
+  padding:10px 12px; font-size:14px; border-radius:4px; font-family:inherit;
+}
+textarea{resize:vertical; line-height:1.5;}
+button{
+  background:var(--amber); color:var(--bg); border:none; padding:10px 18px;
+  font-size:13.5px; font-weight:600; border-radius:4px; cursor:pointer; letter-spacing:.01em;
+}
+button:hover{background:#ffc633;}
+button.secondary{background:var(--surface-2); color:var(--text); border:1px solid var(--rule);}
+button.secondary:hover{background:var(--surface);}
+button:disabled{opacity:.5; cursor:not-allowed;}
+
+#editor-screen{display:none;}
+.tabs{display:flex; gap:2px; margin:18px 0; flex-wrap:wrap;}
+.tab-btn{
+  background:var(--surface); color:var(--text-dim); border:1px solid var(--rule);
+  padding:9px 16px; font-size:13px; font-weight:500; border-radius:4px; cursor:pointer;
+}
+.tab-btn.active{background:var(--amber); color:var(--bg); border-color:var(--amber);}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+
+.field{background:var(--surface); border:1px solid var(--rule); border-radius:6px; padding:18px; margin-bottom:14px;}
+.field label{display:block; font-size:12px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.06em; margin-bottom:8px;}
+.field .hint{font-size:12px; color:var(--text-faint); margin-top:6px;}
+.field .row{display:flex; gap:10px; align-items:center; margin-top:10px;}
+.field.pending{border-color:var(--amber);}
+.field .pending-tag{display:none; float:right; font-size:10.5px; color:var(--amber); font-weight:700; letter-spacing:.06em;}
+.field.pending .pending-tag{display:inline;}
+
+.img-item{display:flex; gap:14px; align-items:center; background:var(--surface); border:1px solid var(--rule); border-radius:6px; padding:12px 14px; margin-bottom:8px;}
+.img-item img{width:52px; height:52px; object-fit:contain; background:#f1efe9; border-radius:4px; flex-shrink:0;}
+.img-item .meta{flex:1; min-width:0;}
+.img-item .meta .alt{font-size:12.5px; color:var(--text-dim); margin-bottom:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.img-item .meta .count{font-size:10.5px; color:var(--text-faint);}
+.img-item input{margin-top:6px;}
+
+.article-list{display:flex; flex-direction:column; gap:6px; margin-bottom:16px;}
+.article-list button{background:var(--surface); color:var(--text); border:1px solid var(--rule); text-align:left; width:100%; padding:10px 14px; font-weight:400;}
+.article-list button.active{border-color:var(--amber); color:var(--amber);}
+
+#status-bar{
+  position:fixed; bottom:0; left:0; right:0; background:var(--surface); border-top:1px solid var(--rule);
+  padding:14px 20px; display:flex; justify-content:center; align-items:center; gap:16px; z-index:10;
+}
+#status-bar .msg{font-size:13px; color:var(--text-dim);}
+#status-bar .msg.error{color:var(--red);}
+#status-bar .msg.ok{color:var(--green);}
+#search-box{margin-bottom:14px;}
+</style>
+</head>
+<body>
+
+<header class="wrap">
+  <h1>94rubbermarbles — Site Editor</h1>
+  <p>Edit the live site without touching code. Changes are staged here, then published to GitHub in one step.</p>
+</header>
+
+<div id="login-screen">
+  <h2>Connect to the repo</h2>
+  <p>This page saves changes by committing directly to the <code>94rubbermarbles</code> GitHub repo on your behalf. It needs a personal access token — a password-like key you create once — to be allowed to do that.</p>
+  <ol>
+    <li>Go to <a href="https://github.com/settings/tokens?type=beta" target="_blank" rel="noopener">github.com/settings/tokens</a> and create a new <b>fine-grained</b> token.</li>
+    <li>Under "Repository access", choose <b>Only select repositories</b> and pick <b>94rubbermarbles</b>.</li>
+    <li>Under "Permissions", set <b>Contents</b> to <b>Read and write</b>.</li>
+    <li>Generate it, copy the token, and paste it below. It's stored only in this browser (localStorage) — never sent anywhere except directly to GitHub's API.</li>
+  </ol>
+  <input type="password" id="token-input" placeholder="Paste your GitHub token here">
+  <div style="margin-top:14px;"><button id="connect-btn">Connect</button></div>
+  <div id="login-status" style="margin-top:14px; font-size:13px; color:var(--red);"></div>
+</div>
+
+<div id="editor-screen" class="wrap">
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="homepage">Homepage</button>
+    <button class="tab-btn" data-tab="blurbs">Series Blurbs</button>
+    <button class="tab-btn" data-tab="articles">Articles</button>
+    <button class="tab-btn" data-tab="images">Images</button>
+  </div>
+
+  <div class="tab-panel active" id="tab-homepage"></div>
+  <div class="tab-panel" id="tab-blurbs"></div>
+  <div class="tab-panel" id="tab-articles"></div>
+  <div class="tab-panel" id="tab-images"></div>
+</div>
+
+<div id="status-bar" style="display:none;">
+  <span class="msg" id="status-msg"></span>
+  <button class="secondary" id="discard-btn">Discard staged changes</button>
+  <button id="publish-btn">Publish to GitHub</button>
+</div>
+
+<script>
+const OWNER = 'Exact-Crescent18';
+const REPO = '94rubbermarbles';
+const FILE_PATH = 'index.html';
+const API_URL = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${FILE_PATH}`;
+const TOKEN_KEY = 'rubbermarbles_admin_token';
+
+const SERIES_META = {
+  'f1': { chip: 'f1', chipText: 'Formula 1' },
+  'nascar-cup': { chip: 'nascar', chipText: 'NASCAR Cup' },
+  'nascar-oreilly': { chip: 'nascar', chipText: "O'Reilly Series" },
+  'nascar-truck': { chip: 'nascar', chipText: 'Truck Series' },
+  'arca': { chip: 'nascar', chipText: 'ARCA Menards' },
+  'indycar': { chip: 'indy', chipText: 'NTT IndyCar' },
+  'indy-nxt': { chip: 'indy', chipText: 'Indy NXT' },
+  'motogp': { chip: 'moto', chipText: 'MotoGP' },
+  'wec': { chip: 'wec', chipText: 'WEC' },
+  'wrc': { chip: 'wrc', chipText: 'WRC' },
+  'formula-e': { chip: 'formula-e', chipText: 'Formula E' },
+};
+
+let token = localStorage.getItem(TOKEN_KEY) || '';
+let originalHtml = null;   // exactly what GitHub has right now
+let workingHtml = null;    // originalHtml + staged edits, not yet published
+let currentSha = null;
+let pendingCount = 0;
+
+// ---------- utf8-safe base64 ----------
+function b64ToUtf8(b64) {
+  const bin = atob(b64.replace(/\n/g, ''));
+  const bytes = Uint8Array.from(bin, c => c.charCodeAt(0));
+  return new TextDecoder('utf-8').decode(bytes);
+}
+function utf8ToB64(str) {
+  const bytes = new TextEncoder().encode(str);
+  let bin = '';
+  bytes.forEach(b => bin += String.fromCharCode(b));
+  return btoa(bin);
+}
+
+// ---------- GitHub API ----------
+async function ghFetchFile() {
+  const res = await fetch(API_URL, {
+    headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json' },
+  });
+  if (!res.ok) throw new Error(`Could not load the file from GitHub (${res.status}). Check the token's repo access.`);
+  const data = await res.json();
+  currentSha = data.sha;
+  return b64ToUtf8(data.content);
+}
+
+async function ghSaveFile(newHtml, message) {
+  // Re-fetch sha right before saving, in case the hourly bot committed
+  // in between — reduces (doesn't eliminate) the chance of a conflict.
+  const latest = await fetch(API_URL, {
+    headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json' },
+  }).then(r => r.json());
+  const res = await fetch(API_URL, {
+    method: 'PUT',
+    headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      message,
+      content: utf8ToB64(newHtml),
+      sha: latest.sha,
+      committer: { name: 'rubbermarbles-editor', email: 'actions@users.noreply.github.com' },
+    }),
+  });
+  if (!res.ok) {
+    const t = await res.text();
+    throw new Error(`GitHub rejected the save (${res.status}): ${t.slice(0, 300)}`);
+  }
+}
+
+// ---------- validation, same discipline as the automation scripts ----------
+function validateHtml(html) {
+  // Written as '<\/script>' (not the literal 8-char sequence) — this
+  // file's own <script> block would otherwise be closed early by an
+  // HTML parser the instant it scans past that substring, since the
+  // browser's tokenizer looks for that byte sequence regardless of JS
+  // string context. Same reason index.html's automation scripts never
+  // need this trick: they run under Node, not a browser HTML parser.
+  const scriptContent = html.slice(html.indexOf('<script>') + 8, html.lastIndexOf('<\/script>'));
+  try { new Function(scriptContent); }
+  catch (e) { return { ok: false, error: 'A change broke the page script: ' + e.message }; }
+  const css = html.slice(html.indexOf('<style>'), html.indexOf('</style>'));
+  const open = (css.match(/{/g) || []).length, close = (css.match(/}/g) || []).length;
+  if (open !== close) return { ok: false, error: `A change broke the stylesheet (brace mismatch: ${open} vs ${close}).` };
+  return { ok: true };
+}
+
+// ---------- Hero (homepage headline/deck) ----------
+function getHero(html) {
+  const secStart = html.indexOf('<section class="hero">');
+  const secEnd = html.indexOf('</section>', secStart);
+  const slice = html.slice(secStart, secEnd);
+  const h1m = slice.match(/<h1>([\s\S]*?)<\/h1>/);
+  const dekm = slice.match(/<p class="deck">([\s\S]*?)<\/p>/);
+  if (!h1m || !dekm) return null;
+  return {
+    h1: h1m[1], dek: dekm[1],
+    h1Full: h1m[0], dekFull: dekm[0],
+  };
+}
+function setHero(html, newH1, newDek) {
+  const hero = getHero(html);
+  if (!hero) return html;
+  html = html.replace(hero.h1Full, `<h1>${newH1}</h1>`);
+  html = html.replace(hero.dekFull, `<p class="deck">${newDek}</p>`);
+  return html;
+}
+
+// ---------- Per-series "what to know" blurb ----------
+function viewBounds(html, view) {
+  const marker = `id="view-${view}"`;
+  const start = html.indexOf(marker);
+  if (start === -1) return null;
+  const nextStart = html.indexOf('id="view-', start + marker.length);
+  const end = nextStart === -1 ? html.length : nextStart;
+  return { start, end };
+}
+function getBlurb(html, view) {
+  const b = viewBounds(html, view);
+  if (!b) return null;
+  const slice = html.slice(b.start, b.end);
+  const wbIdx = slice.indexOf('<div class="watch-block">');
+  if (wbIdx === -1) return null;
+  const after = slice.slice(wbIdx);
+  const m = after.match(/<h4>([^<]*)<\/h4>\s*<p>([\s\S]*?)<\/p>/);
+  if (!m) return null;
+  return { label: m[1], text: m[2], full: m[0], offset: b.start + wbIdx + m.index };
+}
+function setBlurb(html, view, newText) {
+  const blurb = getBlurb(html, view);
+  if (!blurb) return html;
+  const before = html.slice(0, blurb.offset);
+  const after = html.slice(blurb.offset + blurb.full.length);
+  const newBlock = `<h4>${blurb.label}</h4>\n        <p>${newText}</p>`;
+  return before + newBlock + after;
+}
+
+// ---------- Images site-wide ----------
+function listImages(html) {
+  const re = /<img\b[^>]*>/g;
+  const seen = new Map();
+  let m;
+  while ((m = re.exec(html))) {
+    const tag = m[0];
+    const srcM = tag.match(/src="([^"]*)"/);
+    const altM = tag.match(/alt="([^"]*)"/);
+    if (!srcM) continue;
+    const src = srcM[1];
+    const alt = altM ? altM[1] : '';
+    if (seen.has(src)) seen.get(src).count++;
+    else seen.set(src, { src, alt, count: 1 });
+  }
+  return [...seen.values()].sort((a, b) => b.count - a.count);
+}
+function replaceImageSrc(html, oldSrc, newSrc) {
+  return html.split(`src="${oldSrc}"`).join(`src="${newSrc}"`);
+}
+
+// ---------- Articles (mirrors scripts/lib/articles.mjs exactly) ----------
+const ARTICLES_START = 'const ARTICLES = {';
+const ARTICLES_CLOSE = '\n};\n\nfunction renderArticle(slug){';
+function dq(s) { return `"${String(s).replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`; }
+function sq(s) { return `'${String(s).replace(/'/g, "\\'")}'`; }
+function locateArticles(html) {
+  const start = html.indexOf(ARTICLES_START);
+  const end = html.indexOf(ARTICLES_CLOSE, start);
+  if (start === -1 || end === -1) throw new Error('Could not locate ARTICLES block.');
+  return { start, end };
+}
+function parseArticles(html) {
+  const { start, end } = locateArticles(html);
+  const literal = html.slice(start + 'const ARTICLES = '.length, end + 2);
+  return new Function(`return ${literal}`)();
+}
+function serializeOneArticle(slug, a) {
+  const bodyLines = a.body.map(p => `      ${dq(p)},`).join('\n');
+  const publishLine = a.publishAt ? `\n    publishAt:${sq(a.publishAt)},` : '';
+  return `  ${sq(slug)}: {
+    view:${sq(a.view)}, chip:${sq(a.chip)}, chipLogo:${sq(a.chipLogo)}, chipText:${sq(a.chipText)},
+    title:${dq(a.title)}, category:${sq(a.category)}, readTime:${sq(a.readTime)}, date:${sq(a.date)},
+    track:${sq(a.track || '')},
+    dek:${dq(a.dek)},${publishLine}
+    body:[
+${bodyLines}
+    ],
+  }`;
+}
+function writeArticles(html, articles) {
+  const { start, end } = locateArticles(html);
+  const entries = Object.entries(articles).map(([slug, a]) => serializeOneArticle(slug, a));
+  const newLiteral = `{\n${entries.join(',\n')},\n}`;
+  return html.slice(0, start) + 'const ARTICLES = ' + newLiteral + html.slice(end + 2);
+}
+// Story-card previews (homepage, series pages, full Wire page) are static
+// HTML baked in at write-time elsewhere in the file — editing ARTICLES
+// alone won't update them. Since they embed the plain title/dek text
+// with no escaping, a global find-and-replace of the literal old text
+// (outside the ARTICLES block itself, which writeArticles already
+// handled correctly) catches every copy at once.
+function propagateArticleTextChange(html, oldText, newText) {
+  if (!oldText || oldText === newText) return html;
+  const { start, end } = locateArticles(html);
+  // Replace independently on each side and concatenate fresh — reusing
+  // the original start/end offsets after a length-changing replacement
+  // would misalign the re-insertion point (a real bug caught here: if
+  // oldText also appears in `before`, e.g. in a story-card preview, its
+  // replacement shifts everything after it, so `start` no longer points
+  // at the same place in the replaced string).
+  const before = html.slice(0, start).split(oldText).join(newText);
+  const articlesBlock = html.slice(start, end);
+  const after = html.slice(end).split(oldText).join(newText);
+  return before + articlesBlock + after;
+}
+
+// ---------- staging ----------
+function markPending(fieldEl) {
+  fieldEl.classList.add('pending');
+  updateStatusBar();
+}
+function updateStatusBar() {
+  const bar = document.getElementById('status-bar');
+  const dirty = workingHtml !== originalHtml;
+  bar.style.display = dirty ? 'flex' : 'none';
+  document.getElementById('status-msg').textContent = dirty ? 'You have unpublished changes.' : '';
+}
+
+// ---------- Homepage tab ----------
+function renderHomepageTab() {
+  const el = document.getElementById('tab-homepage');
+  const hero = getHero(workingHtml);
+  if (!hero) { el.innerHTML = '<p>Could not find the homepage headline section.</p>'; return; }
+  el.innerHTML = `
+    <div class="field" id="field-h1">
+      <span class="pending-tag">STAGED</span>
+      <label>Headline (you can wrap a word in &lt;em&gt;...&lt;/em&gt; for amber highlight)</label>
+      <textarea id="h1-input" rows="2">${hero.h1}</textarea>
+      <div class="row"><button data-action="apply-hero">Apply</button></div>
+    </div>
+    <div class="field" id="field-dek">
+      <span class="pending-tag">STAGED</span>
+      <label>Summary paragraph</label>
+      <textarea id="dek-input" rows="4">${hero.dek}</textarea>
+      <div class="row"><button data-action="apply-hero">Apply</button></div>
+    </div>
+  `;
+  el.querySelectorAll('[data-action="apply-hero"]').forEach(btn => btn.addEventListener('click', () => {
+    const newH1 = document.getElementById('h1-input').value;
+    const newDek = document.getElementById('dek-input').value;
+    workingHtml = setHero(workingHtml, newH1, newDek);
+    document.getElementById('field-h1').classList.add('pending');
+    document.getElementById('field-dek').classList.add('pending');
+    updateStatusBar();
+  }));
+}
+
+// ---------- Blurbs tab ----------
+function renderBlurbsTab() {
+  const el = document.getElementById('tab-blurbs');
+  el.innerHTML = '';
+  for (const view of Object.keys(SERIES_META)) {
+    const blurb = getBlurb(workingHtml, view);
+    if (!blurb) continue;
+    const field = document.createElement('div');
+    field.className = 'field';
+    field.id = 'field-blurb-' + view;
+    field.innerHTML = `
+      <span class="pending-tag">STAGED</span>
+      <label>${SERIES_META[view].chipText} — "${blurb.label}"</label>
+      <textarea rows="3" data-view="${view}">${blurb.text}</textarea>
+      <div class="row"><button data-action="apply-blurb" data-view="${view}">Apply</button></div>
+    `;
+    el.appendChild(field);
+  }
+  el.querySelectorAll('[data-action="apply-blurb"]').forEach(btn => btn.addEventListener('click', () => {
+    const view = btn.dataset.view;
+    const textarea = el.querySelector(`textarea[data-view="${view}"]`);
+    workingHtml = setBlurb(workingHtml, view, textarea.value);
+    document.getElementById('field-blurb-' + view).classList.add('pending');
+    updateStatusBar();
+  }));
+}
+
+// ---------- Articles tab ----------
+let selectedArticleSlug = null;
+function renderArticlesTab() {
+  const el = document.getElementById('tab-articles');
+  const articles = parseArticles(workingHtml);
+  const slugs = Object.keys(articles);
+  if (!selectedArticleSlug) selectedArticleSlug = slugs[0];
+
+  const listHtml = `<div class="article-list">` + slugs.map(slug =>
+    `<button data-slug="${slug}" class="${slug === selectedArticleSlug ? 'active' : ''}">${articles[slug].title}</button>`
+  ).join('') + `</div>`;
+
+  const a = articles[selectedArticleSlug];
+  const formHtml = a ? `
+    <div class="field" id="field-article">
+      <span class="pending-tag">STAGED</span>
+      <label>Title</label>
+      <input type="text" id="art-title" value="${a.title.replace(/"/g, '&quot;')}">
+      <label style="margin-top:14px;">Dek (subhead)</label>
+      <input type="text" id="art-dek" value="${a.dek.replace(/"/g, '&quot;')}">
+      <label style="margin-top:14px;">Category</label>
+      <input type="text" id="art-category" value="${a.category}">
+      <label style="margin-top:14px;">Body (one paragraph per line)</label>
+      <textarea id="art-body" rows="10">${a.body.join('\n\n')}</textarea>
+      <div class="row"><button data-action="apply-article">Apply</button></div>
+    </div>
+  ` : '<p>No articles found.</p>';
+
+  el.innerHTML = listHtml + formHtml;
+
+  el.querySelectorAll('.article-list button').forEach(btn => btn.addEventListener('click', () => {
+    selectedArticleSlug = btn.dataset.slug;
+    renderArticlesTab();
+  }));
+  const applyBtn = el.querySelector('[data-action="apply-article"]');
+  if (applyBtn) applyBtn.addEventListener('click', () => {
+    const articles = parseArticles(workingHtml);
+    const old = articles[selectedArticleSlug];
+    const oldTitle = old.title, oldDek = old.dek;
+    const newTitle = document.getElementById('art-title').value;
+    const newDek = document.getElementById('art-dek').value;
+    old.title = newTitle;
+    old.dek = newDek;
+    old.category = document.getElementById('art-category').value;
+    old.body = document.getElementById('art-body').value.split(/\n\s*\n/).map(p => p.trim()).filter(Boolean);
+    workingHtml = writeArticles(workingHtml, articles);
+    workingHtml = propagateArticleTextChange(workingHtml, oldTitle, newTitle);
+    workingHtml = propagateArticleTextChange(workingHtml, oldDek, newDek);
+    document.getElementById('field-article').classList.add('pending');
+    updateStatusBar();
+  });
+}
+
+// ---------- Images tab ----------
+function renderImagesTab() {
+  const el = document.getElementById('tab-images');
+  el.innerHTML = `<input type="text" id="search-box" placeholder="Filter by image URL or alt text…">
+    <div id="image-list"></div>`;
+  function draw(filter) {
+    const images = listImages(workingHtml).filter(img =>
+      !filter || img.src.toLowerCase().includes(filter) || img.alt.toLowerCase().includes(filter)
+    ).slice(0, 60);
+    const list = document.getElementById('image-list');
+    list.innerHTML = images.map((img, i) => `
+      <div class="img-item">
+        <img src="${img.src}" alt="" onerror="this.style.opacity=0.15">
+        <div class="meta">
+          <div class="alt">${img.alt || '(no alt text)'}</div>
+          <div class="count">used ${img.count}× in the page</div>
+          <input type="text" data-old="${img.src}" value="${img.src}">
+        </div>
+        <button data-action="apply-image" data-old="${img.src}" data-index="${i}">Apply</button>
+      </div>
+    `).join('') || '<p style="color:var(--text-faint);">No matches.</p>';
+    list.querySelectorAll('[data-action="apply-image"]').forEach(btn => btn.addEventListener('click', () => {
+      const oldSrc = btn.dataset.old;
+      const input = list.querySelector(`input[data-old="${CSS.escape(oldSrc)}"]`);
+      const newSrc = input.value.trim();
+      if (!newSrc || newSrc === oldSrc) return;
+      workingHtml = replaceImageSrc(workingHtml, oldSrc, newSrc);
+      btn.closest('.img-item').style.borderColor = 'var(--amber)';
+      updateStatusBar();
+    }));
+  }
+  draw('');
+  document.getElementById('search-box').addEventListener('input', e => draw(e.target.value.trim().toLowerCase()));
+}
+
+// ---------- tabs ----------
+document.querySelectorAll('.tab-btn').forEach(btn => btn.addEventListener('click', () => {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b === btn));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+}));
+
+// ---------- connect / publish / discard ----------
+async function connect() {
+  const statusEl = document.getElementById('login-status');
+  token = document.getElementById('token-input').value.trim();
+  if (!token) { statusEl.textContent = 'Paste a token first.'; return; }
+  statusEl.textContent = 'Connecting…';
+  try {
+    originalHtml = await ghFetchFile();
+    workingHtml = originalHtml;
+    localStorage.setItem(TOKEN_KEY, token);
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('editor-screen').style.display = 'block';
+    renderHomepageTab();
+    renderBlurbsTab();
+    renderArticlesTab();
+    renderImagesTab();
+  } catch (e) {
+    statusEl.textContent = e.message;
+  }
+}
+document.getElementById('connect-btn').addEventListener('click', connect);
+document.getElementById('token-input').addEventListener('keydown', e => { if (e.key === 'Enter') connect(); });
+
+document.getElementById('discard-btn').addEventListener('click', () => {
+  if (!confirm('Discard all staged changes? This cannot be undone.')) return;
+  workingHtml = originalHtml;
+  renderHomepageTab(); renderBlurbsTab(); renderArticlesTab(); renderImagesTab();
+  updateStatusBar();
+});
+
+document.getElementById('publish-btn').addEventListener('click', async () => {
+  const statusEl = document.getElementById('status-msg');
+  const v = validateHtml(workingHtml);
+  if (!v.ok) { statusEl.textContent = v.error; statusEl.className = 'msg error'; return; }
+  statusEl.textContent = 'Publishing…'; statusEl.className = 'msg';
+  try {
+    await ghSaveFile(workingHtml, 'Edit via site editor');
+    originalHtml = workingHtml;
+    statusEl.textContent = 'Published. The live site will update within a minute or two.';
+    statusEl.className = 'msg ok';
+    document.querySelectorAll('.field.pending').forEach(f => f.classList.remove('pending'));
+  } catch (e) {
+    statusEl.textContent = e.message;
+    statusEl.className = 'msg error';
+  }
+});
+
+// auto-connect if a token is already saved
+if (token) {
+  document.getElementById('token-input').value = token;
+  connect();
+}
+</script>
+</body>
+</html>
