@@ -178,18 +178,20 @@ footer .social-links{margin-left:4px;}
 
 /* ---------- CHAMPION BANNER (above Sector 01, every series page) ---------- */
 .champion-banner{
-  display:flex; align-items:center; gap:14px;
-  background:var(--surface); border:1px solid var(--rule);
-  padding:10px 16px; margin:24px 0 -6px;
+  display:flex; align-items:center; gap:18px;
+  padding:6px 0 24px; margin:28px 0 -4px;
+  border-bottom:1px solid var(--rule);
 }
 .champion-headshot-frame{
-  width:52px; height:52px; border-radius:50%; position:relative; overflow:hidden;
-  border:2px solid var(--amber); flex-shrink:0; background:var(--surface-2);
+  width:68px; height:68px; border-radius:50%; position:relative; overflow:hidden;
+  flex-shrink:0; background:var(--surface-2);
+  border:2px solid var(--amber);
+  box-shadow:0 0 0 4px var(--bg), 0 0 0 5px var(--rule);
 }
 .champion-headshot{width:100%; height:100%; object-fit:cover; position:absolute; inset:0;}
-.champion-info{display:flex; flex-direction:column; gap:1px; min-width:0;}
-.champion-eyebrow{font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--text-faint);}
-.champion-name{font-family:'Oswald',sans-serif; font-size:17px; text-transform:uppercase; letter-spacing:.01em; color:var(--text); line-height:1.2;}
+.champion-info{display:flex; flex-direction:column; gap:3px; min-width:0;}
+.champion-eyebrow{font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--amber); font-weight:700;}
+.champion-name{font-family:'Oswald',sans-serif; font-size:25px; font-weight:600; text-transform:uppercase; letter-spacing:.01em; color:var(--text); line-height:1.15;}
 .hero-dots{display:flex; gap:8px; justify-content:center; margin-top:18px;}
 .hero-dot{width:8px; height:8px; border-radius:50%; background:var(--rule); border:none; cursor:pointer; padding:0;}
 .hero-dot.active{background:var(--amber);}

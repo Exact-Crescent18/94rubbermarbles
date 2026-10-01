@@ -576,7 +576,6 @@ let onApplyImage = null;
 // directly — the thing actually asked for.
 let imgNaturalW = 0, imgNaturalH = 0;
 let cropRect = { x: 0, y: 0, w: 0, h: 0 };
-let cropAspect = 1;
 let cropDrag = null; // {anchorX, anchorY} in natural pixel coords, while drawing
 
 function clampNum(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
@@ -636,7 +635,11 @@ function cropStyleString(rect, natW, natH) {
   const heightPct = r((natH / rect.h) * 100);
   const leftPct = r((-rect.x / rect.w) * 100);
   const topPct = r((-rect.y / rect.h) * 100);
-  return `position:absolute; width:${widthPct}%; height:${heightPct}%; left:${leftPct}%; top:${topPct}%;`;
+  // object-fit:fill overrides the base rule's cover/contain — without it,
+  // the image re-fits its OWN natural aspect inside this box on top of
+  // the positioning below, undoing the crop instead of showing exactly
+  // the selected rectangle stretched to the frame.
+  return `position:absolute; object-fit:fill; width:${widthPct}%; height:${heightPct}%; left:${leftPct}%; top:${topPct}%;`;
 }
 
 // options.credit: current credit text to prefill (pass '' if none yet).
@@ -646,11 +649,7 @@ function cropStyleString(rect, natW, natH) {
 // no visible caption slot in that markup. Always shown now — no image
 // type is left with nowhere to put a source. options.cropStyle: the
 // image's current style="..." attribute, if any, so re-opening an
-// already-cropped image starts from where it was left. options.aspect:
-// the target frame's own live width/height ratio (read from the clicked
-// <img>'s getBoundingClientRect(), which fills its frame exactly) — the
-// drawn rectangle is locked to this so it always fits the frame with no
-// distortion. Falls back to the image's own natural aspect if unknown.
+// already-cropped image starts from where it was left.
 // onApply receives (newSrc, newCredit, previewSrc, cropStyle).
 function openImageModal(currentSrc, onApply, options = {}) {
   onApplyImage = onApply;
@@ -664,7 +663,6 @@ function openImageModal(currentSrc, onApply, options = {}) {
   function onReady() {
     imgNaturalW = previewImg.naturalWidth || 1;
     imgNaturalH = previewImg.naturalHeight || 1;
-    cropAspect = options.aspect > 0 ? options.aspect : (imgNaturalW / imgNaturalH);
     cropRect = parseCropStyle(options.cropStyle, imgNaturalW, imgNaturalH);
     renderCropRect();
   }
@@ -674,11 +672,10 @@ function openImageModal(currentSrc, onApply, options = {}) {
   document.getElementById('img-modal-backdrop').style.display = 'flex';
 }
 
-// Click-and-drag to draw a brand-new rectangle, aspect-locked to the
-// target frame. The anchor (where the drag started) stays fixed; the
-// rectangle grows toward the pointer, sized to the largest aspect-locked
-// box that fits within the drag distance without crossing the image's
-// own edges.
+// Click-and-drag to draw a brand-new rectangle — width and height each
+// follow the drag independently (no locked aspect), clamped so it never
+// crosses the image's own edges. The anchor (where the drag started)
+// stays fixed; the rectangle grows toward the pointer.
 (function initCropDrag() {
   const box = document.getElementById('img-modal-crop-box');
   box.addEventListener('pointerdown', (e) => {
@@ -700,11 +697,8 @@ function openImageModal(currentSrc, onApply, options = {}) {
     const dirY = cur.y >= cropDrag.anchorY ? 1 : -1;
     const maxW = dirX > 0 ? (imgNaturalW - cropDrag.anchorX) : cropDrag.anchorX;
     const maxH = dirY > 0 ? (imgNaturalH - cropDrag.anchorY) : cropDrag.anchorY;
-    const freeW = Math.min(Math.abs(cur.x - cropDrag.anchorX), maxW);
-    const freeH = Math.min(Math.abs(cur.y - cropDrag.anchorY), maxH);
-    let w, h;
-    if (freeW / cropAspect <= freeH) { w = freeW; h = freeW / cropAspect; }
-    else { h = freeH; w = freeH * cropAspect; }
+    const w = Math.min(Math.abs(cur.x - cropDrag.anchorX), maxW);
+    const h = Math.min(Math.abs(cur.y - cropDrag.anchorY), maxH);
     const x = dirX > 0 ? cropDrag.anchorX : cropDrag.anchorX - w;
     const y = dirY > 0 ? cropDrag.anchorY : cropDrag.anchorY - h;
     cropRect = { x, y, w, h };
@@ -835,7 +829,6 @@ function instrumentFrame() {
         e.stopPropagation(); e.preventDefault();
         const img = art.querySelector('img');
         const currentCredit = art.querySelector('.src')?.textContent || '';
-        const artRect = art.getBoundingClientRect();
         openImageModal(img?.getAttribute('src') || '', async (newSrc, newCredit, previewSrc, cropStyle) => {
           workingHtml = await setSlideImage(workingHtml, slug, newSrc, newCredit, cropStyle);
           markDirty();
@@ -848,7 +841,7 @@ function instrumentFrame() {
             liveImg.src = previewSrc || newSrc;
             if (cropStyle) liveImg.setAttribute('style', cropStyle); else liveImg.removeAttribute('style');
           } else loadFrame(); // no <img> existed on this slide at all — needs a structural reload
-        }, { credit: currentCredit, creditLabel: 'Source / credit (shown in the corner of the image)', cropStyle: img?.getAttribute('style') || '', aspect: artRect.height > 0 ? artRect.width / artRect.height : 0 });
+        }, { credit: currentCredit, creditLabel: 'Source / credit (shown in the corner of the image)', cropStyle: img?.getAttribute('style') || '' });
       }, true);
     }
   });
@@ -920,7 +913,6 @@ function instrumentFrame() {
       // <img> rather than every element sharing that URL.
       const nextUpTrack = img.closest('.next-up-panel .track');
       const view = nextUpTrack ? img.closest('[id^="view-"]')?.id.replace('view-', '') : null;
-      const imgRect = img.getBoundingClientRect();
 
       openImageModal(oldSrc, (newSrc, newCredit, previewSrc, cropStyle) => {
         if (view) {
@@ -939,7 +931,7 @@ function instrumentFrame() {
           });
         }
         markDirty();
-      }, { credit: img.getAttribute('title') || '', cropStyle: img.getAttribute('style') || '', aspect: imgRect.height > 0 ? imgRect.width / imgRect.height : 0 });
+      }, { credit: img.getAttribute('title') || '', cropStyle: img.getAttribute('style') || '' });
     }, true);
   });
 
