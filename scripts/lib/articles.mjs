@@ -35,18 +35,21 @@ export function parseArticles(html) {
 function serializeOne(slug, a) {
   const bodyLines = a.body.map((p) => `      ${dq(p)},`).join('\n');
   const publishLine = a.publishAt ? `\n    publishAt:${sq(a.publishAt)},` : '';
-  // trackImg/trackAlt/trackCredit are optional per-article image
-  // overrides (used by storyCardHTML() below and
+  // trackImg/trackAlt/trackCredit/trackStyle are optional per-article
+  // image overrides (used by storyCardHTML() below and
   // scripts/lib/hero-carousel.mjs) — only emitted when actually set, so
   // this stays a no-op for the common case of relying on `track` (a
-  // TRACKS-lookup key) instead.
+  // TRACKS-lookup key) instead. Every new field added here MUST also be
+  // added to this list — trackImg originally wasn't, and silently never
+  // persisted across a save despite working in the same request.
   const trackImgLine = a.trackImg ? `\n    trackImg:${sq(a.trackImg)},` : '';
   const trackAltLine = a.trackAlt ? `\n    trackAlt:${sq(a.trackAlt)},` : '';
   const trackCreditLine = a.trackCredit ? `\n    trackCredit:${sq(a.trackCredit)},` : '';
+  const trackStyleLine = a.trackStyle ? `\n    trackStyle:${sq(a.trackStyle)},` : '';
   return `  ${sq(slug)}: {
     view:${sq(a.view)}, chip:${sq(a.chip)}, chipLogo:${sq(a.chipLogo)}, chipText:${sq(a.chipText)},
     title:${dq(a.title)}, category:${sq(a.category)}, readTime:${sq(a.readTime)}, date:${sq(a.date)},
-    track:${sq(a.track || '')},${trackImgLine}${trackAltLine}${trackCreditLine}
+    track:${sq(a.track || '')},${trackImgLine}${trackAltLine}${trackCreditLine}${trackStyleLine}
     dek:${dq(a.dek)},${publishLine}
     body:[
 ${bodyLines}

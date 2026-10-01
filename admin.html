@@ -62,8 +62,11 @@ button:disabled{opacity:.5; cursor:not-allowed;}
   width:420px; max-width:90vw;
 }
 #img-modal h3, #result-modal h3, #ticker-modal h3{margin:0 0 14px; font-size:15px;}
-#img-modal .preview{width:100%; height:140px; background:#f1efe9; border-radius:4px; display:flex; align-items:center; justify-content:center; margin-bottom:14px; overflow:hidden;}
-#img-modal .preview img{max-width:100%; max-height:100%; object-fit:contain;}
+#img-modal .preview{width:100%; height:200px; background:#f1efe9; border-radius:4px; margin-bottom:6px; overflow:hidden; position:relative; cursor:grab; touch-action:none;}
+#img-modal .preview.dragging{cursor:grabbing;}
+#img-modal .preview img{position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; pointer-events:none; user-select:none;}
+#img-modal .crop-controls{margin-bottom:10px;}
+#img-modal .crop-controls input[type=range]{width:100%;}
 #img-modal label, #result-modal label, #ticker-modal label{display:block; font-size:11.5px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px; margin-top:14px;}
 #img-modal .row, #result-modal .row, #ticker-modal .row{display:flex; gap:10px; margin-top:20px; justify-content:flex-end;}
 #img-modal .or{font-size:11.5px; color:var(--text-faint); text-align:center; margin:14px 0;}
@@ -108,7 +111,12 @@ button:disabled{opacity:.5; cursor:not-allowed;}
 <div id="img-modal-backdrop">
   <div id="img-modal">
     <h3>Change image</h3>
-    <div class="preview"><img id="img-modal-preview" src="" alt=""></div>
+    <div class="preview" id="img-modal-crop-box"><img id="img-modal-preview" src="" alt=""></div>
+    <div class="crop-controls">
+      <label style="margin-top:8px;">Zoom / position — drag the image to reposition it within the frame</label>
+      <input type="range" id="img-modal-zoom" min="100" max="300" value="100">
+      <button class="secondary" id="img-modal-reset-crop" type="button" style="margin-top:8px;">Reset crop</button>
+    </div>
     <label>Image URL</label>
     <input type="text" id="img-modal-url">
     <div class="or">— or —</div>
@@ -269,14 +277,17 @@ function getNextUpTrackImg(html, view) {
   const slice = html.slice(b.start, b.end);
   const trackIdx = slice.indexOf('<div class="track">');
   if (trackIdx === -1) return null;
-  const m = slice.slice(trackIdx).match(/<img class="diagram" src="([^"]*)" alt="([^"]*)">/);
+  // Tolerate an optional trailing style="..." (set by a previous crop
+  // edit) — the tag isn't always the bare class/src/alt form once edited.
+  const m = slice.slice(trackIdx).match(/<img class="diagram" src="([^"]*)" alt="([^"]*)"(?: style="([^"]*)")?>/);
   if (!m) return null;
-  return { offset: b.start + trackIdx + m.index, full: m[0], src: m[1], alt: m[2] };
+  return { offset: b.start + trackIdx + m.index, full: m[0], src: m[1], alt: m[2], style: m[3] || '' };
 }
-function setNextUpTrackImage(html, view, newSrc) {
+function setNextUpTrackImage(html, view, newSrc, newStyle) {
   const t = getNextUpTrackImg(html, view);
   if (!t) return html;
-  const newTag = `<img class="diagram" src="${newSrc}" alt="${t.alt}">`;
+  const styleAttr = newStyle ? ` style="${escAttr(newStyle)}"` : '';
+  const newTag = `<img class="diagram" src="${newSrc}" alt="${t.alt}"${styleAttr}>`;
   return html.slice(0, t.offset) + newTag + html.slice(t.offset + t.full.length);
 }
 
@@ -322,6 +333,17 @@ function setImageTitle(html, src, newTitle) {
     return stripped.slice(0, -1) + ` title="${escAttr(newTitle)}">`;
   });
 }
+// Crop/zoom (object-position + scale) stored as an inline style, same
+// matching approach as setImageTitle.
+function setImageStyle(html, src, newStyle) {
+  return html.replace(/<img\b[^>]*>/g, (tag) => {
+    const m = tag.match(/src="([^"]*)"/);
+    if (!m || m[1] !== src) return tag;
+    const stripped = tag.replace(/\s*style="[^"]*"/g, '');
+    if (!newStyle) return stripped;
+    return stripped.slice(0, -1) + ` style="${escAttr(newStyle)}">`;
+  });
+}
 
 // ================= Ticker bar =================
 // Each ticker item is keyed by its logo's alt text (e.g. "F1",
@@ -346,12 +368,13 @@ function setTickerText(html, altText, newText) {
 // scripts/lib/hero-carousel.mjs) and regenerates just the carousel block
 // — reuses the exact same render function the automation uses, so the
 // result is byte-consistent with what a bot-driven update would produce.
-async function setSlideImage(html, slug, newSrc, newCredit) {
+async function setSlideImage(html, slug, newSrc, newCredit, newStyle) {
   const { renderCarousel, getLeadStories, replaceCarousel } = await import('./scripts/lib/hero-carousel.mjs');
   const articles = parseArticles(html);
   if (!articles[slug]) return html;
   articles[slug].trackImg = newSrc;
   articles[slug].trackCredit = newCredit || '';
+  articles[slug].trackStyle = newStyle || '';
   html = writeArticles(html, articles);
   const tracks = parseNamedLiteral(html, 'TRACKS')?.value || {};
   return replaceCarousel(html, renderCarousel(getLeadStories(html), articles, tracks));
@@ -524,13 +547,42 @@ function findEventByViewAndName(events, view, name) {
 
 // ================= image editor modal =================
 let onApplyImage = null;
+// Crop/zoom state: objectPosition (0-100, 0-100) is where the image is
+// anchored within its frame; zoom (1-3) scales it further in from
+// there. Applied together so zooming stays centered on wherever the
+// user last dragged to, not back to the image's own center.
+let cropX = 50, cropY = 50, cropZoom = 1;
+
+function parseCropStyle(styleAttr) {
+  if (!styleAttr) return { x: 50, y: 50, zoom: 1 };
+  const posM = styleAttr.match(/object-position:\s*([\d.]+)%\s+([\d.]+)%/);
+  const zoomM = styleAttr.match(/scale\(([\d.]+)\)/);
+  return {
+    x: posM ? parseFloat(posM[1]) : 50,
+    y: posM ? parseFloat(posM[2]) : 50,
+    zoom: zoomM ? parseFloat(zoomM[1]) : 1,
+  };
+}
+function cropStyleString(x, y, zoom) {
+  if (x === 50 && y === 50 && zoom === 1) return ''; // no adjustment — don't clutter the markup
+  return `object-position:${x}% ${y}%; transform:scale(${zoom}); transform-origin:${x}% ${y}%;`;
+}
+function renderCropPreview() {
+  const img = document.getElementById('img-modal-preview');
+  img.style.objectPosition = `${cropX}% ${cropY}%`;
+  img.style.transform = `scale(${cropZoom})`;
+  img.style.transformOrigin = `${cropX}% ${cropY}%`;
+}
+
 // options.credit: current credit text to prefill (pass '' if none yet).
 // options.creditLabel: describes where this credit actually shows up —
 // the hero carousel has a real visible caption badge; everywhere else
 // it becomes the image's title attribute (a hover tooltip) since there's
 // no visible caption slot in that markup. Always shown now — no image
-// type is left with nowhere to put a source. onApply receives
-// (newSrc, newCredit).
+// type is left with nowhere to put a source. options.cropStyle: the
+// image's current style="..." attribute, if any, so re-opening an
+// already-cropped image starts from where it was left, not re-centered.
+// onApply receives (newSrc, newCredit, previewSrc, cropStyle).
 function openImageModal(currentSrc, onApply, options = {}) {
   onApplyImage = onApply;
   document.getElementById('img-modal-preview').src = currentSrc;
@@ -539,8 +591,51 @@ function openImageModal(currentSrc, onApply, options = {}) {
   document.getElementById('img-modal-credit-label').textContent =
     options.creditLabel || 'Source / credit (shown as a hover tooltip on the image)';
   document.getElementById('img-modal-credit').value = options.credit || '';
+  const crop = parseCropStyle(options.cropStyle);
+  cropX = crop.x; cropY = crop.y; cropZoom = crop.zoom;
+  document.getElementById('img-modal-zoom').value = Math.round(cropZoom * 100);
+  renderCropPreview();
   document.getElementById('img-modal-backdrop').style.display = 'flex';
 }
+
+// Drag-to-pan: pointer position deltas convert to a percentage shift
+// relative to the frame's own size, since object-position is a
+// percentage of the image's excess size within that frame. Clamped to
+// 0-100 — there's no meaningful "past the edge" position.
+(function initCropDrag() {
+  const box = document.getElementById('img-modal-crop-box');
+  let dragging = false, startX = 0, startY = 0, startCropX = 50, startCropY = 50;
+  box.addEventListener('pointerdown', (e) => {
+    dragging = true;
+    box.classList.add('dragging');
+    box.setPointerCapture(e.pointerId);
+    startX = e.clientX; startY = e.clientY;
+    startCropX = cropX; startCropY = cropY;
+  });
+  box.addEventListener('pointermove', (e) => {
+    if (!dragging) return;
+    const rect = box.getBoundingClientRect();
+    // Dragging right should reveal more of the image's left side, i.e.
+    // move the focal point left — hence the minus sign.
+    const dx = ((e.clientX - startX) / rect.width) * 100;
+    const dy = ((e.clientY - startY) / rect.height) * 100;
+    cropX = Math.max(0, Math.min(100, startCropX - dx));
+    cropY = Math.max(0, Math.min(100, startCropY - dy));
+    renderCropPreview();
+  });
+  function endDrag() { dragging = false; box.classList.remove('dragging'); }
+  box.addEventListener('pointerup', endDrag);
+  box.addEventListener('pointercancel', endDrag);
+})();
+document.getElementById('img-modal-zoom').addEventListener('input', (e) => {
+  cropZoom = Number(e.target.value) / 100;
+  renderCropPreview();
+});
+document.getElementById('img-modal-reset-crop').addEventListener('click', () => {
+  cropX = 50; cropY = 50; cropZoom = 1;
+  document.getElementById('img-modal-zoom').value = 100;
+  renderCropPreview();
+});
 function closeImageModal() { document.getElementById('img-modal-backdrop').style.display = 'none'; onApplyImage = null; }
 // Picking a file previously gave no feedback at all until Apply — show
 // it immediately via a local object URL, and clear the URL field so
@@ -550,11 +645,16 @@ document.getElementById('img-modal-file').addEventListener('change', (e) => {
   if (!file) return;
   document.getElementById('img-modal-preview').src = URL.createObjectURL(file);
   document.getElementById('img-modal-url').value = '';
+  // A new image starts fresh — the old crop was framed for a different photo.
+  cropX = 50; cropY = 50; cropZoom = 1;
+  document.getElementById('img-modal-zoom').value = 100;
+  renderCropPreview();
 });
 async function applyImageModal() {
   const fileInput = document.getElementById('img-modal-file');
   const urlInput = document.getElementById('img-modal-url');
   const credit = document.getElementById('img-modal-credit').value.trim();
+  const cropStyle = cropStyleString(cropX, cropY, cropZoom);
   if (fileInput.files && fileInput.files[0]) {
     const file = fileInput.files[0];
     const b64 = await fileToBase64(file);
@@ -567,11 +667,11 @@ async function applyImageModal() {
       // the local object URL immediately while `path` — the real,
       // permanent location — is what gets written into workingHtml and
       // published.
-      if (onApplyImage) await onApplyImage(path, credit, URL.createObjectURL(file));
+      if (onApplyImage) await onApplyImage(path, credit, URL.createObjectURL(file), cropStyle);
       setStatus('Image uploaded — remember to Publish.', 'ok');
     } catch (e) { setStatus('Upload failed: ' + e.message, 'error'); }
   } else if (urlInput.value.trim() && onApplyImage) {
-    await onApplyImage(urlInput.value.trim(), credit);
+    await onApplyImage(urlInput.value.trim(), credit, undefined, cropStyle);
   }
   closeImageModal();
 }
@@ -653,17 +753,19 @@ function instrumentFrame() {
         e.stopPropagation(); e.preventDefault();
         const img = art.querySelector('img');
         const currentCredit = art.querySelector('.src')?.textContent || '';
-        openImageModal(img?.getAttribute('src') || '', async (newSrc, newCredit, previewSrc) => {
-          workingHtml = await setSlideImage(workingHtml, slug, newSrc, newCredit);
+        openImageModal(img?.getAttribute('src') || '', async (newSrc, newCredit, previewSrc, cropStyle) => {
+          workingHtml = await setSlideImage(workingHtml, slug, newSrc, newCredit, cropStyle);
           markDirty();
           // A just-uploaded image isn't fetchable at its real repo path
           // until GitHub Pages redeploys, so show the local object URL
           // immediately instead — the real path is already what's saved
           // in workingHtml for publishing.
           const liveImg = art.querySelector('img');
-          if (liveImg) liveImg.src = previewSrc || newSrc;
-          else loadFrame(); // no <img> existed on this slide at all — needs a structural reload
-        }, { credit: currentCredit, creditLabel: 'Source / credit (shown in the corner of the image)' });
+          if (liveImg) {
+            liveImg.src = previewSrc || newSrc;
+            if (cropStyle) liveImg.setAttribute('style', cropStyle); else liveImg.removeAttribute('style');
+          } else loadFrame(); // no <img> existed on this slide at all — needs a structural reload
+        }, { credit: currentCredit, creditLabel: 'Source / credit (shown in the corner of the image)', cropStyle: img?.getAttribute('style') || '' });
       }, true);
     }
   });
@@ -734,21 +836,24 @@ function instrumentFrame() {
       const nextUpTrack = img.closest('.next-up-panel .track');
       const view = nextUpTrack ? img.closest('[id^="view-"]')?.id.replace('view-', '') : null;
 
-      openImageModal(oldSrc, (newSrc, newCredit, previewSrc) => {
+      openImageModal(oldSrc, (newSrc, newCredit, previewSrc, cropStyle) => {
         if (view) {
-          workingHtml = setNextUpTrackImage(workingHtml, view, newSrc);
+          workingHtml = setNextUpTrackImage(workingHtml, view, newSrc, cropStyle);
           img.setAttribute('src', previewSrc || newSrc);
           if (newCredit) img.setAttribute('title', newCredit); else img.removeAttribute('title');
+          if (cropStyle) img.setAttribute('style', cropStyle); else img.removeAttribute('style');
         } else {
           workingHtml = replaceImageSrc(workingHtml, oldSrc, newSrc);
           workingHtml = setImageTitle(workingHtml, newSrc, newCredit);
+          workingHtml = setImageStyle(workingHtml, newSrc, cropStyle);
           doc.querySelectorAll(`img[src="${CSS.escape(oldSrc)}"]`).forEach(i => {
             i.setAttribute('src', previewSrc || newSrc);
             if (newCredit) i.setAttribute('title', newCredit); else i.removeAttribute('title');
+            if (cropStyle) i.setAttribute('style', cropStyle); else i.removeAttribute('style');
           });
         }
         markDirty();
-      }, { credit: img.getAttribute('title') || '' });
+      }, { credit: img.getAttribute('title') || '', cropStyle: img.getAttribute('style') || '' });
     }, true);
   });
 

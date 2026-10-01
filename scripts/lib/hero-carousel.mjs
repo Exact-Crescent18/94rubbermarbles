@@ -58,7 +58,7 @@ function slideHTML(slug, article, trackSrc, active) {
       </div>
     </div>
     <div class="hero-art">
-      ${trackSrc ? `<img src="${trackSrc}" alt="${article.chipText} art">` : ''}
+      ${trackSrc ? `<img src="${trackSrc}" alt="${article.chipText} art"${article.trackStyle ? ` style="${article.trackStyle}"` : ''}>` : ''}
       ${credit ? `<span class="src">${credit}</span>` : ''}
     </div>
   </section>`;
