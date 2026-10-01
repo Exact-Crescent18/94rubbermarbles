@@ -182,10 +182,11 @@ footer .social-links{margin-left:4px;}
   background:var(--surface); border:1px solid var(--rule);
   padding:10px 16px; margin:24px 0 -6px;
 }
-.champion-headshot{
-  width:52px; height:52px; border-radius:50%; object-fit:cover;
+.champion-headshot-frame{
+  width:52px; height:52px; border-radius:50%; position:relative; overflow:hidden;
   border:2px solid var(--amber); flex-shrink:0; background:var(--surface-2);
 }
+.champion-headshot{width:100%; height:100%; object-fit:cover; position:absolute; inset:0;}
 .champion-info{display:flex; flex-direction:column; gap:1px; min-width:0;}
 .champion-eyebrow{font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--text-faint);}
 .champion-name{font-family:'Oswald',sans-serif; font-size:17px; text-transform:uppercase; letter-spacing:.01em; color:var(--text); line-height:1.2;}
@@ -199,7 +200,7 @@ footer .social-links{margin-left:4px;}
   border:1px solid var(--rule); background:var(--surface);
   display:grid; grid-template-columns:1.1fr 0.9fr; overflow:hidden; margin-top:8px;
 }
-.series-hero .photo{position:relative; min-height:280px; background:var(--surface-2);}
+.series-hero .photo{position:relative; min-height:280px; background:var(--surface-2); overflow:hidden;}
 .series-hero .photo img{width:100%; height:100%; object-fit:cover; position:absolute; inset:0;}
 .series-hero .photo img.hero-track-diagram{object-fit:contain; background:#f1efe9; padding:26px; box-sizing:border-box;}
 .series-hero .photo .cap{position:absolute; bottom:10px; left:12px; font-family:'JetBrains Mono',monospace; font-size:10px; color:#fff; background:rgba(11,12,14,.78); padding:3px 8px; letter-spacing:.08em; z-index:2;}
@@ -216,7 +217,7 @@ footer .social-links{margin-left:4px;}
   border:1px solid var(--rule); background:var(--surface);
   display:grid; grid-template-columns:1fr 1fr; overflow:hidden; margin-top:8px;
 }
-.next-up-panel .track{position:relative; min-height:320px; background:var(--surface-2);}
+.next-up-panel .track{position:relative; min-height:320px; background:var(--surface-2); overflow:hidden;}
 .next-up-panel .track img{width:100%; height:100%; object-fit:cover; position:absolute; inset:0;}
 .next-up-panel .track img.diagram{object-fit:contain; background:#f1efe9; padding:30px; box-sizing:border-box;}
 .next-up-panel .track .cap{position:absolute; bottom:10px; left:12px; font-family:'JetBrains Mono',monospace; font-size:10px; color:#fff; background:rgba(11,12,14,.78); padding:3px 8px; letter-spacing:.08em; z-index:2;}
@@ -287,7 +288,7 @@ footer .social-links{margin-left:4px;}
 .ticker-logo-white{filter:brightness(0) invert(1);}
 img[src*="WRC_logo.svg"]{filter:brightness(0) invert(1);}
 .series-hero .info .series-logo{height:34px; width:auto; max-width:200px; object-fit:contain; display:block; margin-bottom:16px; background:#f1efe9; border-radius:3px; padding:8px 14px; box-sizing:content-box;}
-.event-card .track-svg{height:56px; width:100%;}
+.event-card .track-svg{height:56px; width:100%; position:relative; overflow:hidden;}
 .event-card .track-svg svg{width:100%; height:100%;}
 .event-card .track-svg img{width:100%; height:100%; object-fit:cover; display:block;}
 .event-card .track-svg img.diagram{object-fit:contain; background:#f1efe9; padding:4px; box-sizing:border-box; border-radius:2px;}
@@ -316,7 +317,7 @@ img[src*="WRC_logo.svg"]{filter:brightness(0) invert(1);}
 .news-grid.flat{grid-template-rows:auto;}
 .story{background:var(--surface); border:1px solid var(--rule); display:flex; flex-direction:column; overflow:hidden; text-decoration:none; color:inherit; transition:border-color .2s;}
 .story:hover{border-color:var(--amber);}
-.story .art{aspect-ratio:16/9; background:var(--surface-2); display:flex; align-items:center; justify-content:center; border-bottom:1px solid var(--rule); position:relative;}
+.story .art{aspect-ratio:16/9; background:var(--surface-2); display:flex; align-items:center; justify-content:center; border-bottom:1px solid var(--rule); position:relative; overflow:hidden;}
 .story.lead .art{aspect-ratio:16/10;}
 .story .art svg{width:60%; height:60%; opacity:0.9;}
 .story .art img{width:100%; height:100%; object-fit:cover;}
@@ -1098,7 +1099,7 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 
 <section class="view" id="view-f1">
   <div class="champion-banner">
-    <img class="champion-headshot" src="https://upload.wikimedia.org/wikipedia/commons/9/90/2024-08-25_Motorsport%2C_Formel_1%2C_Gro%C3%9Fer_Preis_der_Niederlande_2024_STP_3968_by_Stepro_%28cropped2%29.jpg" alt="Lando Norris headshot" title="Wikimedia Commons">
+    <div class="champion-headshot-frame"><img class="champion-headshot" src="https://upload.wikimedia.org/wikipedia/commons/9/90/2024-08-25_Motorsport%2C_Formel_1%2C_Gro%C3%9Fer_Preis_der_Niederlande_2024_STP_3968_by_Stepro_%28cropped2%29.jpg" alt="Lando Norris headshot" title="Wikimedia Commons"></div>
     <div class="champion-info">
       <span class="champion-eyebrow">2025 Champion</span>
       <span class="champion-name">Lando Norris</span>
@@ -1234,7 +1235,7 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 
 <section class="view" id="view-nascar-cup">
   <div class="champion-banner">
-    <img class="champion-headshot" src="https://upload.wikimedia.org/wikipedia/commons/1/18/Kyle_Larson_Las_Vegas_2026.jpg" alt="Kyle Larson headshot" title="Wikimedia Commons">
+    <div class="champion-headshot-frame"><img class="champion-headshot" src="https://upload.wikimedia.org/wikipedia/commons/1/18/Kyle_Larson_Las_Vegas_2026.jpg" alt="Kyle Larson headshot" title="Wikimedia Commons"></div>
     <div class="champion-info">
       <span class="champion-eyebrow">2025 Champion</span>
       <span class="champion-name">Kyle Larson</span>
@@ -1368,7 +1369,7 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 
 <section class="view" id="view-nascar-oreilly">
   <div class="champion-banner">
-    <img class="champion-headshot" src="https://upload.wikimedia.org/wikipedia/commons/b/b2/Jesse_Love_Sonoma_2026_%281%29.jpg" alt="Jesse Love headshot" title="Wikimedia Commons">
+    <div class="champion-headshot-frame"><img class="champion-headshot" src="https://upload.wikimedia.org/wikipedia/commons/b/b2/Jesse_Love_Sonoma_2026_%281%29.jpg" alt="Jesse Love headshot" title="Wikimedia Commons"></div>
     <div class="champion-info">
       <span class="champion-eyebrow">2025 Champion</span>
       <span class="champion-name">Jesse Love</span>
@@ -1477,7 +1478,7 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 
 <section class="view" id="view-arca">
   <div class="champion-banner">
-    <img class="champion-headshot" src="https://upload.wikimedia.org/wikipedia/commons/e/e6/Thomas_Annunziata_2025.jpg" alt="Thomas Annunziata headshot" title="Wikimedia Commons">
+    <div class="champion-headshot-frame"><img class="champion-headshot" src="https://upload.wikimedia.org/wikipedia/commons/e/e6/Thomas_Annunziata_2025.jpg" alt="Thomas Annunziata headshot" title="Wikimedia Commons"></div>
     <div class="champion-info">
       <span class="champion-eyebrow">2026 Champion</span>
       <span class="champion-name">Thomas Annunziata</span>
@@ -1574,7 +1575,7 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 
 <section class="view" id="view-indycar">
   <div class="champion-banner">
-    <img class="champion-headshot" src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Alex_Palou_at_2024_Chevrolet_Detroit_Grand_Prix.jpg" alt="Álex Palou headshot" title="Wikimedia Commons">
+    <div class="champion-headshot-frame"><img class="champion-headshot" src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Alex_Palou_at_2024_Chevrolet_Detroit_Grand_Prix.jpg" alt="Álex Palou headshot" title="Wikimedia Commons"></div>
     <div class="champion-info">
       <span class="champion-eyebrow">2026 Champion</span>
       <span class="champion-name">Álex Palou</span>
@@ -1713,7 +1714,7 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 
 <section class="view" id="view-indy-nxt">
   <div class="champion-banner">
-    <img class="champion-headshot" src="https://upload.wikimedia.org/wikipedia/commons/7/7c/FIA_F3_Austria_2025_Nr._29_Johnson.jpg" alt="Nikita Johnson headshot" title="Wikimedia Commons">
+    <div class="champion-headshot-frame"><img class="champion-headshot" src="https://upload.wikimedia.org/wikipedia/commons/7/7c/FIA_F3_Austria_2025_Nr._29_Johnson.jpg" alt="Nikita Johnson headshot" title="Wikimedia Commons"></div>
     <div class="champion-info">
       <span class="champion-eyebrow">2026 Champion</span>
       <span class="champion-name">Nikita Johnson</span>
@@ -1808,7 +1809,7 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 
 <section class="view" id="view-motogp">
   <div class="champion-banner">
-    <img class="champion-headshot" src="https://upload.wikimedia.org/wikipedia/commons/a/a7/Marc_Marquez_at_the_2026_Spanish_Grand_Prix_%28cropped%29.jpg" alt="Marc Márquez headshot" title="Wikimedia Commons">
+    <div class="champion-headshot-frame"><img class="champion-headshot" src="https://upload.wikimedia.org/wikipedia/commons/a/a7/Marc_Marquez_at_the_2026_Spanish_Grand_Prix_%28cropped%29.jpg" alt="Marc Márquez headshot" title="Wikimedia Commons"></div>
     <div class="champion-info">
       <span class="champion-eyebrow">2025 Champion</span>
       <span class="champion-name">Marc Márquez</span>
@@ -1951,7 +1952,7 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 
 <section class="view" id="view-wec">
   <div class="champion-banner">
-    <img class="champion-headshot" src="https://upload.wikimedia.org/wikipedia/commons/9/91/Antonio_Giovinazzi_-_Ferrari_499P_-_Hybrid_during_the_pitwalk_at_the_2023_Le_Mans_%2853468237574%29.jpg" alt="Antonio Giovinazzi headshot" title="Wikimedia Commons">
+    <div class="champion-headshot-frame"><img class="champion-headshot" src="https://upload.wikimedia.org/wikipedia/commons/9/91/Antonio_Giovinazzi_-_Ferrari_499P_-_Hybrid_during_the_pitwalk_at_the_2023_Le_Mans_%2853468237574%29.jpg" alt="Antonio Giovinazzi headshot" title="Wikimedia Commons"></div>
     <div class="champion-info">
       <span class="champion-eyebrow">2025 Champion</span>
       <span class="champion-name">Antonio Giovinazzi</span>
@@ -2066,7 +2067,7 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 
 <section class="view" id="view-nascar-truck">
   <div class="champion-banner">
-    <img class="champion-headshot" src="https://upload.wikimedia.org/wikipedia/commons/d/db/NASCAR_San_Diego_Weekend_Victor_Conducts_Interview_%281%29_9764270_%28cropped%29.jpg" alt="Corey Heim headshot" title="Wikimedia Commons">
+    <div class="champion-headshot-frame"><img class="champion-headshot" src="https://upload.wikimedia.org/wikipedia/commons/d/db/NASCAR_San_Diego_Weekend_Victor_Conducts_Interview_%281%29_9764270_%28cropped%29.jpg" alt="Corey Heim headshot" title="Wikimedia Commons"></div>
     <div class="champion-info">
       <span class="champion-eyebrow">2025 Champion</span>
       <span class="champion-name">Corey Heim</span>
@@ -2197,7 +2198,7 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 
 <section class="view" id="view-wrc">
   <div class="champion-banner">
-    <img class="champion-headshot" src="https://upload.wikimedia.org/wikipedia/commons/3/38/2023_Central_European_Rally_-_Ogier_01_%28cropped%29.jpg" alt="Sébastien Ogier headshot" title="Wikimedia Commons">
+    <div class="champion-headshot-frame"><img class="champion-headshot" src="https://upload.wikimedia.org/wikipedia/commons/3/38/2023_Central_European_Rally_-_Ogier_01_%28cropped%29.jpg" alt="Sébastien Ogier headshot" title="Wikimedia Commons"></div>
     <div class="champion-info">
       <span class="champion-eyebrow">2025 Champion</span>
       <span class="champion-name">Sébastien Ogier</span>
@@ -2309,7 +2310,7 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 
 <section class="view" id="view-formula-e">
   <div class="champion-banner">
-    <img class="champion-headshot" src="https://upload.wikimedia.org/wikipedia/commons/4/47/2024-05-11_Motorsport%2C_ABB_FIA_Formula_E_World_Championship%2C_Berlin_E-Prix_2024_STP_2979_by_Stepro_%28cropped%29.jpg" alt="Oliver Rowland headshot" title="Wikimedia Commons">
+    <div class="champion-headshot-frame"><img class="champion-headshot" src="https://upload.wikimedia.org/wikipedia/commons/4/47/2024-05-11_Motorsport%2C_ABB_FIA_Formula_E_World_Championship%2C_Berlin_E-Prix_2024_STP_2979_by_Stepro_%28cropped%29.jpg" alt="Oliver Rowland headshot" title="Wikimedia Commons"></div>
     <div class="champion-info">
       <span class="champion-eyebrow">2025 Champion</span>
       <span class="champion-name">Oliver Rowland</span>

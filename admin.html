@@ -62,11 +62,10 @@ button:disabled{opacity:.5; cursor:not-allowed;}
   width:420px; max-width:90vw;
 }
 #img-modal h3, #result-modal h3, #ticker-modal h3{margin:0 0 14px; font-size:15px;}
-#img-modal .preview{width:100%; height:200px; background:#f1efe9; border-radius:4px; margin-bottom:6px; overflow:hidden; position:relative; cursor:grab; touch-action:none;}
-#img-modal .preview.dragging{cursor:grabbing;}
-#img-modal .preview img{position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; pointer-events:none; user-select:none;}
-#img-modal .crop-controls{margin-bottom:10px;}
-#img-modal .crop-controls input[type=range]{width:100%;}
+#img-modal .crop-box{width:100%; height:200px; background:#f1efe9; border-radius:4px; margin-bottom:10px; position:relative; overflow:hidden; touch-action:none; cursor:crosshair;}
+#img-modal .crop-box img{position:absolute; top:0; left:0; width:100%; height:100%; object-fit:contain; pointer-events:none; user-select:none;}
+#img-modal .crop-rect{position:absolute; border:1.5px dashed #fff; box-shadow:0 0 0 2000px rgba(0,0,0,.55); box-sizing:border-box; pointer-events:none;}
+#img-modal .crop-hint{font-size:11.5px; color:var(--text-faint); margin:0 0 10px;}
 #img-modal label, #result-modal label, #ticker-modal label{display:block; font-size:11.5px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px; margin-top:14px;}
 #img-modal .row, #result-modal .row, #ticker-modal .row{display:flex; gap:10px; margin-top:20px; justify-content:flex-end;}
 #img-modal .or{font-size:11.5px; color:var(--text-faint); text-align:center; margin:14px 0;}
@@ -111,12 +110,12 @@ button:disabled{opacity:.5; cursor:not-allowed;}
 <div id="img-modal-backdrop">
   <div id="img-modal">
     <h3>Change image</h3>
-    <div class="preview" id="img-modal-crop-box"><img id="img-modal-preview" src="" alt=""></div>
-    <div class="crop-controls">
-      <label style="margin-top:8px;">Zoom / position — drag the image to reposition it within the frame</label>
-      <input type="range" id="img-modal-zoom" min="100" max="300" value="100">
-      <button class="secondary" id="img-modal-reset-crop" type="button" style="margin-top:8px;">Reset crop</button>
+    <p class="crop-hint">Click and drag to draw a crop — that outline is exactly what shows in the frame.</p>
+    <div class="crop-box" id="img-modal-crop-box">
+      <img id="img-modal-preview" src="" alt="">
+      <div class="crop-rect" id="img-modal-crop-rect"></div>
     </div>
+    <button class="secondary" id="img-modal-reset-crop" type="button" style="margin-top:0; margin-bottom:10px;">Reset crop (use whole image)</button>
     <label>Image URL</label>
     <input type="text" id="img-modal-url">
     <div class="or">— or —</div>
@@ -344,8 +343,8 @@ function setImageTitle(html, src, newTitle) {
     return stripped.slice(0, -1) + ` title="${escAttr(newTitle)}">`;
   });
 }
-// Crop/zoom (object-position + scale) stored as an inline style, same
-// matching approach as setImageTitle.
+// Crop (absolute-position width/height/left/top, see cropStyleString
+// below) stored as an inline style, same matching approach as setImageTitle.
 function setImageStyle(html, src, newStyle) {
   return html.replace(/<img\b[^>]*>/g, (tag) => {
     const m = tag.match(/src="([^"]*)"/);
@@ -558,31 +557,86 @@ function findEventByViewAndName(events, view, name) {
 
 // ================= image editor modal =================
 let onApplyImage = null;
-// Crop/zoom state: objectPosition (0-100, 0-100) is where the image is
-// anchored within its frame; zoom (1-3) scales it further in from
-// there. Applied together so zooming stays centered on wherever the
-// user last dragged to, not back to the image's own center.
-let cropX = 50, cropY = 50, cropZoom = 1;
+// Crop state: a rectangle (x, y, w, h — all in the image's own NATURAL
+// pixel coordinates) the user draws directly over the full, unscaled
+// image. That rectangle becomes exactly what shows in the target frame:
+//   width:  naturalW / rect.w * 100%
+//   height: naturalH / rect.h * 100%
+//   left:   -rect.x / rect.w * 100%
+//   top:    -rect.y / rect.h * 100%
+// (applied to an absolutely-positioned <img> inside a position:relative;
+// overflow:hidden; frame). Verified by hand: the full image
+// (x=0,y=0,w=naturalW,h=naturalH) reduces to width/height:100%,
+// left/top:0 — a no-op, as it must. A centered half-width selection
+// (w=naturalW/2, x=naturalW/4) reduces to width:200%, left:-50% — at 2x
+// scale, shifting left by half the SCALED width lands the selection's
+// left edge exactly on the frame's left edge. This replaces the earlier
+// object-position+transform:scale approach, which panned/zoomed an
+// already-cropped preview instead of letting the user draw the crop
+// directly — the thing actually asked for.
+let imgNaturalW = 0, imgNaturalH = 0;
+let cropRect = { x: 0, y: 0, w: 0, h: 0 };
+let cropAspect = 1;
+let cropDrag = null; // {anchorX, anchorY} in natural pixel coords, while drawing
 
-function parseCropStyle(styleAttr) {
-  if (!styleAttr) return { x: 50, y: 50, zoom: 1 };
-  const posM = styleAttr.match(/object-position:\s*([\d.]+)%\s+([\d.]+)%/);
-  const zoomM = styleAttr.match(/scale\(([\d.]+)\)/);
+function clampNum(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+// The preview box shows the full image via object-fit:contain, which
+// letterboxes it (natural aspect may not match the box's own aspect) —
+// this computes where the actual image pixels land within the box, so
+// pointer coordinates can convert to/from natural image pixels.
+function getCropDisplayRect() {
+  const box = document.getElementById('img-modal-crop-box');
+  const cw = box.clientWidth, ch = box.clientHeight;
+  if (!imgNaturalW || !imgNaturalH) return { dispX: 0, dispY: 0, scale: 1 };
+  const scale = Math.min(cw / imgNaturalW, ch / imgNaturalH);
+  const dispW = imgNaturalW * scale, dispH = imgNaturalH * scale;
+  return { dispX: (cw - dispW) / 2, dispY: (ch - dispH) / 2, scale };
+}
+function boxPxToNatural(px, py) {
+  const { dispX, dispY, scale } = getCropDisplayRect();
   return {
-    x: posM ? parseFloat(posM[1]) : 50,
-    y: posM ? parseFloat(posM[2]) : 50,
-    zoom: zoomM ? parseFloat(zoomM[1]) : 1,
+    x: clampNum((px - dispX) / scale, 0, imgNaturalW),
+    y: clampNum((py - dispY) / scale, 0, imgNaturalH),
   };
 }
-function cropStyleString(x, y, zoom) {
-  if (x === 50 && y === 50 && zoom === 1) return ''; // no adjustment — don't clutter the markup
-  return `object-position:${x}% ${y}%; transform:scale(${zoom}); transform-origin:${x}% ${y}%;`;
+function renderCropRect() {
+  const { dispX, dispY, scale } = getCropDisplayRect();
+  const el = document.getElementById('img-modal-crop-rect');
+  el.style.left = (dispX + cropRect.x * scale) + 'px';
+  el.style.top = (dispY + cropRect.y * scale) + 'px';
+  el.style.width = (cropRect.w * scale) + 'px';
+  el.style.height = (cropRect.h * scale) + 'px';
 }
-function renderCropPreview() {
-  const img = document.getElementById('img-modal-preview');
-  img.style.objectPosition = `${cropX}% ${cropY}%`;
-  img.style.transform = `scale(${cropZoom})`;
-  img.style.transformOrigin = `${cropX}% ${cropY}%`;
+function resetCropToFull() {
+  cropRect = { x: 0, y: 0, w: imgNaturalW, h: imgNaturalH };
+  renderCropRect();
+}
+
+// Parses a previous crop's inline style back into a natural-pixel rect,
+// so re-opening an already-cropped image starts from where it was left.
+function parseCropStyle(styleAttr, natW, natH) {
+  if (!styleAttr) return { x: 0, y: 0, w: natW, h: natH };
+  const wM = styleAttr.match(/width:\s*([\d.]+)%/);
+  const hM = styleAttr.match(/height:\s*([\d.]+)%/);
+  const lM = styleAttr.match(/left:\s*(-?[\d.]+)%/);
+  const tM = styleAttr.match(/top:\s*(-?[\d.]+)%/);
+  if (!wM || !hM || !lM || !tM) return { x: 0, y: 0, w: natW, h: natH };
+  const w = natW / (parseFloat(wM[1]) / 100);
+  const h = natH / (parseFloat(hM[1]) / 100);
+  const x = (-parseFloat(lM[1]) / 100) * w;
+  const y = (-parseFloat(tM[1]) / 100) * h;
+  return { x, y, w, h };
+}
+function cropStyleString(rect, natW, natH) {
+  if (!rect.w || !rect.h) return '';
+  if (rect.x === 0 && rect.y === 0 && rect.w === natW && rect.h === natH) return ''; // full image — no-op, don't clutter the markup
+  const r = (n) => Math.round(n * 1000) / 1000;
+  const widthPct = r((natW / rect.w) * 100);
+  const heightPct = r((natH / rect.h) * 100);
+  const leftPct = r((-rect.x / rect.w) * 100);
+  const topPct = r((-rect.y / rect.h) * 100);
+  return `position:absolute; width:${widthPct}%; height:${heightPct}%; left:${leftPct}%; top:${topPct}%;`;
 }
 
 // options.credit: current credit text to prefill (pass '' if none yet).
@@ -592,61 +646,75 @@ function renderCropPreview() {
 // no visible caption slot in that markup. Always shown now — no image
 // type is left with nowhere to put a source. options.cropStyle: the
 // image's current style="..." attribute, if any, so re-opening an
-// already-cropped image starts from where it was left, not re-centered.
+// already-cropped image starts from where it was left. options.aspect:
+// the target frame's own live width/height ratio (read from the clicked
+// <img>'s getBoundingClientRect(), which fills its frame exactly) — the
+// drawn rectangle is locked to this so it always fits the frame with no
+// distortion. Falls back to the image's own natural aspect if unknown.
 // onApply receives (newSrc, newCredit, previewSrc, cropStyle).
 function openImageModal(currentSrc, onApply, options = {}) {
   onApplyImage = onApply;
-  document.getElementById('img-modal-preview').src = currentSrc;
+  const previewImg = document.getElementById('img-modal-preview');
   document.getElementById('img-modal-url').value = currentSrc;
   document.getElementById('img-modal-file').value = '';
   document.getElementById('img-modal-credit-label').textContent =
     options.creditLabel || 'Source / credit (shown as a hover tooltip on the image)';
   document.getElementById('img-modal-credit').value = options.credit || '';
-  const crop = parseCropStyle(options.cropStyle);
-  cropX = crop.x; cropY = crop.y; cropZoom = crop.zoom;
-  document.getElementById('img-modal-zoom').value = Math.round(cropZoom * 100);
-  renderCropPreview();
+  imgNaturalW = 0; imgNaturalH = 0;
+  function onReady() {
+    imgNaturalW = previewImg.naturalWidth || 1;
+    imgNaturalH = previewImg.naturalHeight || 1;
+    cropAspect = options.aspect > 0 ? options.aspect : (imgNaturalW / imgNaturalH);
+    cropRect = parseCropStyle(options.cropStyle, imgNaturalW, imgNaturalH);
+    renderCropRect();
+  }
+  previewImg.onload = onReady;
+  previewImg.src = currentSrc;
+  if (previewImg.complete && previewImg.naturalWidth) onReady();
   document.getElementById('img-modal-backdrop').style.display = 'flex';
 }
 
-// Drag-to-pan: pointer position deltas convert to a percentage shift
-// relative to the frame's own size, since object-position is a
-// percentage of the image's excess size within that frame. Clamped to
-// 0-100 — there's no meaningful "past the edge" position.
+// Click-and-drag to draw a brand-new rectangle, aspect-locked to the
+// target frame. The anchor (where the drag started) stays fixed; the
+// rectangle grows toward the pointer, sized to the largest aspect-locked
+// box that fits within the drag distance without crossing the image's
+// own edges.
 (function initCropDrag() {
   const box = document.getElementById('img-modal-crop-box');
-  let dragging = false, startX = 0, startY = 0, startCropX = 50, startCropY = 50;
   box.addEventListener('pointerdown', (e) => {
-    dragging = true;
-    box.classList.add('dragging');
+    if (!imgNaturalW) return;
+    const rect = box.getBoundingClientRect();
     box.setPointerCapture(e.pointerId);
-    startX = e.clientX; startY = e.clientY;
-    startCropX = cropX; startCropY = cropY;
+    const anchor = boxPxToNatural(e.clientX - rect.left, e.clientY - rect.top);
+    cropDrag = { anchorX: anchor.x, anchorY: anchor.y };
+    cropRect = { x: anchor.x, y: anchor.y, w: 0, h: 0 };
+    renderCropRect();
   });
   box.addEventListener('pointermove', (e) => {
-    if (!dragging) return;
+    if (!cropDrag) return;
     const rect = box.getBoundingClientRect();
-    // Dragging right should reveal more of the image's left side, i.e.
-    // move the focal point left — hence the minus sign.
-    const dx = ((e.clientX - startX) / rect.width) * 100;
-    const dy = ((e.clientY - startY) / rect.height) * 100;
-    cropX = Math.max(0, Math.min(100, startCropX - dx));
-    cropY = Math.max(0, Math.min(100, startCropY - dy));
-    renderCropPreview();
+    const px = clampNum(e.clientX - rect.left, 0, rect.width);
+    const py = clampNum(e.clientY - rect.top, 0, rect.height);
+    const cur = boxPxToNatural(px, py);
+    const dirX = cur.x >= cropDrag.anchorX ? 1 : -1;
+    const dirY = cur.y >= cropDrag.anchorY ? 1 : -1;
+    const maxW = dirX > 0 ? (imgNaturalW - cropDrag.anchorX) : cropDrag.anchorX;
+    const maxH = dirY > 0 ? (imgNaturalH - cropDrag.anchorY) : cropDrag.anchorY;
+    const freeW = Math.min(Math.abs(cur.x - cropDrag.anchorX), maxW);
+    const freeH = Math.min(Math.abs(cur.y - cropDrag.anchorY), maxH);
+    let w, h;
+    if (freeW / cropAspect <= freeH) { w = freeW; h = freeW / cropAspect; }
+    else { h = freeH; w = freeH * cropAspect; }
+    const x = dirX > 0 ? cropDrag.anchorX : cropDrag.anchorX - w;
+    const y = dirY > 0 ? cropDrag.anchorY : cropDrag.anchorY - h;
+    cropRect = { x, y, w, h };
+    renderCropRect();
   });
-  function endDrag() { dragging = false; box.classList.remove('dragging'); }
+  function endDrag() { cropDrag = null; }
   box.addEventListener('pointerup', endDrag);
   box.addEventListener('pointercancel', endDrag);
 })();
-document.getElementById('img-modal-zoom').addEventListener('input', (e) => {
-  cropZoom = Number(e.target.value) / 100;
-  renderCropPreview();
-});
-document.getElementById('img-modal-reset-crop').addEventListener('click', () => {
-  cropX = 50; cropY = 50; cropZoom = 1;
-  document.getElementById('img-modal-zoom').value = 100;
-  renderCropPreview();
-});
+document.getElementById('img-modal-reset-crop').addEventListener('click', resetCropToFull);
 function closeImageModal() { document.getElementById('img-modal-backdrop').style.display = 'none'; onApplyImage = null; }
 // Picking a file previously gave no feedback at all until Apply — show
 // it immediately via a local object URL, and clear the URL field so
@@ -654,18 +722,21 @@ function closeImageModal() { document.getElementById('img-modal-backdrop').style
 document.getElementById('img-modal-file').addEventListener('change', (e) => {
   const file = e.target.files?.[0];
   if (!file) return;
-  document.getElementById('img-modal-preview').src = URL.createObjectURL(file);
+  const previewImg = document.getElementById('img-modal-preview');
   document.getElementById('img-modal-url').value = '';
-  // A new image starts fresh — the old crop was framed for a different photo.
-  cropX = 50; cropY = 50; cropZoom = 1;
-  document.getElementById('img-modal-zoom').value = 100;
-  renderCropPreview();
+  previewImg.onload = () => {
+    imgNaturalW = previewImg.naturalWidth || 1;
+    imgNaturalH = previewImg.naturalHeight || 1;
+    // A new image starts fresh — the old crop was framed for a different photo.
+    resetCropToFull();
+  };
+  previewImg.src = URL.createObjectURL(file);
 });
 async function applyImageModal() {
   const fileInput = document.getElementById('img-modal-file');
   const urlInput = document.getElementById('img-modal-url');
   const credit = document.getElementById('img-modal-credit').value.trim();
-  const cropStyle = cropStyleString(cropX, cropY, cropZoom);
+  const cropStyle = cropStyleString(cropRect, imgNaturalW, imgNaturalH);
   if (fileInput.files && fileInput.files[0]) {
     const file = fileInput.files[0];
     const b64 = await fileToBase64(file);
@@ -764,6 +835,7 @@ function instrumentFrame() {
         e.stopPropagation(); e.preventDefault();
         const img = art.querySelector('img');
         const currentCredit = art.querySelector('.src')?.textContent || '';
+        const artRect = art.getBoundingClientRect();
         openImageModal(img?.getAttribute('src') || '', async (newSrc, newCredit, previewSrc, cropStyle) => {
           workingHtml = await setSlideImage(workingHtml, slug, newSrc, newCredit, cropStyle);
           markDirty();
@@ -776,7 +848,7 @@ function instrumentFrame() {
             liveImg.src = previewSrc || newSrc;
             if (cropStyle) liveImg.setAttribute('style', cropStyle); else liveImg.removeAttribute('style');
           } else loadFrame(); // no <img> existed on this slide at all — needs a structural reload
-        }, { credit: currentCredit, creditLabel: 'Source / credit (shown in the corner of the image)', cropStyle: img?.getAttribute('style') || '' });
+        }, { credit: currentCredit, creditLabel: 'Source / credit (shown in the corner of the image)', cropStyle: img?.getAttribute('style') || '', aspect: artRect.height > 0 ? artRect.width / artRect.height : 0 });
       }, true);
     }
   });
@@ -848,6 +920,7 @@ function instrumentFrame() {
       // <img> rather than every element sharing that URL.
       const nextUpTrack = img.closest('.next-up-panel .track');
       const view = nextUpTrack ? img.closest('[id^="view-"]')?.id.replace('view-', '') : null;
+      const imgRect = img.getBoundingClientRect();
 
       openImageModal(oldSrc, (newSrc, newCredit, previewSrc, cropStyle) => {
         if (view) {
@@ -866,7 +939,7 @@ function instrumentFrame() {
           });
         }
         markDirty();
-      }, { credit: img.getAttribute('title') || '', cropStyle: img.getAttribute('style') || '' });
+      }, { credit: img.getAttribute('title') || '', cropStyle: img.getAttribute('style') || '', aspect: imgRect.height > 0 ? imgRect.width / imgRect.height : 0 });
     }, true);
   });
 
