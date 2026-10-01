@@ -234,6 +234,17 @@ function validateIndexHtml(html) {
   return { ok: true };
 }
 
+// ================= Champion banner name =================
+function setChampionName(html, view, newName) {
+  const b = viewBounds(html, view);
+  if (!b) return html;
+  const slice = html.slice(b.start, b.end);
+  const m = slice.match(/<span class="champion-name">([^<]*)<\/span>/);
+  if (!m) return html;
+  const offset = b.start + m.index;
+  return html.slice(0, offset) + `<span class="champion-name">${newName}</span>` + html.slice(offset + m[0].length);
+}
+
 // ================= Per-series "what to know" blurb =================
 function viewBounds(html, view) {
   const marker = `id="view-${view}"`;
@@ -770,12 +781,14 @@ function instrumentFrame() {
     }
   });
 
-  // ---- text: per-series blurbs ----
+  // ---- text: per-series blurbs & champion banner ----
   for (const view of Object.keys(SERIES_META)) {
     const section = doc.getElementById('view-' + view);
     if (!section) continue;
     const p = section.querySelector('.watch-block p');
     if (p) wireEditableText(p, () => { workingHtml = setBlurb(workingHtml, view, p.innerHTML.trim()); markDirty(); });
+    const championName = section.querySelector('.champion-name');
+    if (championName) wireEditableText(championName, () => { workingHtml = setChampionName(workingHtml, view, championName.textContent.trim()); markDirty(); });
   }
 
   // ---- text: "Know the Rules" blocks ----

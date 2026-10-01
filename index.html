@@ -175,6 +175,20 @@ footer .social-links{margin-left:4px;}
 @media (prefers-reduced-motion:reduce){
   .hero-carousel .hero{transition:none;}
 }
+
+/* ---------- CHAMPION BANNER (above Sector 01, every series page) ---------- */
+.champion-banner{
+  display:flex; align-items:center; gap:14px;
+  background:var(--surface); border:1px solid var(--rule);
+  padding:10px 16px; margin:24px 0 -6px;
+}
+.champion-headshot{
+  width:52px; height:52px; border-radius:50%; object-fit:cover;
+  border:2px solid var(--amber); flex-shrink:0; background:var(--surface-2);
+}
+.champion-info{display:flex; flex-direction:column; gap:1px; min-width:0;}
+.champion-eyebrow{font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--text-faint);}
+.champion-name{font-family:'Oswald',sans-serif; font-size:17px; text-transform:uppercase; letter-spacing:.01em; color:var(--text); line-height:1.2;}
 .hero-dots{display:flex; gap:8px; justify-content:center; margin-top:18px;}
 .hero-dot{width:8px; height:8px; border-radius:50%; background:var(--rule); border:none; cursor:pointer; padding:0;}
 .hero-dot.active{background:var(--amber);}
@@ -569,7 +583,7 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
       <span><img class="ticker-logo" src="https://upload.wikimedia.org/wikipedia/en/b/b5/IndyCar_Series_logo.svg" alt="NTT IndyCar">
       Mission Foods announced sponsorship of the season‑final IndyCar race at Laguna Seca.</span>
       <span><img class="ticker-logo" src="https://upload.wikimedia.org/wikipedia/en/a/a8/IndyNXTLogo.png" alt="Indy NXT">
-      Tymek Kucharczyk applies title pressure in his strong first U.S. Indy NXT season.</span>
+      Nikita Johnson becomes the youngest champion in Indy NXT history at just 18 years old.</span>
       <span><img class="ticker-logo ticker-logo-white" src="https://upload.wikimedia.org/wikipedia/commons/f/f9/MotoGP_logo_%282024%29.svg" alt="MotoGP">
       Yamaha confirms Jack Miller’s MotoGP departure, paving the way for his move to WorldSBK.</span>
       <span><img class="ticker-logo" src="https://upload.wikimedia.org/wikipedia/commons/4/4c/FIA_WEC_Logo_2024.png" alt="WEC">
@@ -1083,6 +1097,14 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 </section>
 
 <section class="view" id="view-f1">
+  <div class="champion-banner">
+    <img class="champion-headshot" src="https://upload.wikimedia.org/wikipedia/commons/9/90/2024-08-25_Motorsport%2C_Formel_1%2C_Gro%C3%9Fer_Preis_der_Niederlande_2024_STP_3968_by_Stepro_%28cropped2%29.jpg" alt="Lando Norris headshot" title="Wikimedia Commons">
+    <div class="champion-info">
+      <span class="champion-eyebrow">2025 Champion</span>
+      <span class="champion-name">Lando Norris</span>
+    </div>
+  </div>
+
   <div class="sector-label"><span class="num">S1</span><span class="name">Sector 01 — Next Up</span><span class="line"></span></div>
   <section class="next-up-panel">
     <div class="track">
@@ -1211,6 +1233,14 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 
 
 <section class="view" id="view-nascar-cup">
+  <div class="champion-banner">
+    <img class="champion-headshot" src="https://upload.wikimedia.org/wikipedia/commons/1/18/Kyle_Larson_Las_Vegas_2026.jpg" alt="Kyle Larson headshot" title="Wikimedia Commons">
+    <div class="champion-info">
+      <span class="champion-eyebrow">2025 Champion</span>
+      <span class="champion-name">Kyle Larson</span>
+    </div>
+  </div>
+
   <div class="sector-label"><span class="num">S1</span><span class="name">Sector 01 — Next Up</span><span class="line"></span></div>
   <section class="next-up-panel">
     <div class="track">
@@ -1337,6 +1367,14 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 
 
 <section class="view" id="view-nascar-oreilly">
+  <div class="champion-banner">
+    <img class="champion-headshot" src="https://upload.wikimedia.org/wikipedia/commons/b/b2/Jesse_Love_Sonoma_2026_%281%29.jpg" alt="Jesse Love headshot" title="Wikimedia Commons">
+    <div class="champion-info">
+      <span class="champion-eyebrow">2025 Champion</span>
+      <span class="champion-name">Jesse Love</span>
+    </div>
+  </div>
+
   <div class="sector-label"><span class="num">S1</span><span class="name">Sector 01 — Next Up</span><span class="line"></span></div>
   <section class="next-up-panel">
     <div class="track">
@@ -1438,6 +1476,14 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 
 
 <section class="view" id="view-arca">
+  <div class="champion-banner">
+    <img class="champion-headshot" src="https://upload.wikimedia.org/wikipedia/commons/e/e6/Thomas_Annunziata_2025.jpg" alt="Thomas Annunziata headshot" title="Wikimedia Commons">
+    <div class="champion-info">
+      <span class="champion-eyebrow">2026 Champion</span>
+      <span class="champion-name">Thomas Annunziata</span>
+    </div>
+  </div>
+
   <div class="sector-label"><span class="num">S1</span><span class="name">Sector 01 — Season Wrap</span><span class="line"></span></div>
   <section class="next-up-panel">
     <div class="track">
@@ -1527,6 +1573,14 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 
 
 <section class="view" id="view-indycar">
+  <div class="champion-banner">
+    <img class="champion-headshot" src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Alex_Palou_at_2024_Chevrolet_Detroit_Grand_Prix.jpg" alt="Álex Palou headshot" title="Wikimedia Commons">
+    <div class="champion-info">
+      <span class="champion-eyebrow">2026 Champion</span>
+      <span class="champion-name">Álex Palou</span>
+    </div>
+  </div>
+
   <div class="sector-label">
     <span class="num">S1</span>
     <span class="name">Sector 01 — Season Wrap</span>
@@ -1658,6 +1712,14 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 
 
 <section class="view" id="view-indy-nxt">
+  <div class="champion-banner">
+    <img class="champion-headshot" src="https://upload.wikimedia.org/wikipedia/commons/7/7c/FIA_F3_Austria_2025_Nr._29_Johnson.jpg" alt="Nikita Johnson headshot" title="Wikimedia Commons">
+    <div class="champion-info">
+      <span class="champion-eyebrow">2026 Champion</span>
+      <span class="champion-name">Nikita Johnson</span>
+    </div>
+  </div>
+
   <div class="sector-label"><span class="num">S1</span><span class="name">Sector 01 — Season Wrap</span><span class="line"></span></div>
   <section class="next-up-panel">
     <div class="track">
@@ -1666,12 +1728,12 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
     </div>
     <div class="info">
       <div class="series-row"><span class="chip indy"><img class="chip-logo" src="https://upload.wikimedia.org/wikipedia/en/a/a8/IndyNXTLogo.png" alt="Indy NXT logo">Indy NXT</span><span class="round-num">Season Complete</span></div>
-      <h3>Laguna Seca — Championship — Final Race</h3>
-      <div class="venue">WeatherTech Raceway Laguna Seca — title-deciding finale</div>
+      <h3>Nikita Johnson — 2026 Champion</h3>
+      <div class="venue">Clinched at WeatherTech Raceway Laguna Seca — title-deciding finale</div>
 
       <div class="watch-block">
         <h4>Season Recap</h4>
-        <p>Tymek Kucharczyk took the final race of the season at WeatherTech Raceway Laguna Seca — title-deciding finale.</p>
+        <p>Tymek Kucharczyk won the season-finale race at Laguna Seca, but Nikita Johnson's runner-up finish there sealed the 2026 championship by 29 points — at 18, the youngest champion in series history.</p>
       </div>
     </div>
   </section>
@@ -1745,6 +1807,14 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 
 
 <section class="view" id="view-motogp">
+  <div class="champion-banner">
+    <img class="champion-headshot" src="https://upload.wikimedia.org/wikipedia/commons/a/a7/Marc_Marquez_at_the_2026_Spanish_Grand_Prix_%28cropped%29.jpg" alt="Marc Márquez headshot" title="Wikimedia Commons">
+    <div class="champion-info">
+      <span class="champion-eyebrow">2025 Champion</span>
+      <span class="champion-name">Marc Márquez</span>
+    </div>
+  </div>
+
   <div class="sector-label"><span class="num">S1</span><span class="name">Sector 01 — Next Up</span><span class="line"></span></div>
   <section class="next-up-panel">
     <div class="track">
@@ -1880,6 +1950,14 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 
 
 <section class="view" id="view-wec">
+  <div class="champion-banner">
+    <img class="champion-headshot" src="https://upload.wikimedia.org/wikipedia/commons/9/91/Antonio_Giovinazzi_-_Ferrari_499P_-_Hybrid_during_the_pitwalk_at_the_2023_Le_Mans_%2853468237574%29.jpg" alt="Antonio Giovinazzi headshot" title="Wikimedia Commons">
+    <div class="champion-info">
+      <span class="champion-eyebrow">2025 Champion</span>
+      <span class="champion-name">Antonio Giovinazzi</span>
+    </div>
+  </div>
+
   <div class="sector-label"><span class="num">S1</span><span class="name">Sector 01 — Next Up</span><span class="line"></span></div>
   <section class="next-up-panel">
     <div class="track">
@@ -1987,6 +2065,14 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 </section>
 
 <section class="view" id="view-nascar-truck">
+  <div class="champion-banner">
+    <img class="champion-headshot" src="https://upload.wikimedia.org/wikipedia/commons/d/db/NASCAR_San_Diego_Weekend_Victor_Conducts_Interview_%281%29_9764270_%28cropped%29.jpg" alt="Corey Heim headshot" title="Wikimedia Commons">
+    <div class="champion-info">
+      <span class="champion-eyebrow">2025 Champion</span>
+      <span class="champion-name">Corey Heim</span>
+    </div>
+  </div>
+
   <div class="sector-label"><span class="num">S1</span><span class="name">Sector 01 — Next Up</span><span class="line"></span></div>
   <section class="next-up-panel">
     <div class="track">
@@ -2110,6 +2196,14 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 
 
 <section class="view" id="view-wrc">
+  <div class="champion-banner">
+    <img class="champion-headshot" src="https://upload.wikimedia.org/wikipedia/commons/3/38/2023_Central_European_Rally_-_Ogier_01_%28cropped%29.jpg" alt="Sébastien Ogier headshot" title="Wikimedia Commons">
+    <div class="champion-info">
+      <span class="champion-eyebrow">2025 Champion</span>
+      <span class="champion-name">Sébastien Ogier</span>
+    </div>
+  </div>
+
   <div class="sector-label"><span class="num">S1</span><span class="name">Sector 01 — Next Up</span><span class="line"></span></div>
   <section class="next-up-panel">
     <div class="track">
@@ -2214,6 +2308,14 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 
 
 <section class="view" id="view-formula-e">
+  <div class="champion-banner">
+    <img class="champion-headshot" src="https://upload.wikimedia.org/wikipedia/commons/4/47/2024-05-11_Motorsport%2C_ABB_FIA_Formula_E_World_Championship%2C_Berlin_E-Prix_2024_STP_2979_by_Stepro_%28cropped%29.jpg" alt="Oliver Rowland headshot" title="Wikimedia Commons">
+    <div class="champion-info">
+      <span class="champion-eyebrow">2025 Champion</span>
+      <span class="champion-name">Oliver Rowland</span>
+    </div>
+  </div>
+
   <div class="sector-label">
     <span class="num">S1</span>
     <span class="name">Sector 01 — Next Up</span>
