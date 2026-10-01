@@ -197,7 +197,7 @@ ${standingsRows}
   </section>`;
 }
 
-// Finds the "Sector 02" label + next-up-panel + "Sector 03" label +
+// Finds the "Sector 01" label + next-up-panel + "Sector 02" label +
 // schedule-table block within one series' <section id="view-X"> and
 // returns their positions, or null if the expected structure isn't
 // there (e.g. a hand-customized page shaped differently — skipped
@@ -209,15 +209,20 @@ function locateBlock(html, view) {
   const nextViewStart = html.indexOf('id="view-', viewStart + viewMarker.length);
   const viewEnd = nextViewStart === -1 ? html.length : nextViewStart;
 
-  const s2Start = html.indexOf('<div class="sector-label">', viewStart);
-  if (s2Start === -1 || s2Start >= viewEnd) return null;
-  // The S2 label may or may not carry an id="..." — find whichever comes first.
-  const s2StartAlt = html.indexOf('<div class="sector-label"', viewStart);
-  const s2Real = s2StartAlt !== -1 && s2StartAlt < s2Start ? s2StartAlt : s2Start;
-
-  const panelStart = html.indexOf('<section class="next-up-panel"', s2Real);
+  const panelStart = html.indexOf('<section class="next-up-panel"', viewStart);
   if (panelStart === -1 || panelStart >= viewEnd) return null;
   const panelEnd = html.indexOf('</section>', panelStart) + '</section>'.length;
+
+  // The sector-label immediately preceding the panel — found by
+  // searching backward from the panel, not just "the view's first
+  // sector-label". A few series (indycar, formula-e) have their own
+  // series-hero intro living under the same Sector 01 ahead of the
+  // panel; searching forward from viewStart would grab that intro's
+  // label instead, and a rebuild would then splice the intro section
+  // itself out as if it were part of "between panel and label".
+  const s2Real = html.lastIndexOf('<div class="sector-label"', panelStart);
+  if (s2Real === -1 || s2Real < viewStart) return null;
+  const s2LabelEnd = html.indexOf('</div>', s2Real) + '</div>'.length;
 
   const tableStart = html.indexOf('<table class="schedule-table">', panelEnd);
   if (tableStart === -1 || tableStart >= viewEnd) return null;
@@ -237,7 +242,7 @@ function locateBlock(html, view) {
   const dateMatch = panelText.match(/data-target="(\d{4}-\d{2}-\d{2})/);
   const currentDate = dateMatch ? dateMatch[1] : null;
 
-  return { s2Real, panelStart, panelEnd, s3Start, tableStart, tableEnd, currentTitle, currentlyComplete, hasCountdown, currentDate };
+  return { s2Real, s2LabelEnd, panelStart, panelEnd, s3Start, tableStart, tableEnd, currentTitle, currentlyComplete, hasCountdown, currentDate };
 }
 
 // Loose "is this still the same race" check — cosmetic differences like
@@ -314,7 +319,7 @@ export async function refreshAllNextUpPanels(html, events, seriesMeta, calSeries
     }
 
     const images = harvestTrackImages(html);
-    let panelHTML, sectorLabel2, sectorLabel3;
+    let panelHTML, sectorLabel1, sectorLabel2;
 
     if (state.mode === 'ongoing') {
       const trackImg = findTrackImage(images, state.next.venue || state.next.name) || {
@@ -335,8 +340,8 @@ Respond with ONLY the sentence(s), no preamble.`;
         chip: meta.chip, chipLogo: seriesInfo.logo, chipText: meta.chipText,
         next: state.next, round: state.round, total: state.total, trackImg, watchText,
       });
-      sectorLabel2 = 'Next Up';
-      sectorLabel3 = 'Remaining Schedule';
+      sectorLabel1 = 'Next Up';
+      sectorLabel2 = 'Remaining Schedule';
     } else {
       const trackImg = findTrackImage(images, state.last.venue || state.last.name) || {
         src: seriesInfo.logo,
@@ -355,19 +360,24 @@ Respond with ONLY the sentence(s), no preamble.`;
         chip: meta.chip, chipLogo: seriesInfo.logo, chipText: meta.chipText,
         last: state.last, trackImg, recapText, standings: null,
       });
-      sectorLabel2 = 'Season Wrap';
-      sectorLabel3 = 'Final Races';
+      sectorLabel1 = 'Season Wrap';
+      sectorLabel2 = 'Final Races';
     }
 
     const tableHTML = renderScheduleTable(state);
+    const label1HTML = `<div class="sector-label"><span class="num">S1</span><span class="name">Sector 01 — ${sectorLabel1}</span><span class="line"></span></div>`;
     const label2HTML = `<div class="sector-label"><span class="num">S2</span><span class="name">Sector 02 — ${sectorLabel2}</span><span class="line"></span></div>`;
-    const label3HTML = `<div class="sector-label"><span class="num">S3</span><span class="name">Sector 03 — ${sectorLabel3}</span><span class="line"></span></div>`;
 
-    // Rebuild back-to-front (S3/table, then S2/panel) so offsets earlier
-    // in the string — which are untouched by the first splice — stay valid.
-    html = html.slice(0, loc.s3Start) + label3HTML + '\n' + tableHTML + html.slice(loc.tableEnd);
+    // Rebuild back-to-front (S2/table, then S1/panel) so offsets earlier
+    // in the string — which are untouched by the first splice — stay
+    // valid. `preamble` is whatever sits between the shared Sector 01
+    // label and the panel itself — empty for most series, but indycar/
+    // formula-e keep a real series-hero intro there under the same
+    // Sector 01, which a rebuild must not silently delete.
+    html = html.slice(0, loc.s3Start) + label2HTML + '\n' + tableHTML + html.slice(loc.tableEnd);
+    const preamble = html.slice(loc.s2LabelEnd, loc.panelStart);
     const between = html.slice(loc.panelEnd, loc.s3Start);
-    html = html.slice(0, loc.s2Real) + label2HTML + '\n' + panelHTML + between + html.slice(loc.s3Start);
+    html = html.slice(0, loc.s2Real) + label1HTML + preamble + panelHTML + between + html.slice(loc.s3Start);
 
     changedViews.push(view);
     console.log(`Rebuilt Next-Up panel for ${view}: "${loc.currentTitle}" -> "${expectedTitle}"`);
