@@ -2859,9 +2859,10 @@ routeFromHash();
     dots.forEach((d,j)=>d.classList.toggle('active', j===idx));
   }
   dots.forEach((d,i)=>d.addEventListener('click', ()=>show(i)));
-  let timer = setInterval(()=>show(idx+1), 9000);
+  const ROTATE_MS = 12000;
+  let timer = setInterval(()=>show(idx+1), ROTATE_MS);
   carousel.addEventListener('mouseenter', ()=>clearInterval(timer));
-  carousel.addEventListener('mouseleave', ()=>{ timer = setInterval(()=>show(idx+1), 9000); });
+  carousel.addEventListener('mouseleave', ()=>{ timer = setInterval(()=>show(idx+1), ROTATE_MS); });
 })();
 
 // ---- Calendar view ----

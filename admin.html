@@ -53,20 +53,27 @@ button:disabled{opacity:.5; cursor:not-allowed;}
 #site-frame{width:100%; height:100%; border:none; display:block; background:#fff;}
 
 /* ---------- modals ---------- */
-#img-modal-backdrop, #result-modal-backdrop{
+#img-modal-backdrop, #result-modal-backdrop, #ticker-modal-backdrop{
   display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:200;
   align-items:center; justify-content:center;
 }
-#img-modal, #result-modal{
+#img-modal, #result-modal, #ticker-modal{
   background:var(--surface); border:1px solid var(--rule); border-radius:8px; padding:24px;
   width:420px; max-width:90vw;
 }
-#img-modal h3, #result-modal h3{margin:0 0 14px; font-size:15px;}
+#img-modal h3, #result-modal h3, #ticker-modal h3{margin:0 0 14px; font-size:15px;}
 #img-modal .preview{width:100%; height:140px; background:#f1efe9; border-radius:4px; display:flex; align-items:center; justify-content:center; margin-bottom:14px; overflow:hidden;}
 #img-modal .preview img{max-width:100%; max-height:100%; object-fit:contain;}
-#img-modal label, #result-modal label{display:block; font-size:11.5px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px; margin-top:14px;}
-#img-modal .row, #result-modal .row{display:flex; gap:10px; margin-top:20px; justify-content:flex-end;}
+#img-modal label, #result-modal label, #ticker-modal label{display:block; font-size:11.5px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px; margin-top:14px;}
+#img-modal .row, #result-modal .row, #ticker-modal .row{display:flex; gap:10px; margin-top:20px; justify-content:flex-end;}
 #img-modal .or{font-size:11.5px; color:var(--text-faint); text-align:center; margin:14px 0;}
+#ticker-modal{width:560px;}
+#ticker-modal-list{max-height:55vh; overflow-y:auto; padding-right:4px;}
+.ticker-row{margin-bottom:16px;}
+.ticker-row .ticker-row-head{display:flex; align-items:center; gap:8px; margin-bottom:6px;}
+.ticker-row img{height:16px; width:auto; max-width:60px; object-fit:contain; background:#f1efe9; border-radius:2px; padding:2px 4px;}
+.ticker-row .ticker-row-name{font-size:12.5px; font-weight:600; color:var(--text);}
+.ticker-row textarea{min-height:48px;}
 </style>
 </head>
 <body>
@@ -88,7 +95,8 @@ button:disabled{opacity:.5; cursor:not-allowed;}
 
 <div id="toolbar">
   <span class="brand">Site Editor</span>
-  <span class="hint">Click text, images, ticker headlines, or "Know the Rules" blocks to edit. Click a schedule row or calendar race to set/fix a result. Drag cards within a grid to reorder.</span>
+  <span class="hint">Click text, images, or "Know the Rules" blocks to edit. Click a schedule row or calendar race to set/fix a result. Drag cards within a grid to reorder.</span>
+  <button class="secondary" id="edit-ticker-btn">Edit Ticker</button>
   <span id="status-msg"></span>
   <button class="secondary" id="discard-btn">Discard changes</button>
   <button id="publish-btn">Publish to GitHub</button>
@@ -128,6 +136,17 @@ button:disabled{opacity:.5; cursor:not-allowed;}
     <div class="row">
       <button class="secondary" id="result-modal-cancel">Cancel</button>
       <button id="result-modal-apply">Apply</button>
+    </div>
+  </div>
+</div>
+
+<div id="ticker-modal-backdrop">
+  <div id="ticker-modal">
+    <h3>Edit ticker headlines</h3>
+    <div id="ticker-modal-list"></div>
+    <div class="row">
+      <button class="secondary" id="ticker-modal-cancel">Cancel</button>
+      <button id="ticker-modal-apply">Apply</button>
     </div>
   </div>
 </div>
@@ -423,6 +442,52 @@ async function applyResultModal() {
 document.getElementById('result-modal-cancel').addEventListener('click', closeResultModal);
 document.getElementById('result-modal-apply').addEventListener('click', applyResultModal);
 
+// ================= ticker modal =================
+// A button + static list instead of click-to-edit-in-place: the ticker
+// scrolls continuously, and catching a specific moving span to click
+// turned out to be more fiddly in practice than it's worth.
+function openTickerModal() {
+  const doc = document.getElementById('site-frame').contentDocument;
+  const list = document.getElementById('ticker-modal-list');
+  list.innerHTML = '';
+  doc.querySelectorAll('.ticker-inner > span').forEach(span => {
+    const img = span.querySelector('img.ticker-logo');
+    const altText = img?.getAttribute('alt');
+    if (!altText) return;
+    let text = '';
+    for (let node = img.nextSibling; node; node = node.nextSibling) text += node.textContent;
+
+    const row = document.createElement('div');
+    row.className = 'ticker-row';
+    const head = document.createElement('div');
+    head.className = 'ticker-row-head';
+    const logo = document.createElement('img');
+    logo.src = img.getAttribute('src');
+    const name = document.createElement('span');
+    name.className = 'ticker-row-name';
+    name.textContent = altText;
+    head.append(logo, name);
+    const textarea = document.createElement('textarea');
+    textarea.value = text.trim();
+    textarea.dataset.alt = altText;
+    row.append(head, textarea);
+    list.appendChild(row);
+  });
+  document.getElementById('ticker-modal-backdrop').style.display = 'flex';
+}
+function closeTickerModal() { document.getElementById('ticker-modal-backdrop').style.display = 'none'; }
+function applyTickerModal() {
+  document.querySelectorAll('#ticker-modal-list textarea').forEach(ta => {
+    workingHtml = setTickerText(workingHtml, ta.dataset.alt, ta.value.trim());
+  });
+  markDirty();
+  closeTickerModal();
+  loadFrame();
+}
+document.getElementById('edit-ticker-btn').addEventListener('click', openTickerModal);
+document.getElementById('ticker-modal-cancel').addEventListener('click', closeTickerModal);
+document.getElementById('ticker-modal-apply').addEventListener('click', applyTickerModal);
+
 // Schedule-table rows use plain view+name lookup (the visible date
 // column shows the *winner* once resolved, not the date, so name is the
 // reliable key across both states — and is unique within one series'
@@ -555,31 +620,6 @@ function instrumentFrame() {
         }, { credit: currentCredit, creditLabel: 'Source / credit (shown in the corner of the image)' });
       }, true);
     }
-  });
-
-  // ---- text: ticker bar ----
-  // The ticker never stops scrolling (95s linear loop) — editing a
-  // moving target is unworkable, so pause it for the duration of the
-  // edit and resume on blur, same moment the text gets committed.
-  const tickerInner = doc.querySelector('.ticker-inner');
-  doc.querySelectorAll('.ticker-inner > span').forEach(span => {
-    const img = span.querySelector('img.ticker-logo');
-    const altText = img?.getAttribute('alt');
-    if (!altText) return;
-    const wrapper = doc.createElement('span');
-    let node = img.nextSibling;
-    while (node) {
-      const next = node.nextSibling;
-      wrapper.appendChild(node);
-      node = next;
-    }
-    span.appendChild(wrapper);
-    wrapper.addEventListener('focus', () => { if (tickerInner) tickerInner.style.animationPlayState = 'paused'; });
-    wrapper.addEventListener('blur', () => { if (tickerInner) tickerInner.style.animationPlayState = 'running'; });
-    wireEditableText(wrapper, () => {
-      workingHtml = setTickerText(workingHtml, altText, wrapper.textContent.trim());
-      markDirty();
-    });
   });
 
   // ---- text: per-series blurbs ----
