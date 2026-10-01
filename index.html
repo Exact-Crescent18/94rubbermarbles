@@ -328,13 +328,6 @@ img[src*="WRC_logo.svg"]{filter:brightness(0) invert(1);}
 .standings-table td.pts{font-family:'JetBrains Mono',monospace; color:var(--text);}
 .standings-table tr.lead td{color:var(--text); background:rgba(255,179,0,0.05);}
 .standings-table tr.lead td:first-child{border-left:2px solid var(--amber);}
-.standings-table tr.extra{display:none;}
-.standings-table.expanded tr.extra{display:table-row;}
-.standings-more{
-  display:block; margin:-2px 0 20px; font-family:'JetBrains Mono',monospace; font-size:11px;
-  letter-spacing:.08em; text-transform:uppercase; color:var(--amber); background:none; border:none; padding:0; cursor:pointer;
-}
-.standings-more:hover{text-decoration:underline;}
 
 /* ---------- NEWS GRID ---------- */
 .news-grid{display:grid; grid-template-columns:1.3fr 1fr 1fr; grid-template-rows:auto auto; gap:16px;}
@@ -1182,8 +1175,9 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 
     <div class="sector-label"><span class="num">S3</span><span class="name">Sector 03 — Standings</span><span class="line"></span></div>
   <p class="standings-caption">Through the Azerbaijan GP — 7 rounds remain.</p>
-  <table class="standings-table" id="standings-f1">
-    <thead><tr><th>Pos</th><th>Driver</th><th>Team</th><th class="pts">Points</th></tr></thead><tbody>
+  <table class="standings-table">
+    <thead><tr><th>Pos</th><th>Driver</th><th>Team</th><th class="pts">Points</th></tr></thead>
+    <tbody>
 <tr class="lead"><td class="pos">1</td><td class="name">Kimi Antonelli</td><td class="">Mercedes</td><td class="pts">302</td></tr>
 <tr><td class="pos">2</td><td class="name">George Russell</td><td class="">Mercedes</td><td class="pts">236</td></tr>
 <tr><td class="pos">3</td><td class="name">Lewis Hamilton</td><td class="">Ferrari</td><td class="pts">199</td></tr>
@@ -1192,25 +1186,8 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 <tr><td class="pos">6</td><td class="name">Max Verstappen</td><td class="">Red Bull Racing</td><td class="pts">163</td></tr>
 <tr><td class="pos">7</td><td class="name">Oscar Piastri</td><td class="">McLaren</td><td class="pts">120</td></tr>
 <tr><td class="pos">8</td><td class="name">Isack Hadjar</td><td class="">Red Bull Racing</td><td class="pts">86</td></tr>
-<tr class="extra"><td class="pos">9</td><td class="name">Liam Lawson</td><td class="">Racing Bulls</td><td class="pts">59</td></tr>
-<tr class="extra"><td class="pos">10</td><td class="name">Pierre Gasly</td><td class="">Alpine</td><td class="pts">41</td></tr>
-<tr class="extra"><td class="pos">11</td><td class="name">Arvid Lindblad</td><td class="">Racing Bulls</td><td class="pts">37</td></tr>
-<tr class="extra"><td class="pos">12</td><td class="name">Franco Colapinto</td><td class="">Alpine</td><td class="pts">27</td></tr>
-<tr class="extra"><td class="pos">13</td><td class="name">Oliver Bearman</td><td class="">Haas</td><td class="pts">20</td></tr>
-<tr class="extra"><td class="pos">14</td><td class="name">Gabriel Bortoleto</td><td class="">Audi</td><td class="pts">10</td></tr>
-<tr class="extra"><td class="pos">15</td><td class="name">Nico Hülkenberg</td><td class="">Audi</td><td class="pts">7</td></tr>
-<tr class="extra"><td class="pos">16</td><td class="name">Esteban Ocon</td><td class="">Haas</td><td class="pts">7</td></tr>
-<tr class="extra"><td class="pos">17</td><td class="name">Carlos Sainz</td><td class="">Williams</td><td class="pts">7</td></tr>
-<tr class="extra"><td class="pos">18</td><td class="name">Alexander Albon</td><td class="">Williams</td><td class="pts">5</td></tr>
-<tr class="extra"><td class="pos">19</td><td class="name">Fernando Alonso</td><td class="">Aston Martin</td><td class="pts">3</td></tr>
-<tr class="extra"><td class="pos">20</td><td class="name">Yuki Tsunoda</td><td class="">Racing Bulls</td><td class="pts">1</td></tr>
-<tr class="extra"><td class="pos">21</td><td class="name">Lance Stroll</td><td class="">Aston Martin</td><td class="pts">0</td></tr>
-<tr class="extra"><td class="pos">22</td><td class="name">Valtteri Bottas</td><td class="">Cadillac</td><td class="pts">0</td></tr>
-<tr class="extra"><td class="pos">23</td><td class="name">Sergio Pérez</td><td class="">Cadillac</td><td class="pts">0</td></tr>
     </tbody>
   </table>
-  <button class="standings-more" type="button" data-target="standings-f1">View Full Standings</button>
-
 
 <div class="sector-label" id="f1-rules"><span class="num">S4</span><span class="name">Sector 04 — Know the Rules</span><span class="line"></span></div>
   <section class="explainer-strip">
@@ -1348,8 +1325,9 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 
     <div class="sector-label"><span class="num">S3</span><span class="name">Sector 03 — Standings</span><span class="line"></span></div>
   <p class="standings-caption">Playoff standings after Kansas (Sept 27) — gaps shown are points behind leader Kyle Larson (2,282 pts).</p>
-  <table class="standings-table" id="standings-nascar-cup">
-    <thead><tr><th>Pos</th><th>Driver</th><th class="pts">Behind</th></tr></thead><tbody>
+  <table class="standings-table">
+    <thead><tr><th>Pos</th><th>Driver</th><th class="pts">Behind</th></tr></thead>
+    <tbody>
 <tr class="lead"><td class="pos">1</td><td class="name">Kyle Larson</td><td class="pts">Leader</td></tr>
 <tr><td class="pos">2</td><td class="name">Denny Hamlin</td><td class="pts">-26</td></tr>
 <tr><td class="pos">3</td><td class="name">Christopher Bell</td><td class="pts">-50</td></tr>
@@ -1358,18 +1336,8 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 <tr><td class="pos">6</td><td class="name">Ty Gibbs</td><td class="pts">-94</td></tr>
 <tr><td class="pos">7</td><td class="name">Tyler Reddick</td><td class="pts">-111</td></tr>
 <tr><td class="pos">8</td><td class="name">Chase Briscoe</td><td class="pts">-123</td></tr>
-<tr class="extra"><td class="pos">9</td><td class="name">Austin Cindric</td><td class="pts">-140</td></tr>
-<tr class="extra"><td class="pos">10</td><td class="name">Bubba Wallace</td><td class="pts">-140</td></tr>
-<tr class="extra"><td class="pos">11</td><td class="name">Carson Hocevar</td><td class="pts">-150</td></tr>
-<tr class="extra"><td class="pos">12</td><td class="name">William Byron</td><td class="pts">-158</td></tr>
-<tr class="extra"><td class="pos">13</td><td class="name">Chase Elliott</td><td class="pts">-161</td></tr>
-<tr class="extra"><td class="pos">14</td><td class="name">Ryan Preece</td><td class="pts">-173</td></tr>
-<tr class="extra"><td class="pos">15</td><td class="name">Chris Buescher</td><td class="pts">-186</td></tr>
-<tr class="extra"><td class="pos">16</td><td class="name">Daniel Suárez</td><td class="pts">-187</td></tr>
     </tbody>
   </table>
-  <button class="standings-more" type="button" data-target="standings-nascar-cup">View Full Standings</button>
-
 
 <div class="sector-label" id="nascar-cup-rules"><span class="num">S4</span><span class="name">Sector 04 — Know the Rules</span><span class="line"></span></div>
   <section class="explainer-strip">
@@ -1501,63 +1469,19 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 
     <div class="sector-label"><span class="num">S3</span><span class="name">Sector 03 — Standings</span><span class="line"></span></div>
   <p class="standings-caption">Current 2026 driver standings.</p>
-  <table class="standings-table" id="standings-nascar-oreilly">
+  <table class="standings-table">
     <thead><tr><th>Pos</th><th>Driver</th><th class="pts">Points</th></tr></thead>
     <tbody>
-<tr class="lead"><td class="pos">1</td><td class="name">Sheldon Creed</td><td class="pts">2235</td></tr>
-<tr><td class="pos">2</td><td class="name">Justin Allgaier</td><td class="pts">2224</td></tr>
-<tr><td class="pos">3</td><td class="name">Carson Kvapil</td><td class="pts">2198</td></tr>
-<tr><td class="pos">4</td><td class="name">Jesse Love</td><td class="pts">2194</td></tr>
-<tr><td class="pos">5</td><td class="name">Sam Mayer</td><td class="pts">2157</td></tr>
-<tr><td class="pos">6</td><td class="name">Corey Day</td><td class="pts">2143</td></tr>
-<tr><td class="pos">7</td><td class="name">Sammy Smith</td><td class="pts">2143</td></tr>
-<tr><td class="pos">8</td><td class="name">Taylor Gray</td><td class="pts">2131</td></tr>
-<tr class="extra"><td class="pos">9</td><td class="name">Austin Hill</td><td class="pts">2129</td></tr>
-<tr class="extra"><td class="pos">10</td><td class="name">Parker Retzlaff</td><td class="pts">2124</td></tr>
-<tr class="extra"><td class="pos">11</td><td class="name">Brandon Jones</td><td class="pts">2121</td></tr>
-<tr class="extra"><td class="pos">12</td><td class="name">Rajah Caruth</td><td class="pts">2071</td></tr>
-<tr class="extra"><td class="pos">13</td><td class="name">Brent Crews</td><td class="pts">715</td></tr>
-<tr class="extra"><td class="pos">14</td><td class="name">William Sawalich</td><td class="pts">676</td></tr>
-<tr class="extra"><td class="pos">15</td><td class="name">Ryan Sieg</td><td class="pts">619</td></tr>
-<tr class="extra"><td class="pos">16</td><td class="name">Anthony Alfredo</td><td class="pts">579</td></tr>
-<tr class="extra"><td class="pos">17</td><td class="name">Brennan Poole</td><td class="pts">515</td></tr>
-<tr class="extra"><td class="pos">18</td><td class="name">Dean Thompson</td><td class="pts">507</td></tr>
-<tr class="extra"><td class="pos">19</td><td class="name">Jeremy Clements</td><td class="pts">445</td></tr>
-<tr class="extra"><td class="pos">20</td><td class="name">Harrison Burton</td><td class="pts">444</td></tr>
-<tr class="extra"><td class="pos">21</td><td class="name">Jeb Burton</td><td class="pts">425</td></tr>
-<tr class="extra"><td class="pos">22</td><td class="name">Blaine Perkins</td><td class="pts">392</td></tr>
-<tr class="extra"><td class="pos">23</td><td class="name">Patrick Staropoli</td><td class="pts">368</td></tr>
-<tr class="extra"><td class="pos">24</td><td class="name">Kyle Sieg</td><td class="pts">354</td></tr>
-<tr class="extra"><td class="pos">25</td><td class="name">Josh Bilicki</td><td class="pts">318</td></tr>
-<tr class="extra"><td class="pos">26</td><td class="name">Lavar Scott</td><td class="pts">288</td></tr>
-<tr class="extra"><td class="pos">27</td><td class="name">Ryan Ellis</td><td class="pts">279</td></tr>
-<tr class="extra"><td class="pos">28</td><td class="name">Austin Green</td><td class="pts">262</td></tr>
-<tr class="extra"><td class="pos">29</td><td class="name">Garrett Smithley</td><td class="pts">204</td></tr>
-<tr class="extra"><td class="pos">30</td><td class="name">Josh Williams</td><td class="pts">183</td></tr>
-<tr class="extra"><td class="pos">31</td><td class="name">Joey Gase</td><td class="pts">179</td></tr>
-<tr class="extra"><td class="pos">32</td><td class="name">Mason Maggio</td><td class="pts">141</td></tr>
-<tr class="extra"><td class="pos">33</td><td class="name">Alex Labbe</td><td class="pts">93</td></tr>
-<tr class="extra"><td class="pos">34</td><td class="name">Andrew Patterson</td><td class="pts">90</td></tr>
-<tr class="extra"><td class="pos">35</td><td class="name">J.J. Yeley</td><td class="pts">82</td></tr>
-<tr class="extra"><td class="pos">36</td><td class="name">Nathan Byrd</td><td class="pts">79</td></tr>
-<tr class="extra"><td class="pos">37</td><td class="name">Preston Pardus</td><td class="pts">66</td></tr>
-<tr class="extra"><td class="pos">38</td><td class="name">Myatt Snider</td><td class="pts">61</td></tr>
-<tr class="extra"><td class="pos">39</td><td class="name">Jordan Anderson</td><td class="pts">57</td></tr>
-<tr class="extra"><td class="pos">40</td><td class="name">Dawson Cram</td><td class="pts">54</td></tr>
-<tr class="extra"><td class="pos">41</td><td class="name">Jake Finch</td><td class="pts">52</td></tr>
-<tr class="extra"><td class="pos">42</td><td class="name">Carson Ware</td><td class="pts">51</td></tr>
-<tr class="extra"><td class="pos">43</td><td class="name">Logan Bearden</td><td class="pts">47</td></tr>
-<tr class="extra"><td class="pos">44</td><td class="name">Brad Perez</td><td class="pts">46</td></tr>
-<tr class="extra"><td class="pos">45</td><td class="name">Will Rodgers</td><td class="pts">41</td></tr>
-<tr class="extra"><td class="pos">46</td><td class="name">David Starr</td><td class="pts">35</td></tr>
-<tr class="extra"><td class="pos">47</td><td class="name">Lee Pulliam</td><td class="pts">32</td></tr>
-<tr class="extra"><td class="pos">48</td><td class="name">Glen Reen</td><td class="pts">32</td></tr>
-<tr class="extra"><td class="pos">49</td><td class="name">Luke Fenhaus</td><td class="pts">31</td></tr>
-<tr class="extra"><td class="pos">50</td><td class="name">Blake Lothian</td><td class="pts">30</td></tr>
+<tr class="lead"><td class="pos">1</td><td class="name">Sheldon Creed</td><td class="pts">2175</td></tr>
+<tr><td class="pos">2</td><td class="name">Justin Allgaier</td><td class="pts">2172</td></tr>
+<tr><td class="pos">3</td><td class="name">Carson Kvapil</td><td class="pts">2166</td></tr>
+<tr><td class="pos">4</td><td class="name">Jesse Love</td><td class="pts">2159</td></tr>
+<tr><td class="pos">5</td><td class="name">Austin Hill</td><td class="pts">2114</td></tr>
+<tr><td class="pos">6</td><td class="name">Sam Mayer</td><td class="pts">2114</td></tr>
+<tr><td class="pos">7</td><td class="name">Sammy Smith</td><td class="pts">2111</td></tr>
+<tr><td class="pos">8</td><td class="name">Corey Day</td><td class="pts">2106</td></tr>
     </tbody>
   </table>
-  <button class="standings-more" type="button" data-target="standings-nascar-oreilly">View Full Standings</button>
-
 
 <div class="sector-label" id="nascar-oreilly-rules"><span class="num">S4</span><span class="name">Sector 04 — Know the Rules</span><span class="line"></span></div>
   <section class="explainer-strip">
@@ -1803,8 +1727,9 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 
     <div class="sector-label"><span class="num">S3</span><span class="name">Sector 03 — Standings</span><span class="line"></span></div>
   <p class="standings-caption">Final 2026 standings — after the season finale at Laguna Seca.</p>
-  <table class="standings-table" id="standings-indycar">
-    <thead><tr><th>Pos</th><th>Driver</th><th class="pts">Points</th></tr></thead><tbody>
+  <table class="standings-table">
+    <thead><tr><th>Pos</th><th>Driver</th><th class="pts">Points</th></tr></thead>
+    <tbody>
 <tr class="lead"><td class="pos">1</td><td class="name">Álex Palou</td><td class="pts">631</td></tr>
 <tr><td class="pos">2</td><td class="name">Kyle Kirkwood</td><td class="pts">545</td></tr>
 <tr><td class="pos">3</td><td class="name">Christian Lundgaard</td><td class="pts">535</td></tr>
@@ -1813,35 +1738,10 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 <tr><td class="pos">6</td><td class="name">Scott McLaughlin</td><td class="pts">482</td></tr>
 <tr><td class="pos">7</td><td class="name">Marcus Ericsson</td><td class="pts">429</td></tr>
 <tr><td class="pos">8</td><td class="name">Josef Newgarden</td><td class="pts">423</td></tr>
-<tr class="extra"><td class="pos">9</td><td class="name">Felix Rosenqvist</td><td class="pts">412</td></tr>
-<tr class="extra"><td class="pos">10</td><td class="name">Rinus VeeKay</td><td class="pts">378</td></tr>
-<tr class="extra"><td class="pos">11</td><td class="name">Will Power</td><td class="pts">368</td></tr>
-<tr class="extra"><td class="pos">12</td><td class="name">Scott Dixon</td><td class="pts">331</td></tr>
-<tr class="extra"><td class="pos">13</td><td class="name">Kyffin Simpson</td><td class="pts">327</td></tr>
-<tr class="extra"><td class="pos">14</td><td class="name">Marcus Armstrong</td><td class="pts">320</td></tr>
-<tr class="extra"><td class="pos">15</td><td class="name">Alexander Rossi</td><td class="pts">307</td></tr>
-<tr class="extra"><td class="pos">16</td><td class="name">Graham Rahal</td><td class="pts">302</td></tr>
-<tr class="extra"><td class="pos">17</td><td class="name">Santino Ferrucci</td><td class="pts">280</td></tr>
-<tr class="extra"><td class="pos">18</td><td class="name">Louis Foster</td><td class="pts">267</td></tr>
-<tr class="extra"><td class="pos">19</td><td class="name">Romain Grosjean</td><td class="pts">259</td></tr>
-<tr class="extra"><td class="pos">20</td><td class="name">Nolan Siegel</td><td class="pts">259</td></tr>
-<tr class="extra"><td class="pos">21</td><td class="name">Christian Rasmussen</td><td class="pts">245</td></tr>
-<tr class="extra"><td class="pos">22</td><td class="name">Dennis Hauger</td><td class="pts">228</td></tr>
-<tr class="extra"><td class="pos">23</td><td class="name">Mick Schumacher</td><td class="pts">213</td></tr>
-<tr class="extra"><td class="pos">24</td><td class="name">Caio Collet</td><td class="pts">203</td></tr>
-<tr class="extra"><td class="pos">25</td><td class="name">Sting Ray Robb</td><td class="pts">182</td></tr>
-<tr class="extra"><td class="pos">26</td><td class="name">Conor Daly</td><td class="pts">24</td></tr>
-<tr class="extra"><td class="pos">27</td><td class="name">Takuma Sato</td><td class="pts">20</td></tr>
-<tr class="extra"><td class="pos">28</td><td class="name">Jack Harvey</td><td class="pts">8</td></tr>
-<tr class="extra"><td class="pos">29</td><td class="name">Jacob Abel</td><td class="pts">6</td></tr>
-<tr class="extra"><td class="pos">30</td><td class="name">Hélio Castroneves</td><td class="pts">5</td></tr>
-<tr class="extra"><td class="pos">31</td><td class="name">Ryan Hunter-Reay</td><td class="pts">5</td></tr>
-<tr class="extra"><td class="pos">32</td><td class="name">Katherine Legge</td><td class="pts">5</td></tr>
-<tr class="extra"><td class="pos">33</td><td class="name">Ed Carpenter</td><td class="pts">5</td></tr>
+<tr><td class="pos">9</td><td class="name">Felix Rosenqvist</td><td class="pts">412</td></tr>
+<tr><td class="pos">10</td><td class="name">Rinus VeeKay</td><td class="pts">378</td></tr>
     </tbody>
   </table>
-  <button class="standings-more" type="button" data-target="standings-indycar">View Full Standings</button>
-
 
 <div class="sector-label" id="indycar-rules"><span class="num">S4</span><span class="name">Sector 04 — Know the Rules</span><span class="line"></span></div>
   <section class="explainer-strip">
@@ -1947,8 +1847,9 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 
     <div class="sector-label"><span class="num">S3</span><span class="name">Sector 03 — Standings</span><span class="line"></span></div>
   <p class="standings-caption">Final 2026 standings.</p>
-  <table class="standings-table" id="standings-indy-nxt">
-    <thead><tr><th>Pos</th><th>Driver</th><th>Team</th><th class="pts">Points</th></tr></thead><tbody>
+  <table class="standings-table">
+    <thead><tr><th>Pos</th><th>Driver</th><th>Team</th><th class="pts">Points</th></tr></thead>
+    <tbody>
 <tr class="lead"><td class="pos">1</td><td class="name">Nikita Johnson</td><td class="">Cape Motorsports</td><td class="pts">585</td></tr>
 <tr><td class="pos">2</td><td class="name">Enzo Fittipaldi</td><td class="">HMD Motorsports</td><td class="pts">556</td></tr>
 <tr><td class="pos">3</td><td class="name">Tymek Kucharczyk</td><td class="">HMD Motorsports</td><td class="pts">551</td></tr>
@@ -1957,30 +1858,8 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 <tr><td class="pos">6</td><td class="name">Alessandro de Tullio</td><td class="">A.J. Foyt Racing</td><td class="pts">442</td></tr>
 <tr><td class="pos">7</td><td class="name">JM Correa</td><td class="">Cusick Morgan Motorsports</td><td class="pts">389</td></tr>
 <tr><td class="pos">8</td><td class="name">Myles Rowe</td><td class="">Abel Motorsports</td><td class="pts">388</td></tr>
-<tr class="extra"><td class="pos">9</td><td class="name">Jack Beeton</td><td class="">HMD Motorsports</td><td class="pts">382</td></tr>
-<tr class="extra"><td class="pos">10</td><td class="name">Max Garcia</td><td class="">Abel Motorsports</td><td class="pts">381</td></tr>
-<tr class="extra"><td class="pos">11</td><td class="name">Josh Pierson</td><td class="">Andretti Global</td><td class="pts">364</td></tr>
-<tr class="extra"><td class="pos">12</td><td class="name">Matteo Nannini</td><td class="">Cape Motorsports</td><td class="pts">362</td></tr>
-<tr class="extra"><td class="pos">13</td><td class="name">Seb Murray</td><td class="">Andretti Global</td><td class="pts">306</td></tr>
-<tr class="extra"><td class="pos">14</td><td class="name">Bryce Aron</td><td class="">Chip Ganassi Racing</td><td class="pts">298</td></tr>
-<tr class="extra"><td class="pos">15</td><td class="name">Niels Koolen</td><td class="">Chip Ganassi Racing</td><td class="pts">268</td></tr>
-<tr class="extra"><td class="pos">16</td><td class="name">Salvador de Alba</td><td class="">HMD Motorsports</td><td class="pts">245</td></tr>
-<tr class="extra"><td class="pos">17</td><td class="name">Nicolas Stati</td><td class="">Cusick Morgan Motorsports</td><td class="pts">227</td></tr>
-<tr class="extra"><td class="pos">18</td><td class="name">Colin Kaminsky</td><td class="">Abel Motorsports</td><td class="pts">222</td></tr>
-<tr class="extra"><td class="pos">19</td><td class="name">Jordan Missig</td><td class="">Abel Motorsports</td><td class="pts">216</td></tr>
-<tr class="extra"><td class="pos">20</td><td class="name">James Roe</td><td class="">Chip Ganassi Racing</td><td class="pts">214</td></tr>
-<tr class="extra"><td class="pos">21</td><td class="name">Alexander Koreiba</td><td class="">Juncos Hollinger Racing</td><td class="pts">207</td></tr>
-<tr class="extra"><td class="pos">22</td><td class="name">Carson Etter</td><td class="">Chip Ganassi Racing</td><td class="pts">182</td></tr>
-<tr class="extra"><td class="pos">23</td><td class="name">Nicholas Monteiro</td><td class="">A.J. Foyt Racing</td><td class="pts">179</td></tr>
-<tr class="extra"><td class="pos">24</td><td class="name">Ricardo Escotto</td><td class="">Juncos Hollinger Racing</td><td class="pts">142</td></tr>
-<tr class="extra"><td class="pos">25</td><td class="name">Jacob Abel</td><td class="">Abel Motorsports</td><td class="pts">101</td></tr>
-<tr class="extra"><td class="pos">26</td><td class="name">Nolan Allaer</td><td class="">Juncos Hollinger Racing</td><td class="pts">67</td></tr>
-<tr class="extra"><td class="pos">27</td><td class="name">Bart Harrison</td><td class="">HMD Motorsports</td><td class="pts">51</td></tr>
-<tr class="extra"><td class="pos">28</td><td class="name">Yuven Sundaramoorthy</td><td class="">Cusick Morgan Motorsports</td><td class="pts">9</td></tr>
     </tbody>
   </table>
-  <button class="standings-more" type="button" data-target="standings-indy-nxt">View Full Standings</button>
-
 
 <div class="sector-label" id="indy-nxt-rules"><span class="num">S4</span><span class="name">Sector 04 — Know the Rules</span><span class="line"></span></div>
   <section class="explainer-strip">
@@ -2100,8 +1979,9 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 
     <div class="sector-label"><span class="num">S3</span><span class="name">Sector 03 — Standings</span><span class="line"></span></div>
   <p class="standings-caption">Through Round 14 of 22 (Misano).</p>
-  <table class="standings-table" id="standings-motogp">
-    <thead><tr><th>Pos</th><th>Rider</th><th class="pts">Points</th></tr></thead><tbody>
+  <table class="standings-table">
+    <thead><tr><th>Pos</th><th>Rider</th><th class="pts">Points</th></tr></thead>
+    <tbody>
 <tr class="lead"><td class="pos">1</td><td class="name">Marc Márquez</td><td class="pts">274</td></tr>
 <tr><td class="pos">2</td><td class="name">Jorge Martín</td><td class="pts">274</td></tr>
 <tr><td class="pos">3</td><td class="name">Marco Bezzecchi</td><td class="pts">241</td></tr>
@@ -2110,27 +1990,8 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 <tr><td class="pos">6</td><td class="name">Ai Ogura</td><td class="pts">203</td></tr>
 <tr><td class="pos">7</td><td class="name">Raúl Fernández</td><td class="pts">199</td></tr>
 <tr><td class="pos">8</td><td class="name">Álex Márquez</td><td class="pts">153</td></tr>
-<tr class="extra"><td class="pos">9</td><td class="name">Francesco Bagnaia</td><td class="pts">143</td></tr>
-<tr class="extra"><td class="pos">10</td><td class="name">Fermín Aldeguer</td><td class="pts">105</td></tr>
-<tr class="extra"><td class="pos">11</td><td class="name">Luca Marini</td><td class="pts">96</td></tr>
-<tr class="extra"><td class="pos">12</td><td class="name">Enea Bastianini</td><td class="pts">92</td></tr>
-<tr class="extra"><td class="pos">13</td><td class="name">Brad Binder</td><td class="pts">83</td></tr>
-<tr class="extra"><td class="pos">14</td><td class="name">Diogo Moreira</td><td class="pts">64</td></tr>
-<tr class="extra"><td class="pos">15</td><td class="name">Fabio Quartararo</td><td class="pts">61</td></tr>
-<tr class="extra"><td class="pos">16</td><td class="name">Franco Morbidelli</td><td class="pts">56</td></tr>
-<tr class="extra"><td class="pos">17</td><td class="name">Johann Zarco</td><td class="pts">36</td></tr>
-<tr class="extra"><td class="pos">18</td><td class="name">Joan Mir</td><td class="pts">33</td></tr>
-<tr class="extra"><td class="pos">19</td><td class="name">Jack Miller</td><td class="pts">28</td></tr>
-<tr class="extra"><td class="pos">20</td><td class="name">Álex Rins</td><td class="pts">24</td></tr>
-<tr class="extra"><td class="pos">21</td><td class="name">Toprak Razgatlıoğlu</td><td class="pts">18</td></tr>
-<tr class="extra"><td class="pos">22</td><td class="name">Maverick Viñales</td><td class="pts">10</td></tr>
-<tr class="extra"><td class="pos">23</td><td class="name">Iker Lecuona</td><td class="pts">9</td></tr>
-<tr class="extra"><td class="pos">24</td><td class="name">Augusto Fernández</td><td class="pts">6</td></tr>
-<tr class="extra"><td class="pos">25</td><td class="name">Pol Espargaró</td><td class="pts">5</td></tr>
     </tbody>
   </table>
-  <button class="standings-more" type="button" data-target="standings-motogp">View Full Standings</button>
-
 
 <div class="sector-label" id="motogp-rules"><span class="num">S4</span><span class="name">Sector 04 — Know the Rules</span><span class="line"></span></div>
   <section class="explainer-strip">
@@ -2269,17 +2130,16 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 
     <div class="sector-label"><span class="num">S3</span><span class="name">Sector 03 — Standings</span><span class="line"></span></div>
   <p class="standings-caption">Hypercar drivers’ standings after Round 6 (6 Hours of Fuji).</p>
-  <table class="standings-table" id="standings-wec">
-    <thead><tr><th>Pos</th><th>Drivers</th><th>Car</th><th class="pts">Points</th></tr></thead><tbody>
+  <table class="standings-table">
+    <thead><tr><th>Pos</th><th>Drivers</th><th>Car</th><th class="pts">Points</th></tr></thead>
+    <tbody>
 <tr class="lead"><td class="pos">1</td><td class="name">Sébastien Buemi / Brendon Hartley / Ryō Hirakawa</td><td class="">Toyota #8</td><td class="pts">89</td></tr>
 <tr><td class="pos">2</td><td class="name">Mike Conway / Kamui Kobayashi / Nyck de Vries</td><td class="">Toyota #7</td><td class="pts">79</td></tr>
 <tr><td class="pos">3</td><td class="name">René Rast / Robin Frijns</td><td class="">BMW #20</td><td class="pts">75</td></tr>
 <tr><td class="pos">4</td><td class="name">Kevin Magnussen / Raffaele Marciello</td><td class="">BMW #15</td><td class="pts">69</td></tr>
 <tr><td class="pos">5</td><td class="name">Sheldon van der Linde</td><td class=""></td><td class="pts">65</td></tr>
-<tr><td class="pos">6</td><td class="name">Dries Vanthoor</td><td class=""></td><td class="pts">63</td></tr>
     </tbody>
   </table>
-
 
 <div class="sector-label" id="wec-rules"><span class="num">S4</span><span class="name">Sector 04 — Know the Rules</span><span class="line"></span></div>
   <section class="explainer-strip">
@@ -2402,8 +2262,9 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 
     <div class="sector-label"><span class="num">S3</span><span class="name">Sector 03 — Standings</span><span class="line"></span></div>
   <p class="standings-caption">Chase standings as of late September 2026.</p>
-  <table class="standings-table" id="standings-nascar-truck">
-    <thead><tr><th>Pos</th><th>Driver</th><th class="pts">Points</th></tr></thead><tbody>
+  <table class="standings-table">
+    <thead><tr><th>Pos</th><th>Driver</th><th class="pts">Points</th></tr></thead>
+    <tbody>
 <tr class="lead"><td class="pos">1</td><td class="name">Kaden Honeycutt</td><td class="pts">2197</td></tr>
 <tr><td class="pos">2</td><td class="name">Layne Riggs</td><td class="pts">2160</td></tr>
 <tr><td class="pos">3</td><td class="name">Chandler Smith</td><td class="pts">2126</td></tr>
@@ -2412,12 +2273,8 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 <tr><td class="pos">6</td><td class="name">Daniel Hemric</td><td class="pts">2110</td></tr>
 <tr><td class="pos">7</td><td class="name">Ty Majeski</td><td class="pts">2109</td></tr>
 <tr><td class="pos">8</td><td class="name">Ben Rhodes</td><td class="pts">2099</td></tr>
-<tr class="extra"><td class="pos">9</td><td class="name">Grant Enfinger</td><td class="pts">2079</td></tr>
-<tr class="extra"><td class="pos">10</td><td class="name">Tyler Ankrum</td><td class="pts">2070</td></tr>
     </tbody>
   </table>
-  <button class="standings-more" type="button" data-target="standings-nascar-truck">View Full Standings</button>
-
 
 <div class="sector-label" id="nascar-truck-rules"><span class="num">S4</span><span class="name">Sector 04 — Know the Rules</span><span class="line"></span></div>
   <section class="explainer-strip">
@@ -2508,7 +2365,7 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
   <div class="sector-label"><span class="num">S1</span><span class="name">Sector 01 — Next Up</span><span class="line"></span></div>
   <section class="next-up-panel">
     <div class="track">
-      <img class="diagram" src="https://upload.wikimedia.org/wikipedia/commons/b/bb/WRC_logo.svg" alt="WRC logo">
+      <img class="diagram" src="uploads/1790832522087-AdobeExpress-file.jpg" alt="WRC logo">
       <div class="cap">WRC LOGO</div>
     </div>
     <div class="info">
@@ -2548,8 +2405,9 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 
     <div class="sector-label"><span class="num">S3</span><span class="name">Sector 03 — Standings</span><span class="line"></span></div>
   <p class="standings-caption">Standings with one round remaining.</p>
-  <table class="standings-table" id="standings-wrc">
-    <thead><tr><th>Pos</th><th>Driver</th><th>Team</th><th class="pts">Points</th></tr></thead><tbody>
+  <table class="standings-table">
+    <thead><tr><th>Pos</th><th>Driver</th><th>Team</th><th class="pts">Points</th></tr></thead>
+    <tbody>
 <tr class="lead"><td class="pos">1</td><td class="name">Elfyn Evans</td><td class="">Toyota Gazoo Racing</td><td class="pts">230</td></tr>
 <tr><td class="pos">2</td><td class="name">Sami Pajari</td><td class="">Toyota Gazoo Racing WRT2</td><td class="pts">213</td></tr>
 <tr><td class="pos">3</td><td class="name">Oliver Solberg</td><td class="">Toyota Gazoo Racing</td><td class="pts">209</td></tr>
@@ -2558,12 +2416,8 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 <tr><td class="pos">6</td><td class="name">Takamoto Katsuta</td><td class="">Toyota Gazoo Racing</td><td class="pts">163</td></tr>
 <tr><td class="pos">7</td><td class="name">Thierry Neuville</td><td class="">Hyundai Shell Mobis</td><td class="pts">129</td></tr>
 <tr><td class="pos">8</td><td class="name">Hayden Paddon</td><td class="">Hyundai Shell Mobis</td><td class="pts">38</td></tr>
-<tr class="extra"><td class="pos">9</td><td class="name">Josh McErlean</td><td class="">M-Sport Ford</td><td class="pts">35</td></tr>
-<tr class="extra"><td class="pos">10</td><td class="name">Esapekka Lappi</td><td class="">Hyundai Shell Mobis</td><td class="pts">33</td></tr>
     </tbody>
   </table>
-  <button class="standings-more" type="button" data-target="standings-wrc">View Full Standings</button>
-
 
 <div class="sector-label" id="wrc-rules"><span class="num">S4</span><span class="name">Sector 04 — Know the Rules</span><span class="line"></span></div>
   <section class="explainer-strip">
@@ -2847,16 +2701,6 @@ function tickCountdowns(){
 }
 tickCountdowns();
 setInterval(tickCountdowns, 1000);
-
-// ---- standings "view full list" expand/collapse ----
-document.querySelectorAll('.standings-more').forEach((btn) => {
-  btn.addEventListener('click', () => {
-    const table = document.getElementById(btn.dataset.target);
-    if (!table) return;
-    const expanded = table.classList.toggle('expanded');
-    btn.textContent = expanded ? 'Show Top 8 Only' : 'View Full Standings';
-  });
-});
 
 // ---- SPA view router ----
 const VALID_VIEWS = ['home','news','calendar','article','f1','nascar-cup','nascar-oreilly','arca','indycar','indy-nxt','motogp','wec','nascar-truck','wrc','formula-e'];
