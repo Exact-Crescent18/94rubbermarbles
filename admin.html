@@ -254,6 +254,32 @@ function setBlurb(html, view, newText) {
   return before + `<h4>${blurb.label}</h4>\n        <p>${newText}</p>` + after;
 }
 
+// ================= Next-Up panel track image (scoped, not global) =================
+// nextup.mjs falls back to the series' own logo for a panel's track
+// image when no real track diagram is available yet (e.g. WRC's current
+// panel literally shows the WRC logo) — the exact same URL as that
+// series' chip-logo badge elsewhere in the same panel. A plain
+// document-wide src replace would therefore change both at once from a
+// single click, which is never what "change the next-up track image"
+// means. Scoped to the one <img> inside this view's .next-up-panel
+// .track, identified by text position rather than by src value.
+function getNextUpTrackImg(html, view) {
+  const b = viewBounds(html, view);
+  if (!b) return null;
+  const slice = html.slice(b.start, b.end);
+  const trackIdx = slice.indexOf('<div class="track">');
+  if (trackIdx === -1) return null;
+  const m = slice.slice(trackIdx).match(/<img class="diagram" src="([^"]*)" alt="([^"]*)">/);
+  if (!m) return null;
+  return { offset: b.start + trackIdx + m.index, full: m[0], src: m[1], alt: m[2] };
+}
+function setNextUpTrackImage(html, view, newSrc) {
+  const t = getNextUpTrackImg(html, view);
+  if (!t) return html;
+  const newTag = `<img class="diagram" src="${newSrc}" alt="${t.alt}">`;
+  return html.slice(0, t.offset) + newTag + html.slice(t.offset + t.full.length);
+}
+
 // ================= "Know the Rules" blocks =================
 // Each .rules-block has a unique id (e.g. "f1-format"). Everything after
 // its <h4> label (which carries the numbered badge, kept fixed so it
@@ -516,6 +542,15 @@ function openImageModal(currentSrc, onApply, options = {}) {
   document.getElementById('img-modal-backdrop').style.display = 'flex';
 }
 function closeImageModal() { document.getElementById('img-modal-backdrop').style.display = 'none'; onApplyImage = null; }
+// Picking a file previously gave no feedback at all until Apply — show
+// it immediately via a local object URL, and clear the URL field so
+// it's unambiguous which source Apply will actually use.
+document.getElementById('img-modal-file').addEventListener('change', (e) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+  document.getElementById('img-modal-preview').src = URL.createObjectURL(file);
+  document.getElementById('img-modal-url').value = '';
+});
 async function applyImageModal() {
   const fileInput = document.getElementById('img-modal-file');
   const urlInput = document.getElementById('img-modal-url');
@@ -527,9 +562,14 @@ async function applyImageModal() {
     setStatus('Uploading image…', '');
     try {
       await ghSaveFile(path, b64, `Upload ${path} via site editor`, true);
-      if (onApplyImage) await onApplyImage(path, credit);
+      // The repo path won't actually be fetchable until GitHub Pages
+      // finishes redeploying (can take a minute+), so the preview uses
+      // the local object URL immediately while `path` — the real,
+      // permanent location — is what gets written into workingHtml and
+      // published.
+      if (onApplyImage) await onApplyImage(path, credit, URL.createObjectURL(file));
       setStatus('Image uploaded — remember to Publish.', 'ok');
-    } catch (e) { setStatus(e.message, 'error'); }
+    } catch (e) { setStatus('Upload failed: ' + e.message, 'error'); }
   } else if (urlInput.value.trim() && onApplyImage) {
     await onApplyImage(urlInput.value.trim(), credit);
   }
@@ -613,10 +653,16 @@ function instrumentFrame() {
         e.stopPropagation(); e.preventDefault();
         const img = art.querySelector('img');
         const currentCredit = art.querySelector('.src')?.textContent || '';
-        openImageModal(img?.getAttribute('src') || '', async (newSrc, newCredit) => {
+        openImageModal(img?.getAttribute('src') || '', async (newSrc, newCredit, previewSrc) => {
           workingHtml = await setSlideImage(workingHtml, slug, newSrc, newCredit);
           markDirty();
-          loadFrame(); // the slide's <img> may not have existed yet (decorative-only slide)
+          // A just-uploaded image isn't fetchable at its real repo path
+          // until GitHub Pages redeploys, so show the local object URL
+          // immediately instead — the real path is already what's saved
+          // in workingHtml for publishing.
+          const liveImg = art.querySelector('img');
+          if (liveImg) liveImg.src = previewSrc || newSrc;
+          else loadFrame(); // no <img> existed on this slide at all — needs a structural reload
         }, { credit: currentCredit, creditLabel: 'Source / credit (shown in the corner of the image)' });
       }, true);
     }
@@ -681,13 +727,26 @@ function instrumentFrame() {
     img.addEventListener('click', function (e) {
       e.stopPropagation(); e.preventDefault();
       const oldSrc = img.getAttribute('src');
-      openImageModal(oldSrc, (newSrc, newCredit) => {
-        workingHtml = replaceImageSrc(workingHtml, oldSrc, newSrc);
-        workingHtml = setImageTitle(workingHtml, newSrc, newCredit);
-        doc.querySelectorAll(`img[src="${CSS.escape(oldSrc)}"]`).forEach(i => {
-          i.setAttribute('src', newSrc);
-          if (newCredit) i.setAttribute('title', newCredit); else i.removeAttribute('title');
-        });
+      // A next-up panel's track image can currently be showing a
+      // fallback that's identical to that series' own chip-logo (see
+      // getNextUpTrackImg's comment) — scope the edit to just this one
+      // <img> rather than every element sharing that URL.
+      const nextUpTrack = img.closest('.next-up-panel .track');
+      const view = nextUpTrack ? img.closest('[id^="view-"]')?.id.replace('view-', '') : null;
+
+      openImageModal(oldSrc, (newSrc, newCredit, previewSrc) => {
+        if (view) {
+          workingHtml = setNextUpTrackImage(workingHtml, view, newSrc);
+          img.setAttribute('src', previewSrc || newSrc);
+          if (newCredit) img.setAttribute('title', newCredit); else img.removeAttribute('title');
+        } else {
+          workingHtml = replaceImageSrc(workingHtml, oldSrc, newSrc);
+          workingHtml = setImageTitle(workingHtml, newSrc, newCredit);
+          doc.querySelectorAll(`img[src="${CSS.escape(oldSrc)}"]`).forEach(i => {
+            i.setAttribute('src', previewSrc || newSrc);
+            if (newCredit) i.setAttribute('title', newCredit); else i.removeAttribute('title');
+          });
+        }
         markDirty();
       }, { credit: img.getAttribute('title') || '' });
     }, true);
