@@ -125,6 +125,12 @@ button:disabled{opacity:.5; cursor:not-allowed;}
       <label id="img-modal-credit-label">Source / credit</label>
       <input type="text" id="img-modal-credit" placeholder="e.g. Wikimedia Commons">
     </div>
+    <div id="img-modal-diagram-field" style="display:none; margin-top:14px;">
+      <label style="display:flex; align-items:center; gap:8px; margin:0; text-transform:none; letter-spacing:0; font-size:13px; color:var(--text);">
+        <input type="checkbox" id="img-modal-diagram" style="width:auto; margin:0;">
+        This is a line-art diagram (track map, logo) — adds padding and a light background so it reads clearly
+      </label>
+    </div>
     <div class="row">
       <button class="secondary" id="img-modal-cancel">Cancel</button>
       <button id="img-modal-apply">Apply</button>
@@ -287,17 +293,21 @@ function getNextUpTrackImg(html, view) {
   const slice = html.slice(b.start, b.end);
   const trackIdx = slice.indexOf('<div class="track">');
   if (trackIdx === -1) return null;
-  // Tolerate an optional trailing style="..." (set by a previous crop
-  // edit) — the tag isn't always the bare class/src/alt form once edited.
-  const m = slice.slice(trackIdx).match(/<img class="diagram" src="([^"]*)" alt="([^"]*)"(?: style="([^"]*)")?>/);
+  // The "diagram" class is optional — a real photo (uploaded to replace
+  // what was a line-art track map) shouldn't carry it, since it adds
+  // padding + a light background meant for line art, which just shows up
+  // as an unwanted border around a photo. Tolerate an optional trailing
+  // style="..." too (set by a previous crop edit).
+  const m = slice.slice(trackIdx).match(/<img( class="diagram")? src="([^"]*)" alt="([^"]*)"(?: style="([^"]*)")?>/);
   if (!m) return null;
-  return { offset: b.start + trackIdx + m.index, full: m[0], src: m[1], alt: m[2], style: m[3] || '' };
+  return { offset: b.start + trackIdx + m.index, full: m[0], isDiagram: !!m[1], src: m[2], alt: m[3], style: m[4] || '' };
 }
-function setNextUpTrackImage(html, view, newSrc, newStyle) {
+function setNextUpTrackImage(html, view, newSrc, newStyle, isDiagram) {
   const t = getNextUpTrackImg(html, view);
   if (!t) return html;
+  const classAttr = isDiagram ? ' class="diagram"' : '';
   const styleAttr = newStyle ? ` style="${escAttr(newStyle)}"` : '';
-  const newTag = `<img class="diagram" src="${newSrc}" alt="${t.alt}"${styleAttr}>`;
+  const newTag = `<img${classAttr} src="${newSrc}" alt="${t.alt}"${styleAttr}>`;
   return html.slice(0, t.offset) + newTag + html.slice(t.offset + t.full.length);
 }
 
@@ -352,6 +362,30 @@ function setImageStyle(html, src, newStyle) {
     const stripped = tag.replace(/\s*style="[^"]*"/g, '');
     if (!newStyle) return stripped;
     return stripped.slice(0, -1) + ` style="${escAttr(newStyle)}">`;
+  });
+}
+// A handful of image slots (series-hero photo, event-card track-svg,
+// story art) carry a "diagram"/"hero-track-diagram" class that adds
+// padding and a light background so line-art track maps read clearly
+// against it. Swapping the src for a real photo without clearing that
+// class leaves the photo boxed in that same padding/background — reads
+// as an unwanted border. Toggled explicitly via the image modal's
+// checkbox rather than guessed from the file, since track maps on this
+// site are a mix of SVG and PNG — file type alone doesn't tell photo
+// from diagram.
+function setImageClassToken(html, src, token, enable) {
+  return html.replace(/<img\b[^>]*>/g, (tag) => {
+    const m = tag.match(/src="([^"]*)"/);
+    if (!m || m[1] !== src) return tag;
+    const classM = tag.match(/class="([^"]*)"/);
+    let classes = classM ? classM[1].split(/\s+/).filter(Boolean) : [];
+    if (enable) { if (!classes.includes(token)) classes.push(token); }
+    else { classes = classes.filter((c) => c !== token); }
+    if (classes.length) {
+      const attr = `class="${classes.join(' ')}"`;
+      return classM ? tag.replace(/class="[^"]*"/, attr) : tag.replace('<img', `<img ${attr}`);
+    }
+    return classM ? tag.replace(/\s*class="[^"]*"/, '') : tag;
   });
 }
 
@@ -649,8 +683,11 @@ function cropStyleString(rect, natW, natH) {
 // no visible caption slot in that markup. Always shown now — no image
 // type is left with nowhere to put a source. options.cropStyle: the
 // image's current style="..." attribute, if any, so re-opening an
-// already-cropped image starts from where it was left.
-// onApply receives (newSrc, newCredit, previewSrc, cropStyle).
+// already-cropped image starts from where it was left. options.diagram:
+// {current, show} — current is whether the image currently has the
+// diagram/hero-track-diagram class (prefills the checkbox); show is
+// false for hero-art slides, which never use that class at all.
+// onApply receives (newSrc, newCredit, previewSrc, cropStyle, isDiagram).
 function openImageModal(currentSrc, onApply, options = {}) {
   onApplyImage = onApply;
   const previewImg = document.getElementById('img-modal-preview');
@@ -659,6 +696,8 @@ function openImageModal(currentSrc, onApply, options = {}) {
   document.getElementById('img-modal-credit-label').textContent =
     options.creditLabel || 'Source / credit (shown as a hover tooltip on the image)';
   document.getElementById('img-modal-credit').value = options.credit || '';
+  document.getElementById('img-modal-diagram-field').style.display = options.diagram?.show ? 'block' : 'none';
+  document.getElementById('img-modal-diagram').checked = !!options.diagram?.current;
   imgNaturalW = 0; imgNaturalH = 0;
   function onReady() {
     imgNaturalW = previewImg.naturalWidth || 1;
@@ -731,6 +770,7 @@ async function applyImageModal() {
   const urlInput = document.getElementById('img-modal-url');
   const credit = document.getElementById('img-modal-credit').value.trim();
   const cropStyle = cropStyleString(cropRect, imgNaturalW, imgNaturalH);
+  const isDiagram = document.getElementById('img-modal-diagram').checked;
   if (fileInput.files && fileInput.files[0]) {
     const file = fileInput.files[0];
     const b64 = await fileToBase64(file);
@@ -743,11 +783,11 @@ async function applyImageModal() {
       // the local object URL immediately while `path` — the real,
       // permanent location — is what gets written into workingHtml and
       // published.
-      if (onApplyImage) await onApplyImage(path, credit, URL.createObjectURL(file), cropStyle);
+      if (onApplyImage) await onApplyImage(path, credit, URL.createObjectURL(file), cropStyle, isDiagram);
       setStatus('Image uploaded — remember to Publish.', 'ok');
     } catch (e) { setStatus('Upload failed: ' + e.message, 'error'); }
   } else if (urlInput.value.trim() && onApplyImage) {
-    await onApplyImage(urlInput.value.trim(), credit, undefined, cropStyle);
+    await onApplyImage(urlInput.value.trim(), credit, undefined, cropStyle, isDiagram);
   }
   closeImageModal();
 }
@@ -913,25 +953,34 @@ function instrumentFrame() {
       // <img> rather than every element sharing that URL.
       const nextUpTrack = img.closest('.next-up-panel .track');
       const view = nextUpTrack ? img.closest('[id^="view-"]')?.id.replace('view-', '') : null;
+      // series-hero's photo uses a differently-named diagram class than
+      // everywhere else — figure out which one applies to this image so
+      // the checkbox toggles the right one without the admin needing to
+      // know either name.
+      const diagramToken = img.closest('.series-hero .photo') ? 'hero-track-diagram' : 'diagram';
+      const isCurrentlyDiagram = img.classList.contains(diagramToken);
 
-      openImageModal(oldSrc, (newSrc, newCredit, previewSrc, cropStyle) => {
+      openImageModal(oldSrc, (newSrc, newCredit, previewSrc, cropStyle, isDiagram) => {
         if (view) {
-          workingHtml = setNextUpTrackImage(workingHtml, view, newSrc, cropStyle);
+          workingHtml = setNextUpTrackImage(workingHtml, view, newSrc, cropStyle, isDiagram);
           img.setAttribute('src', previewSrc || newSrc);
           if (newCredit) img.setAttribute('title', newCredit); else img.removeAttribute('title');
           if (cropStyle) img.setAttribute('style', cropStyle); else img.removeAttribute('style');
+          img.classList.toggle('diagram', isDiagram);
         } else {
           workingHtml = replaceImageSrc(workingHtml, oldSrc, newSrc);
           workingHtml = setImageTitle(workingHtml, newSrc, newCredit);
           workingHtml = setImageStyle(workingHtml, newSrc, cropStyle);
+          workingHtml = setImageClassToken(workingHtml, newSrc, diagramToken, isDiagram);
           doc.querySelectorAll(`img[src="${CSS.escape(oldSrc)}"]`).forEach(i => {
             i.setAttribute('src', previewSrc || newSrc);
             if (newCredit) i.setAttribute('title', newCredit); else i.removeAttribute('title');
             if (cropStyle) i.setAttribute('style', cropStyle); else i.removeAttribute('style');
+            i.classList.toggle(diagramToken, isDiagram);
           });
         }
         markDirty();
-      }, { credit: img.getAttribute('title') || '', cropStyle: img.getAttribute('style') || '' });
+      }, { credit: img.getAttribute('title') || '', cropStyle: img.getAttribute('style') || '', diagram: { show: true, current: isCurrentlyDiagram } });
     }, true);
   });
 
