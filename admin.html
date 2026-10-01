@@ -757,6 +757,15 @@ document.getElementById('img-modal-file').addEventListener('change', (e) => {
   if (!file) return;
   const previewImg = document.getElementById('img-modal-preview');
   document.getElementById('img-modal-url').value = '';
+  // A freshly uploaded file is virtually always a real photo, not a
+  // redrawn diagram — the checkbox otherwise stays checked by default
+  // whenever it's replacing an image that already had the diagram
+  // class (true for nearly every track image, even ones just showing a
+  // fallback logo), which is exactly how the padding/background kept
+  // showing up on uploaded photos. Force it off here; the admin can
+  // still re-check it for the rare case of uploading an actual diagram.
+  const diagramCheckbox = document.getElementById('img-modal-diagram');
+  if (diagramCheckbox) diagramCheckbox.checked = false;
   previewImg.onload = () => {
     imgNaturalW = previewImg.naturalWidth || 1;
     imgNaturalH = previewImg.naturalHeight || 1;
