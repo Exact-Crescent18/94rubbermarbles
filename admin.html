@@ -311,6 +311,34 @@ function setNextUpTrackImage(html, view, newSrc, newStyle, isDiagram) {
   return html.slice(0, t.offset) + newTag + html.slice(t.offset + t.full.length);
 }
 
+// ================= Series-hero photo (scoped, not global) =================
+// Only IndyCar and Formula E have a .series-hero block (the merged
+// hero+Sector-01 layout). Formula E's hero photo happens to share a
+// literal filename ("formula-e.png") with its own nav rail icon and a
+// couple of story-card arts — a document-wide src replace would change
+// all of them from one click, which is never what "change the sector 1
+// photo" means. Scoped to the one <img> inside this view's
+// .series-hero .photo, identified by text position, same approach as
+// the next-up-panel track image above.
+function getSeriesHeroPhotoImg(html, view) {
+  const b = viewBounds(html, view);
+  if (!b) return null;
+  const slice = html.slice(b.start, b.end);
+  const photoIdx = slice.indexOf('<div class="photo">');
+  if (photoIdx === -1) return null;
+  const m = slice.slice(photoIdx).match(/<img( class="hero-track-diagram")? src="([^"]*)" alt="([^"]*)"(?: style="([^"]*)")?>/);
+  if (!m) return null;
+  return { offset: b.start + photoIdx + m.index, full: m[0], isDiagram: !!m[1], src: m[2], alt: m[3], style: m[4] || '' };
+}
+function setSeriesHeroPhotoImage(html, view, newSrc, newStyle, isDiagram) {
+  const t = getSeriesHeroPhotoImg(html, view);
+  if (!t) return html;
+  const classAttr = isDiagram ? ' class="hero-track-diagram"' : '';
+  const styleAttr = newStyle ? ` style="${escAttr(newStyle)}"` : '';
+  const newTag = `<img${classAttr} src="${newSrc}" alt="${t.alt}"${styleAttr}>`;
+  return html.slice(0, t.offset) + newTag + html.slice(t.offset + t.full.length);
+}
+
 // ================= "Know the Rules" blocks =================
 // Each .rules-block has a unique id (e.g. "f1-format"). Everything after
 // its <h4> label (which carries the numbered badge, kept fixed so it
@@ -961,21 +989,33 @@ function instrumentFrame() {
       // getNextUpTrackImg's comment) — scope the edit to just this one
       // <img> rather than every element sharing that URL.
       const nextUpTrack = img.closest('.next-up-panel .track');
-      const view = nextUpTrack ? img.closest('[id^="view-"]')?.id.replace('view-', '') : null;
+      const heroPhoto = img.closest('.series-hero .photo');
+      const view = (nextUpTrack || heroPhoto) ? img.closest('[id^="view-"]')?.id.replace('view-', '') : null;
       // series-hero's photo uses a differently-named diagram class than
       // everywhere else — figure out which one applies to this image so
       // the checkbox toggles the right one without the admin needing to
       // know either name.
-      const diagramToken = img.closest('.series-hero .photo') ? 'hero-track-diagram' : 'diagram';
+      const diagramToken = heroPhoto ? 'hero-track-diagram' : 'diagram';
       const isCurrentlyDiagram = img.classList.contains(diagramToken);
 
       openImageModal(oldSrc, (newSrc, newCredit, previewSrc, cropStyle, isDiagram) => {
-        if (view) {
+        if (nextUpTrack) {
           workingHtml = setNextUpTrackImage(workingHtml, view, newSrc, cropStyle, isDiagram);
           img.setAttribute('src', previewSrc || newSrc);
           if (newCredit) img.setAttribute('title', newCredit); else img.removeAttribute('title');
           if (cropStyle) img.setAttribute('style', cropStyle); else img.removeAttribute('style');
           img.classList.toggle('diagram', isDiagram);
+        } else if (heroPhoto) {
+          // Formula E's hero photo happens to share a literal filename
+          // with its own nav rail icon and a couple of story-card arts
+          // — scope this edit to just the one <img> in this view's
+          // .series-hero .photo rather than every element sharing the
+          // old src, same reasoning as the next-up-track case above.
+          workingHtml = setSeriesHeroPhotoImage(workingHtml, view, newSrc, cropStyle, isDiagram);
+          img.setAttribute('src', previewSrc || newSrc);
+          if (newCredit) img.setAttribute('title', newCredit); else img.removeAttribute('title');
+          if (cropStyle) img.setAttribute('style', cropStyle); else img.removeAttribute('style');
+          img.classList.toggle('hero-track-diagram', isDiagram);
         } else {
           workingHtml = replaceImageSrc(workingHtml, oldSrc, newSrc);
           workingHtml = setImageTitle(workingHtml, newSrc, newCredit);
