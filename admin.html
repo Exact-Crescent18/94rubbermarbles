@@ -88,7 +88,7 @@ button:disabled{opacity:.5; cursor:not-allowed;}
 
 <div id="toolbar">
   <span class="brand">Site Editor</span>
-  <span class="hint">Click text, images, or "Know the Rules" blocks to edit. Click a schedule row or calendar race to set/fix a result. Drag cards within a grid to reorder.</span>
+  <span class="hint">Click text, images, ticker headlines, or "Know the Rules" blocks to edit. Click a schedule row or calendar race to set/fix a result. Drag cards within a grid to reorder.</span>
   <span id="status-msg"></span>
   <button class="secondary" id="discard-btn">Discard changes</button>
   <button id="publish-btn">Publish to GitHub</button>
@@ -106,8 +106,8 @@ button:disabled{opacity:.5; cursor:not-allowed;}
     <div class="or">— or —</div>
     <label>Upload a file (adds it to the repo and points here to it)</label>
     <input type="file" id="img-modal-file" accept="image/*">
-    <div id="img-modal-credit-field" style="display:none;">
-      <label>Source / credit (shown in the corner of the image)</label>
+    <div id="img-modal-credit-field">
+      <label id="img-modal-credit-label">Source / credit</label>
       <input type="text" id="img-modal-credit" placeholder="e.g. Wikimedia Commons">
     </div>
     <div class="row">
@@ -260,6 +260,41 @@ function setRulesBlock(html, blockId, newContent) {
 function replaceImageSrc(html, oldSrc, newSrc) {
   return html.split(`src="${oldSrc}"`).join(`src="${newSrc}"`);
 }
+// Most image spots on the site (event cards, story cards, track
+// diagrams, nav icons...) have no visible caption slot at all — adding
+// one to every distinct markup pattern is real surface area. A title
+// attribute works everywhere with zero markup changes: it's a real,
+// honest credit (shows as a hover tooltip, and is genuine image
+// metadata), it just isn't a permanent visible badge the way the hero
+// carousel's .src caption is.
+function escAttr(s) { return String(s).replace(/"/g, '&quot;'); }
+function setImageTitle(html, src, newTitle) {
+  return html.replace(/<img\b[^>]*>/g, (tag) => {
+    const m = tag.match(/src="([^"]*)"/);
+    if (!m || m[1] !== src) return tag;
+    const stripped = tag.replace(/\s*title="[^"]*"/g, '');
+    if (!newTitle) return stripped;
+    return stripped.slice(0, -1) + ` title="${escAttr(newTitle)}">`;
+  });
+}
+
+// ================= Ticker bar =================
+// Each ticker item is keyed by its logo's alt text (e.g. "F1",
+// "NASCAR Cup") — the same stable key scripts/update-results.mjs's own
+// ticker-refresh loop already uses (TICKER_ALT_TO_VIEW), so editing here
+// and the bot's own matching stay on the same key.
+function setTickerText(html, altText, newText) {
+  const start = html.indexOf('<div class="ticker-inner">');
+  if (start === -1) return html;
+  const end = html.indexOf('</div>', start);
+  const marker = `alt="${altText}">`;
+  const markerIdx = html.indexOf(marker, start);
+  if (markerIdx === -1 || markerIdx > end) return html;
+  const textStart = markerIdx + marker.length;
+  const textEnd = html.indexOf('</span>', textStart);
+  if (textEnd === -1 || textEnd > end) return html;
+  return html.slice(0, textStart) + '\n      ' + newText + html.slice(textEnd);
+}
 
 // ================= Hero carousel slide image (Track Map art) =================
 // Sets the article's own trackImg override field (see
@@ -399,16 +434,19 @@ function findEventByViewAndName(events, view, name) {
 // ================= image editor modal =================
 let onApplyImage = null;
 // options.credit: current credit text to prefill (pass '' if none yet).
-// options.showCredit: whether this image type has anywhere to display a
-// credit at all (right now, only the hero carousel's .hero-art does) —
-// hidden otherwise so the field never looks like it does something it
-// can't. onApply receives (newSrc, newCredit).
+// options.creditLabel: describes where this credit actually shows up —
+// the hero carousel has a real visible caption badge; everywhere else
+// it becomes the image's title attribute (a hover tooltip) since there's
+// no visible caption slot in that markup. Always shown now — no image
+// type is left with nowhere to put a source. onApply receives
+// (newSrc, newCredit).
 function openImageModal(currentSrc, onApply, options = {}) {
   onApplyImage = onApply;
   document.getElementById('img-modal-preview').src = currentSrc;
   document.getElementById('img-modal-url').value = currentSrc;
   document.getElementById('img-modal-file').value = '';
-  document.getElementById('img-modal-credit-field').style.display = options.showCredit ? 'block' : 'none';
+  document.getElementById('img-modal-credit-label').textContent =
+    options.creditLabel || 'Source / credit (shown as a hover tooltip on the image)';
   document.getElementById('img-modal-credit').value = options.credit || '';
   document.getElementById('img-modal-backdrop').style.display = 'flex';
 }
@@ -514,9 +552,34 @@ function instrumentFrame() {
           workingHtml = await setSlideImage(workingHtml, slug, newSrc, newCredit);
           markDirty();
           loadFrame(); // the slide's <img> may not have existed yet (decorative-only slide)
-        }, { showCredit: true, credit: currentCredit });
+        }, { credit: currentCredit, creditLabel: 'Source / credit (shown in the corner of the image)' });
       }, true);
     }
+  });
+
+  // ---- text: ticker bar ----
+  // The ticker never stops scrolling (95s linear loop) — editing a
+  // moving target is unworkable, so pause it for the duration of the
+  // edit and resume on blur, same moment the text gets committed.
+  const tickerInner = doc.querySelector('.ticker-inner');
+  doc.querySelectorAll('.ticker-inner > span').forEach(span => {
+    const img = span.querySelector('img.ticker-logo');
+    const altText = img?.getAttribute('alt');
+    if (!altText) return;
+    const wrapper = doc.createElement('span');
+    let node = img.nextSibling;
+    while (node) {
+      const next = node.nextSibling;
+      wrapper.appendChild(node);
+      node = next;
+    }
+    span.appendChild(wrapper);
+    wrapper.addEventListener('focus', () => { if (tickerInner) tickerInner.style.animationPlayState = 'paused'; });
+    wrapper.addEventListener('blur', () => { if (tickerInner) tickerInner.style.animationPlayState = 'running'; });
+    wireEditableText(wrapper, () => {
+      workingHtml = setTickerText(workingHtml, altText, wrapper.textContent.trim());
+      markDirty();
+    });
   });
 
   // ---- text: per-series blurbs ----
@@ -577,12 +640,16 @@ function instrumentFrame() {
     img.setAttribute('data-edit-img', '1');
     img.addEventListener('click', function (e) {
       e.stopPropagation(); e.preventDefault();
-      openImageModal(img.getAttribute('src'), (newSrc) => {
-        const oldSrc = img.getAttribute('src');
+      const oldSrc = img.getAttribute('src');
+      openImageModal(oldSrc, (newSrc, newCredit) => {
         workingHtml = replaceImageSrc(workingHtml, oldSrc, newSrc);
-        doc.querySelectorAll(`img[src="${CSS.escape(oldSrc)}"]`).forEach(i => i.setAttribute('src', newSrc));
+        workingHtml = setImageTitle(workingHtml, newSrc, newCredit);
+        doc.querySelectorAll(`img[src="${CSS.escape(oldSrc)}"]`).forEach(i => {
+          i.setAttribute('src', newSrc);
+          if (newCredit) i.setAttribute('title', newCredit); else i.removeAttribute('title');
+        });
         markDirty();
-      });
+      }, { credit: img.getAttribute('title') || '' });
     }, true);
   });
 
