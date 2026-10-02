@@ -1,0 +1,37 @@
+name: Weekly series articles
+
+"on":
+  schedule:
+    - cron: '0 14 * * *' # daily check — the script itself decides which series are actually due (7+ days since their last one)
+  workflow_dispatch: {} # allows manual "Run workflow" from the Actions tab
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15 # up to 11 series x one Groq Compound call each, worst case
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Run weekly article generator
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        run: node scripts/weekly-articles.mjs
+
+      - name: Commit and push if changed
+        run: |
+          if git diff --quiet -- index.html scripts/weekly-article-state.json; then
+            echo "No changes."
+            exit 0
+          fi
+          git config user.name "apexwire-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add index.html scripts/weekly-article-state.json
+          git commit -m "Weekly article(s): new content for due series"
+          git push
