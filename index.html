@@ -189,9 +189,17 @@ footer .social-links{margin-left:4px;}
   box-shadow:0 0 0 4px var(--bg), 0 0 0 5px var(--rule);
 }
 .champion-headshot{width:100%; height:100%; object-fit:cover; position:absolute; inset:0;}
+.champion-number{
+  font-family:'Oswald',sans-serif; font-weight:700; font-style:italic; font-size:30px; line-height:1;
+  color:var(--bg); background:var(--amber); min-width:50px; height:50px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center; padding:0 6px; box-sizing:border-box;
+  clip-path:polygon(12% 0, 100% 0, 88% 100%, 0 100%);
+}
 .champion-info{display:flex; flex-direction:column; gap:3px; min-width:0;}
 .champion-eyebrow{font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--amber); font-weight:700;}
 .champion-name{font-family:'Oswald',sans-serif; font-size:25px; font-weight:600; text-transform:uppercase; letter-spacing:.01em; color:var(--text); line-height:1.15;}
+.champion-stats{display:flex; flex-wrap:wrap; gap:7px; font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-dim); margin-top:3px;}
+.champion-stats .dot{color:var(--text-faint);}
 .hero-dots{display:flex; gap:8px; justify-content:center; margin-top:18px;}
 .hero-dot{width:8px; height:8px; border-radius:50%; background:var(--rule); border:none; cursor:pointer; padding:0;}
 .hero-dot.active{background:var(--amber);}
@@ -313,6 +321,10 @@ img[src*="WRC_logo.svg"]{filter:brightness(0) invert(1);}
 .schedule-table tr.next td:first-child{border-left:2px solid var(--amber);}
 .schedule-table td.name{color:var(--text); font-weight:500;}
 .schedule-table .tag-next{font-family:'JetBrains Mono',monospace; font-size:9.5px; color:var(--bg); background:var(--amber); padding:2px 6px; margin-left:8px; letter-spacing:.06em;}
+.schedule-table th.tickets, .schedule-table td.tickets{text-align:right; white-space:nowrap;}
+.schedule-table td.tickets a{font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.05em; color:var(--amber); text-decoration:none; border-bottom:1px solid rgba(255,179,0,.4);}
+.schedule-table td.tickets a:hover{border-bottom-color:var(--amber);}
+.schedule-table td.tickets .none{color:var(--text-faint);}
 
 /* ---------- STANDINGS TABLE ---------- */
 .standings-caption{font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text-faint); margin:-8px 0 14px;}
@@ -976,9 +988,11 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 <section class="view" id="view-f1">
   <div class="champion-banner">
     <div class="champion-headshot-frame"><img class="champion-headshot" src="https://upload.wikimedia.org/wikipedia/commons/9/90/2024-08-25_Motorsport%2C_Formel_1%2C_Gro%C3%9Fer_Preis_der_Niederlande_2024_STP_3968_by_Stepro_%28cropped2%29.jpg" alt="Lando Norris headshot" title="Wikimedia Commons"></div>
+    <div class="champion-number">4</div>
     <div class="champion-info">
       <span class="champion-eyebrow">2025 Champion</span>
       <span class="champion-name">Lando Norris</span>
+      <div class="champion-stats"><span>McLaren</span><span class="dot">·</span><span>7 wins</span><span class="dot">·</span><span>423 pts</span></div>
     </div>
   </div>
 
@@ -1018,17 +1032,17 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 
   <div class="sector-label"><span class="num">S2</span><span class="name">Sector 02 — Remaining Schedule</span><span class="line"></span></div>
   <table class="schedule-table">
-    <thead><tr><th>Race</th><th>Venue</th><th>Date / Winner</th></tr></thead>
+    <thead><tr><th>Race</th><th>Venue</th><th>Date / Winner</th><th class="tickets">Tickets</th></tr></thead>
     <tbody>
-<tr><td class="name">Dutch GP (Zandvoort)</td><td>Circuit Zandvoort, Netherlands</td><td>Lando Norris</td></tr>
-<tr><td class="name">Italian GP (Monza)</td><td>Autodromo Nazionale Monza, Italy</td><td>Kimi Antonelli</td></tr>
-<tr><td class="name">Spanish GP (Madrid, debut)</td><td>Madrid Street Circuit ("Madring"), Spain — inaugural</td><td>Kimi Antonelli</td></tr>
-<tr><td class="name">Azerbaijan GP (Baku)</td><td>Baku City Circuit, Azerbaijan</td><td>George Russell</td></tr>
-<tr class="next"><td class="name">Singapore GP <span class="tag-next">NEXT</span></td><td>Marina Bay Street Circuit, Singapore — sprint weekend</td><td>2026-10-11</td></tr>
-<tr><td class="name">United States GP (Austin)</td><td>Circuit of the Americas, Austin, TX</td><td>2026-10-25</td></tr>
-<tr><td class="name">Mexico City GP</td><td>Autódromo Hermanos Rodríguez, Mexico City</td><td>2026-11-01</td></tr>
-<tr><td class="name">São Paulo GP</td><td>Autódromo José Carlos Pace, Interlagos, Brazil</td><td>2026-11-08</td></tr>
-<tr><td class="name">Las Vegas GP</td><td>Las Vegas Strip Circuit, NV</td><td>2026-11-21</td></tr>
+<tr><td class="name">Dutch GP (Zandvoort)</td><td>Circuit Zandvoort, Netherlands</td><td>Lando Norris</td><td class="tickets"><span class="none">—</span></td></tr>
+<tr><td class="name">Italian GP (Monza)</td><td>Autodromo Nazionale Monza, Italy</td><td>Kimi Antonelli</td><td class="tickets"><span class="none">—</span></td></tr>
+<tr><td class="name">Spanish GP (Madrid, debut)</td><td>Madrid Street Circuit ("Madring"), Spain — inaugural</td><td>Kimi Antonelli</td><td class="tickets"><span class="none">—</span></td></tr>
+<tr><td class="name">Azerbaijan GP (Baku)</td><td>Baku City Circuit, Azerbaijan</td><td>George Russell</td><td class="tickets"><span class="none">—</span></td></tr>
+<tr class="next"><td class="name">Singapore GP <span class="tag-next">NEXT</span></td><td>Marina Bay Street Circuit, Singapore — sprint weekend</td><td>2026-10-11</td><td class="tickets"><a href="https://tickets.formula1.com" target="_blank" rel="noopener">Tickets →</a></td></tr>
+<tr><td class="name">United States GP (Austin)</td><td>Circuit of the Americas, Austin, TX</td><td>2026-10-25</td><td class="tickets"><a href="https://tickets.formula1.com" target="_blank" rel="noopener">Tickets →</a></td></tr>
+<tr><td class="name">Mexico City GP</td><td>Autódromo Hermanos Rodríguez, Mexico City</td><td>2026-11-01</td><td class="tickets"><a href="https://tickets.formula1.com" target="_blank" rel="noopener">Tickets →</a></td></tr>
+<tr><td class="name">São Paulo GP</td><td>Autódromo José Carlos Pace, Interlagos, Brazil</td><td>2026-11-08</td><td class="tickets"><a href="https://tickets.formula1.com" target="_blank" rel="noopener">Tickets →</a></td></tr>
+<tr><td class="name">Las Vegas GP</td><td>Las Vegas Strip Circuit, NV</td><td>2026-11-21</td><td class="tickets"><a href="https://tickets.formula1.com" target="_blank" rel="noopener">Tickets →</a></td></tr>
     </tbody>
   </table>
 
@@ -1144,9 +1158,11 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 <section class="view" id="view-nascar-cup">
   <div class="champion-banner">
     <div class="champion-headshot-frame"><img class="champion-headshot" src="https://upload.wikimedia.org/wikipedia/commons/1/18/Kyle_Larson_Las_Vegas_2026.jpg" alt="Kyle Larson headshot" title="Wikimedia Commons"></div>
+    <div class="champion-number">5</div>
     <div class="champion-info">
       <span class="champion-eyebrow">2025 Champion</span>
       <span class="champion-name">Kyle Larson</span>
+      <div class="champion-stats"><span>Hendrick Motorsports</span><span class="dot">·</span><span>Chevrolet</span><span class="dot">·</span><span>3 wins</span></div>
     </div>
   </div>
 
@@ -1184,17 +1200,17 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 
   <div class="sector-label"><span class="num">S2</span><span class="name">Sector 02 — Remaining Schedule</span><span class="line"></span></div>
   <table class="schedule-table">
-    <thead><tr><th>Race</th><th>Venue</th><th>Date / Winner</th></tr></thead>
+    <thead><tr><th>Race</th><th>Venue</th><th>Date / Winner</th><th class="tickets">Tickets</th></tr></thead>
     <tbody>
-<tr><td class="name">Cook Out 400 (Richmond)</td><td>Richmond Raceway, VA</td><td>Joey Logano</td></tr>
-<tr><td class="name">Dollar Tree 301 (NH)</td><td>New Hampshire Motor Speedway, Loudon, NH</td><td>Ryan Blaney</td></tr>
-<tr><td class="name">Coke Zero Sugar 400 (Daytona)</td><td>Daytona International Speedway, FL — regular-season finale</td><td>Ryan Preece</td></tr>
-<tr><td class="name">Southern 500 (Darlington) — Playoffs R1</td><td>Darlington Raceway, SC</td><td>Christopher Bell</td></tr>
-<tr><td class="name">Enjoy Illinois 300 (WWT)</td><td>World Wide Technology Raceway, Madison, IL</td><td>Kyle Larson</td></tr>
-<tr><td class="name">Bristol Night Race — R1 elim.</td><td>Bristol Motor Speedway, TN</td><td>Joey Logano</td></tr>
-<tr><td class="name">Hollywood Casino 400 (Kansas)</td><td>Kansas Speedway, KS — Round of 12 opens</td><td>Kyle Larson</td></tr>
-<tr class="next"><td class="name">South Point 400 (Las Vegas) <span class="tag-next">NEXT</span></td><td>Las Vegas Motor Speedway, NV</td><td>2026-10-04</td></tr>
-<tr><td class="name">Homestead — Championship</td><td>Homestead-Miami Speedway, FL — championship race</td><td>2026-11-08</td></tr>
+<tr><td class="name">Cook Out 400 (Richmond)</td><td>Richmond Raceway, VA</td><td>Joey Logano</td><td class="tickets"><span class="none">—</span></td></tr>
+<tr><td class="name">Dollar Tree 301 (NH)</td><td>New Hampshire Motor Speedway, Loudon, NH</td><td>Ryan Blaney</td><td class="tickets"><span class="none">—</span></td></tr>
+<tr><td class="name">Coke Zero Sugar 400 (Daytona)</td><td>Daytona International Speedway, FL — regular-season finale</td><td>Ryan Preece</td><td class="tickets"><span class="none">—</span></td></tr>
+<tr><td class="name">Southern 500 (Darlington) — Playoffs R1</td><td>Darlington Raceway, SC</td><td>Christopher Bell</td><td class="tickets"><span class="none">—</span></td></tr>
+<tr><td class="name">Enjoy Illinois 300 (WWT)</td><td>World Wide Technology Raceway, Madison, IL</td><td>Kyle Larson</td><td class="tickets"><span class="none">—</span></td></tr>
+<tr><td class="name">Bristol Night Race — R1 elim.</td><td>Bristol Motor Speedway, TN</td><td>Joey Logano</td><td class="tickets"><span class="none">—</span></td></tr>
+<tr><td class="name">Hollywood Casino 400 (Kansas)</td><td>Kansas Speedway, KS — Round of 12 opens</td><td>Kyle Larson</td><td class="tickets"><span class="none">—</span></td></tr>
+<tr class="next"><td class="name">South Point 400 (Las Vegas) <span class="tag-next">NEXT</span></td><td>Las Vegas Motor Speedway, NV</td><td>2026-10-04</td><td class="tickets"><a href="https://www.nascar.com/tickets" target="_blank" rel="noopener">Tickets →</a></td></tr>
+<tr><td class="name">Homestead — Championship</td><td>Homestead-Miami Speedway, FL — championship race</td><td>2026-11-08</td><td class="tickets"><a href="https://www.nascar.com/tickets" target="_blank" rel="noopener">Tickets →</a></td></tr>
     </tbody>
   </table>
 
@@ -1303,9 +1319,11 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 <section class="view" id="view-nascar-oreilly">
   <div class="champion-banner">
     <div class="champion-headshot-frame"><img class="champion-headshot" src="https://upload.wikimedia.org/wikipedia/commons/b/b2/Jesse_Love_Sonoma_2026_%281%29.jpg" alt="Jesse Love headshot" title="Wikimedia Commons"></div>
+    <div class="champion-number">2</div>
     <div class="champion-info">
       <span class="champion-eyebrow">2025 Champion</span>
       <span class="champion-name">Jesse Love</span>
+      <div class="champion-stats"><span>Richard Childress Racing</span><span class="dot">·</span><span>Chevrolet</span><span class="dot">·</span><span>2 wins</span></div>
     </div>
   </div>
 
@@ -1341,13 +1359,13 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 
   <div class="sector-label"><span class="num">S2</span><span class="name">Sector 02 — Remaining Schedule</span><span class="line"></span></div>
   <table class="schedule-table">
-    <thead><tr><th>Race</th><th>Venue</th><th>Date / Winner</th></tr></thead>
+    <thead><tr><th>Race</th><th>Venue</th><th>Date / Winner</th><th class="tickets">Tickets</th></tr></thead>
     <tbody>
-<tr><td class="name">Winn-Dixie 250 (Daytona)</td><td>Daytona International Speedway, FL</td><td>Ryan Sieg</td></tr>
-<tr><td class="name">Race at Darlington</td><td>Darlington Raceway, SC — Chase opener</td><td>Sheldon Creed</td></tr>
-<tr><td class="name">Race at WWT Raceway</td><td>World Wide Technology Raceway, Madison, IL</td><td>Jesse Love</td></tr>
-<tr><td class="name">Race at Bristol</td><td>Bristol Motor Speedway, TN</td><td>Sheldon Creed</td></tr>
-<tr class="next"><td class="name">Homestead — Championship <span class="tag-next">NEXT</span></td><td>Homestead-Miami Speedway, FL — championship finale</td><td>2026-11-07</td></tr>
+<tr><td class="name">Winn-Dixie 250 (Daytona)</td><td>Daytona International Speedway, FL</td><td>Ryan Sieg</td><td class="tickets"><span class="none">—</span></td></tr>
+<tr><td class="name">Race at Darlington</td><td>Darlington Raceway, SC — Chase opener</td><td>Sheldon Creed</td><td class="tickets"><span class="none">—</span></td></tr>
+<tr><td class="name">Race at WWT Raceway</td><td>World Wide Technology Raceway, Madison, IL</td><td>Jesse Love</td><td class="tickets"><span class="none">—</span></td></tr>
+<tr><td class="name">Race at Bristol</td><td>Bristol Motor Speedway, TN</td><td>Sheldon Creed</td><td class="tickets"><span class="none">—</span></td></tr>
+<tr class="next"><td class="name">Homestead — Championship <span class="tag-next">NEXT</span></td><td>Homestead-Miami Speedway, FL — championship finale</td><td>2026-11-07</td><td class="tickets"><a href="https://www.nascar.com/tickets" target="_blank" rel="noopener">Tickets →</a></td></tr>
     </tbody>
   </table>
 
@@ -1472,9 +1490,11 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 <section class="view" id="view-arca">
   <div class="champion-banner">
     <div class="champion-headshot-frame"><img class="champion-headshot" src="https://upload.wikimedia.org/wikipedia/commons/e/e6/Thomas_Annunziata_2025.jpg" alt="Thomas Annunziata headshot" title="Wikimedia Commons"></div>
+    <div class="champion-number">70</div>
     <div class="champion-info">
       <span class="champion-eyebrow">2026 Champion</span>
       <span class="champion-name">Thomas Annunziata</span>
+      <div class="champion-stats"><span>Nitro Motorsports</span><span class="dot">·</span><span>Toyota</span><span class="dot">·</span><span>1 win</span><span class="dot">·</span><span>947 pts</span></div>
     </div>
   </div>
 
@@ -1498,14 +1518,14 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 
   <div class="sector-label"><span class="num">S2</span><span class="name">Sector 02 — Final Races</span><span class="line"></span></div>
   <table class="schedule-table">
-    <thead><tr><th>Race</th><th>Venue</th><th>Winner</th></tr></thead>
+    <thead><tr><th>Race</th><th>Venue</th><th>Winner</th><th class="tickets">Tickets</th></tr></thead>
     <tbody>
-<tr><td class="name">Illinois State Fairgrounds</td><td>Illinois State Fairgrounds, Springfield — one-mile dirt</td><td>Max Reaves</td></tr>
-<tr><td class="name">Atlas 200 (Madison)</td><td>Madison International Speedway, Oregon, WI</td><td>Tristan McKee</td></tr>
-<tr><td class="name">DuQuoin State Fairgrounds</td><td>DuQuoin State Fairgrounds, IL — dirt mile</td><td>Carson Brown</td></tr>
-<tr><td class="name">Race at Salem</td><td>Salem Speedway, IN</td><td>Max Reaves</td></tr>
-<tr><td class="name">Race at Bristol</td><td>Bristol Motor Speedway, TN</td><td>Carson Brown</td></tr>
-<tr><td class="name">Kansas — Championship</td><td>Kansas Speedway, KS — championship finale</td><td>Carson Brown</td></tr>
+<tr><td class="name">Illinois State Fairgrounds</td><td>Illinois State Fairgrounds, Springfield — one-mile dirt</td><td>Max Reaves</td><td class="tickets"><span class="none">—</span></td></tr>
+<tr><td class="name">Atlas 200 (Madison)</td><td>Madison International Speedway, Oregon, WI</td><td>Tristan McKee</td><td class="tickets"><span class="none">—</span></td></tr>
+<tr><td class="name">DuQuoin State Fairgrounds</td><td>DuQuoin State Fairgrounds, IL — dirt mile</td><td>Carson Brown</td><td class="tickets"><span class="none">—</span></td></tr>
+<tr><td class="name">Race at Salem</td><td>Salem Speedway, IN</td><td>Max Reaves</td><td class="tickets"><span class="none">—</span></td></tr>
+<tr><td class="name">Race at Bristol</td><td>Bristol Motor Speedway, TN</td><td>Carson Brown</td><td class="tickets"><span class="none">—</span></td></tr>
+<tr><td class="name">Kansas — Championship</td><td>Kansas Speedway, KS — championship finale</td><td>Carson Brown</td><td class="tickets"><span class="none">—</span></td></tr>
     </tbody>
   </table>
 
@@ -1582,9 +1602,11 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 <section class="view" id="view-indycar">
   <div class="champion-banner">
     <div class="champion-headshot-frame"><img class="champion-headshot" src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Alex_Palou_at_2024_Chevrolet_Detroit_Grand_Prix.jpg" alt="Álex Palou headshot" title="Wikimedia Commons"></div>
+    <div class="champion-number">10</div>
     <div class="champion-info">
       <span class="champion-eyebrow">2026 Champion</span>
       <span class="champion-name">Álex Palou</span>
+      <div class="champion-stats"><span>Chip Ganassi Racing</span><span class="dot">·</span><span>Honda</span><span class="dot">·</span><span>6 wins</span><span class="dot">·</span><span>631 pts</span></div>
     </div>
   </div>
 
@@ -1645,11 +1667,11 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 
   <div class="sector-label"><span class="num">S2</span><span class="name">Sector 02 — Final Races</span><span class="line"></span></div>
   <table class="schedule-table">
-    <thead><tr><th>Race</th><th>Venue</th><th>Winner</th></tr></thead>
+    <thead><tr><th>Race</th><th>Venue</th><th>Winner</th><th class="tickets">Tickets</th></tr></thead>
     <tbody>
-      <tr><td class="name">Milwaukee Mile — Race 1</td><td>The Milwaukee Mile</td><td>Pato O'Ward</td></tr>
-<tr><td class="name">Milwaukee Mile — Race 2</td><td>The Milwaukee Mile</td><td>Pato O'Ward</td></tr>
-<tr class="next"><td class="name">Championship Finale <span class="tag-next">FINAL</span></td><td>WeatherTech Raceway Laguna Seca</td><td>Scott McLaughlin</td></tr>
+      <tr><td class="name">Milwaukee Mile — Race 1</td><td>The Milwaukee Mile</td><td>Pato O'Ward</td><td class="tickets"><span class="none">—</span></td></tr>
+<tr><td class="name">Milwaukee Mile — Race 2</td><td>The Milwaukee Mile</td><td>Pato O'Ward</td><td class="tickets"><span class="none">—</span></td></tr>
+<tr class="next"><td class="name">Championship Finale <span class="tag-next">FINAL</span></td><td>WeatherTech Raceway Laguna Seca</td><td>Scott McLaughlin</td><td class="tickets"><span class="none">—</span></td></tr>
     </tbody>
   </table>
 
@@ -1763,9 +1785,11 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 <section class="view" id="view-indy-nxt">
   <div class="champion-banner">
     <div class="champion-headshot-frame"><img class="champion-headshot" src="https://upload.wikimedia.org/wikipedia/commons/7/7c/FIA_F3_Austria_2025_Nr._29_Johnson.jpg" alt="Nikita Johnson headshot" title="Wikimedia Commons"></div>
+    <div class="champion-number">21</div>
     <div class="champion-info">
       <span class="champion-eyebrow">2026 Champion</span>
       <span class="champion-name">Nikita Johnson</span>
+      <div class="champion-stats"><span>Cape Motorsports</span><span class="dot">·</span><span>2 wins</span><span class="dot">·</span><span>585 pts</span></div>
     </div>
   </div>
 
@@ -1789,11 +1813,11 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 
   <div class="sector-label"><span class="num">S2</span><span class="name">Sector 02 — Final Races</span><span class="line"></span></div>
   <table class="schedule-table">
-    <thead><tr><th>Race</th><th>Venue</th><th>Winner</th></tr></thead>
+    <thead><tr><th>Race</th><th>Venue</th><th>Winner</th><th class="tickets">Tickets</th></tr></thead>
     <tbody>
-<tr><td class="name">Race at Milwaukee Mile</td><td>West Allis, Wisconsin — support race for IndyCar</td><td>Max Garcia</td></tr>
-<tr><td class="name">Laguna Seca — R1</td><td>WeatherTech Raceway Laguna Seca, Monterey, CA</td><td>Josh Pierson</td></tr>
-<tr><td class="name">Laguna Seca — Championship</td><td>WeatherTech Raceway Laguna Seca — title-deciding finale</td><td>Tymek Kucharczyk</td></tr>
+<tr><td class="name">Race at Milwaukee Mile</td><td>West Allis, Wisconsin — support race for IndyCar</td><td>Max Garcia</td><td class="tickets"><span class="none">—</span></td></tr>
+<tr><td class="name">Laguna Seca — R1</td><td>WeatherTech Raceway Laguna Seca, Monterey, CA</td><td>Josh Pierson</td><td class="tickets"><span class="none">—</span></td></tr>
+<tr><td class="name">Laguna Seca — Championship</td><td>WeatherTech Raceway Laguna Seca — title-deciding finale</td><td>Tymek Kucharczyk</td><td class="tickets"><span class="none">—</span></td></tr>
     </tbody>
   </table>
 
@@ -1895,9 +1919,11 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 <section class="view" id="view-motogp">
   <div class="champion-banner">
     <div class="champion-headshot-frame"><img class="champion-headshot" src="https://upload.wikimedia.org/wikipedia/commons/a/a7/Marc_Marquez_at_the_2026_Spanish_Grand_Prix_%28cropped%29.jpg" alt="Marc Márquez headshot" title="Wikimedia Commons"></div>
+    <div class="champion-number">93</div>
     <div class="champion-info">
       <span class="champion-eyebrow">2025 Champion</span>
       <span class="champion-name">Marc Márquez</span>
+      <div class="champion-stats"><span>Ducati Lenovo Team</span><span class="dot">·</span><span>Ducati</span><span class="dot">·</span><span>11 wins</span><span class="dot">·</span><span>541 pts</span></div>
     </div>
   </div>
 
@@ -1939,14 +1965,14 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 
   <div class="sector-label"><span class="num">S2</span><span class="name">Sector 02 — Remaining Schedule</span><span class="line"></span></div>
   <table class="schedule-table">
-    <thead><tr><th>Race</th><th>Venue</th><th>Date / Winner</th></tr></thead>
+    <thead><tr><th>Race</th><th>Venue</th><th>Date / Winner</th><th class="tickets">Tickets</th></tr></thead>
     <tbody>
-<tr><td class="name">Aragón GP</td><td>MotorLand Aragón, Spain</td><td>Marc Márquez</td></tr>
-<tr><td class="name">San Marino GP (Misano)</td><td>Misano World Circuit, Italy</td><td>Marc Marquez</td></tr>
-<tr><td class="name">Austrian GP (Red Bull Ring)</td><td>Red Bull Ring, Austria</td><td>Pedro Acosta</td></tr>
-<tr class="next"><td class="name">Japanese GP (Motegi) <span class="tag-next">NEXT</span></td><td>Mobility Resort Motegi, Japan</td><td>2026-10-04</td></tr>
-<tr><td class="name">Indonesian GP (Mandalika)</td><td>Pertamina Mandalika Circuit, Indonesia</td><td>2026-10-11</td></tr>
-<tr><td class="name">Australian GP (Phillip Island)</td><td>Phillip Island Grand Prix Circuit, Australia</td><td>2026-10-25</td></tr>
+<tr><td class="name">Aragón GP</td><td>MotorLand Aragón, Spain</td><td>Marc Márquez</td><td class="tickets"><span class="none">—</span></td></tr>
+<tr><td class="name">San Marino GP (Misano)</td><td>Misano World Circuit, Italy</td><td>Marc Marquez</td><td class="tickets"><span class="none">—</span></td></tr>
+<tr><td class="name">Austrian GP (Red Bull Ring)</td><td>Red Bull Ring, Austria</td><td>Pedro Acosta</td><td class="tickets"><span class="none">—</span></td></tr>
+<tr class="next"><td class="name">Japanese GP (Motegi) <span class="tag-next">NEXT</span></td><td>Mobility Resort Motegi, Japan</td><td>2026-10-04</td><td class="tickets"><a href="https://tickets.motogp.com/en/" target="_blank" rel="noopener">Tickets →</a></td></tr>
+<tr><td class="name">Indonesian GP (Mandalika)</td><td>Pertamina Mandalika Circuit, Indonesia</td><td>2026-10-11</td><td class="tickets"><a href="https://tickets.motogp.com/en/" target="_blank" rel="noopener">Tickets →</a></td></tr>
+<tr><td class="name">Australian GP (Phillip Island)</td><td>Phillip Island Grand Prix Circuit, Australia</td><td>2026-10-25</td><td class="tickets"><a href="https://tickets.motogp.com/en/" target="_blank" rel="noopener">Tickets →</a></td></tr>
     </tbody>
   </table>
 
@@ -2072,9 +2098,11 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 <section class="view" id="view-wec">
   <div class="champion-banner">
     <div class="champion-headshot-frame"><img class="champion-headshot" src="https://upload.wikimedia.org/wikipedia/commons/9/91/Antonio_Giovinazzi_-_Ferrari_499P_-_Hybrid_during_the_pitwalk_at_the_2023_Le_Mans_%2853468237574%29.jpg" alt="Antonio Giovinazzi headshot" title="Wikimedia Commons"></div>
+    <div class="champion-number">51</div>
     <div class="champion-info">
       <span class="champion-eyebrow">2025 Champion</span>
       <span class="champion-name">Antonio Giovinazzi</span>
+      <div class="champion-stats"><span>Ferrari AF Corse</span><span class="dot">·</span><span>Ferrari</span><span class="dot">·</span><span>2 wins</span><span class="dot">·</span><span>133 pts</span></div>
     </div>
   </div>
 
@@ -2110,12 +2138,12 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 
   <div class="sector-label"><span class="num">S2</span><span class="name">Sector 02 — Remaining Schedule</span><span class="line"></span></div>
   <table class="schedule-table">
-    <thead><tr><th>Race</th><th>Venue</th><th>Date / Winner</th></tr></thead>
+    <thead><tr><th>Race</th><th>Venue</th><th>Date / Winner</th><th class="tickets">Tickets</th></tr></thead>
     <tbody>
-<tr><td class="name">Lone Star Le Mans (COTA)</td><td>Circuit of the Americas, Austin, TX</td><td>Ferrari #50 (Fuoco/Molina/Nielsen)</td></tr>
-<tr><td class="name">6 Hours of Fuji</td><td>Fuji Speedway, Japan</td><td>Toyota #8 (Hartley/Hirakawa/Buemi)</td></tr>
-<tr class="next"><td class="name">6 Hours of Barcelona <span class="tag-next">NEXT</span></td><td>Circuit de Barcelona-Catalunya, Spain — inaugural</td><td>2026-10-18</td></tr>
-<tr><td class="name">6 Hours of Monza — Season Finale</td><td>Autodromo Nazionale Monza, Italy — title-deciding finale</td><td>2026-11-08</td></tr>
+<tr><td class="name">Lone Star Le Mans (COTA)</td><td>Circuit of the Americas, Austin, TX</td><td>Ferrari #50 (Fuoco/Molina/Nielsen)</td><td class="tickets"><span class="none">—</span></td></tr>
+<tr><td class="name">6 Hours of Fuji</td><td>Fuji Speedway, Japan</td><td>Toyota #8 (Hartley/Hirakawa/Buemi)</td><td class="tickets"><span class="none">—</span></td></tr>
+<tr class="next"><td class="name">6 Hours of Barcelona <span class="tag-next">NEXT</span></td><td>Circuit de Barcelona-Catalunya, Spain — inaugural</td><td>2026-10-18</td><td class="tickets"><a href="https://www.fiawec.com/en/page/ticketing" target="_blank" rel="noopener">Tickets →</a></td></tr>
+<tr><td class="name">6 Hours of Monza — Season Finale</td><td>Autodromo Nazionale Monza, Italy — title-deciding finale</td><td>2026-11-08</td><td class="tickets"><a href="https://www.fiawec.com/en/page/ticketing" target="_blank" rel="noopener">Tickets →</a></td></tr>
     </tbody>
   </table>
 
@@ -2201,9 +2229,11 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 <section class="view" id="view-nascar-truck">
   <div class="champion-banner">
     <div class="champion-headshot-frame"><img class="champion-headshot" src="https://upload.wikimedia.org/wikipedia/commons/d/db/NASCAR_San_Diego_Weekend_Victor_Conducts_Interview_%281%29_9764270_%28cropped%29.jpg" alt="Corey Heim headshot" title="Wikimedia Commons"></div>
+    <div class="champion-number">11</div>
     <div class="champion-info">
       <span class="champion-eyebrow">2025 Champion</span>
       <span class="champion-name">Corey Heim</span>
+      <div class="champion-stats"><span>TRICON Garage</span><span class="dot">·</span><span>Toyota</span><span class="dot">·</span><span>12 wins</span></div>
     </div>
   </div>
 
@@ -2239,16 +2269,16 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 
   <div class="sector-label"><span class="num">S2</span><span class="name">Sector 02 — Remaining Schedule</span><span class="line"></span></div>
   <table class="schedule-table">
-    <thead><tr><th>Race</th><th>Venue</th><th>Date / Winner</th></tr></thead>
+    <thead><tr><th>Race</th><th>Venue</th><th>Date / Winner</th><th class="tickets">Tickets</th></tr></thead>
     <tbody>
-<tr><td class="name">Team EJP 175 (New Hampshire)</td><td>New Hampshire Motor Speedway — regular-season finale</td><td>Layne Riggs</td></tr>
-<tr><td class="name">UNOH 250 (Bristol)</td><td>Bristol Motor Speedway, TN</td><td>Jake Garcia</td></tr>
-<tr><td class="name">RaceToStopSuicide.com 200 (Kansas)</td><td>Kansas Speedway, KS</td><td>Kaden Honeycutt</td></tr>
-<tr class="next"><td class="name">Ecosave 200 (Charlotte) <span class="tag-next">NEXT</span></td><td>Charlotte Motor Speedway, NC — oval</td><td>2026-10-09</td></tr>
-<tr><td class="name">Craftsman 150 (Phoenix)</td><td>Phoenix Raceway, AZ</td><td>2026-10-16</td></tr>
-<tr><td class="name">Love's RV Stop 225 (Talladega)</td><td>Talladega Superspeedway, AL</td><td>2026-10-23</td></tr>
-<tr><td class="name">Slim Jim 200 (Martinsville)</td><td>Martinsville Speedway, VA</td><td>2026-10-30</td></tr>
-<tr><td class="name">Baptist Health 200 — Championship</td><td>Homestead-Miami Speedway, FL — championship finale</td><td>2026-11-06</td></tr>
+<tr><td class="name">Team EJP 175 (New Hampshire)</td><td>New Hampshire Motor Speedway — regular-season finale</td><td>Layne Riggs</td><td class="tickets"><span class="none">—</span></td></tr>
+<tr><td class="name">UNOH 250 (Bristol)</td><td>Bristol Motor Speedway, TN</td><td>Jake Garcia</td><td class="tickets"><span class="none">—</span></td></tr>
+<tr><td class="name">RaceToStopSuicide.com 200 (Kansas)</td><td>Kansas Speedway, KS</td><td>Kaden Honeycutt</td><td class="tickets"><span class="none">—</span></td></tr>
+<tr class="next"><td class="name">Ecosave 200 (Charlotte) <span class="tag-next">NEXT</span></td><td>Charlotte Motor Speedway, NC — oval</td><td>2026-10-09</td><td class="tickets"><a href="https://www.nascar.com/tickets" target="_blank" rel="noopener">Tickets →</a></td></tr>
+<tr><td class="name">Craftsman 150 (Phoenix)</td><td>Phoenix Raceway, AZ</td><td>2026-10-16</td><td class="tickets"><a href="https://www.nascar.com/tickets" target="_blank" rel="noopener">Tickets →</a></td></tr>
+<tr><td class="name">Love's RV Stop 225 (Talladega)</td><td>Talladega Superspeedway, AL</td><td>2026-10-23</td><td class="tickets"><a href="https://www.nascar.com/tickets" target="_blank" rel="noopener">Tickets →</a></td></tr>
+<tr><td class="name">Slim Jim 200 (Martinsville)</td><td>Martinsville Speedway, VA</td><td>2026-10-30</td><td class="tickets"><a href="https://www.nascar.com/tickets" target="_blank" rel="noopener">Tickets →</a></td></tr>
+<tr><td class="name">Baptist Health 200 — Championship</td><td>Homestead-Miami Speedway, FL — championship finale</td><td>2026-11-06</td><td class="tickets"><a href="https://www.nascar.com/tickets" target="_blank" rel="noopener">Tickets →</a></td></tr>
     </tbody>
   </table>
 
@@ -2351,9 +2381,11 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 <section class="view" id="view-wrc">
   <div class="champion-banner">
     <div class="champion-headshot-frame"><img class="champion-headshot" src="https://upload.wikimedia.org/wikipedia/commons/3/38/2023_Central_European_Rally_-_Ogier_01_%28cropped%29.jpg" alt="Sébastien Ogier headshot" title="Wikimedia Commons"></div>
+    <div class="champion-number">17</div>
     <div class="champion-info">
       <span class="champion-eyebrow">2025 Champion</span>
       <span class="champion-name">Sébastien Ogier</span>
+      <div class="champion-stats"><span>Toyota GAZOO Racing</span><span class="dot">·</span><span>Toyota</span><span class="dot">·</span><span>6 wins</span><span class="dot">·</span><span>293 pts</span></div>
     </div>
   </div>
 
@@ -2390,11 +2422,11 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 
   <div class="sector-label"><span class="num">S2</span><span class="name">Sector 02 — Remaining Schedule</span><span class="line"></span></div>
   <table class="schedule-table">
-    <thead><tr><th>Race</th><th>Venue</th><th>Date / Winner</th></tr></thead>
+    <thead><tr><th>Race</th><th>Venue</th><th>Date / Winner</th><th class="tickets">Tickets</th></tr></thead>
     <tbody>
-<tr><td class="name">Rally Chile Biobío</td><td>Concepción, Biobío, Chile — gravel</td><td>Oliver Solberg</td></tr>
-<tr class="next"><td class="name">Rally Italia Sardegna <span class="tag-next">NEXT</span></td><td>Sardinia, Italy — gravel</td><td>2026-10-04</td></tr>
-<tr><td class="name">Rally Saudi Arabia — Season Finale</td><td>Jeddah, Saudi Arabia — gravel</td><td>2026-11-14</td></tr>
+<tr><td class="name">Rally Chile Biobío</td><td>Concepción, Biobío, Chile — gravel</td><td>Oliver Solberg</td><td class="tickets"><span class="none">—</span></td></tr>
+<tr class="next"><td class="name">Rally Italia Sardegna <span class="tag-next">NEXT</span></td><td>Sardinia, Italy — gravel</td><td>2026-10-04</td><td class="tickets"><a href="https://www.wrc.com/en/whats-on/tickets.html" target="_blank" rel="noopener">Tickets →</a></td></tr>
+<tr><td class="name">Rally Saudi Arabia — Season Finale</td><td>Jeddah, Saudi Arabia — gravel</td><td>2026-11-14</td><td class="tickets"><a href="https://www.wrc.com/en/whats-on/tickets.html" target="_blank" rel="noopener">Tickets →</a></td></tr>
     </tbody>
   </table>
 
@@ -2482,9 +2514,11 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 <section class="view" id="view-formula-e">
   <div class="champion-banner">
     <div class="champion-headshot-frame"><img class="champion-headshot" src="https://upload.wikimedia.org/wikipedia/commons/0/0b/2024-05-10_Motorsport%2C_ABB_FIA_Formula_E_World_Championship%2C_Berlin_E-Prix_2024_STP_2554_by_Stepro.jpg" alt="Pascal Wehrlein headshot" title="Wikimedia Commons"></div>
+    <div class="champion-number">94</div>
     <div class="champion-info">
       <span class="champion-eyebrow">2026 Champion</span>
       <span class="champion-name">Pascal Wehrlein</span>
+      <div class="champion-stats"><span>Porsche Formula E Team</span><span class="dot">·</span><span>Porsche</span><span class="dot">·</span><span>3 wins</span><span class="dot">·</span><span>169 pts</span></div>
     </div>
   </div>
 
@@ -2545,15 +2579,15 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 
   <div class="sector-label"><span class="num">S2</span><span class="name">Sector 02 — Remaining Schedule</span><span class="line"></span></div>
   <table class="schedule-table">
-    <thead><tr><th>Event</th><th>Venue</th><th>Date</th></tr></thead>
+    <thead><tr><th>Event</th><th>Venue</th><th>Date</th><th class="tickets">Tickets</th></tr></thead>
     <tbody>
-      <tr class="next"><td class="name">Jeddah E-Prix (season opener) <span class="tag-next">NEXT</span></td><td>Jeddah Corniche Circuit, Saudi Arabia</td><td>18–19 Dec</td></tr>
-<tr><td class="name">Mexico City E-Prix</td><td>Autódromo Hermanos Rodríguez</td><td>16 Jan 2027</td></tr>
-<tr><td class="name">Austin E-Prix (debut)</td><td>Circuit of the Americas, USA</td><td>6 Feb 2027</td></tr>
-<tr><td class="name">Miami E-Prix</td><td>Miami International Autodrome, USA</td><td>20 Feb 2027</td></tr>
-<tr><td class="name">São Paulo E-Prix</td><td>Anhembi Sambadrome, Brazil</td><td>13 Mar 2027</td></tr>
-<tr><td class="name">...season continues through Europe and Asia</td><td>Berlin, Monaco, Zandvoort, Brands Hatch, Madrid, Sanya, Shanghai</td><td>May–Jul 2027</td></tr>
-<tr><td class="name">Tokyo E-Prix (season finale)</td><td>Tokyo Street Circuit, Japan</td><td>24–25 Jul 2027</td></tr>
+      <tr class="next"><td class="name">Jeddah E-Prix (season opener) <span class="tag-next">NEXT</span></td><td>Jeddah Corniche Circuit, Saudi Arabia</td><td>18–19 Dec</td><td class="tickets"><a href="https://www.fiaformulae.com/en/tickets" target="_blank" rel="noopener">Tickets →</a></td></tr>
+<tr><td class="name">Mexico City E-Prix</td><td>Autódromo Hermanos Rodríguez</td><td>16 Jan 2027</td><td class="tickets"><a href="https://www.fiaformulae.com/en/tickets" target="_blank" rel="noopener">Tickets →</a></td></tr>
+<tr><td class="name">Austin E-Prix (debut)</td><td>Circuit of the Americas, USA</td><td>6 Feb 2027</td><td class="tickets"><a href="https://www.fiaformulae.com/en/tickets" target="_blank" rel="noopener">Tickets →</a></td></tr>
+<tr><td class="name">Miami E-Prix</td><td>Miami International Autodrome, USA</td><td>20 Feb 2027</td><td class="tickets"><a href="https://www.fiaformulae.com/en/tickets" target="_blank" rel="noopener">Tickets →</a></td></tr>
+<tr><td class="name">São Paulo E-Prix</td><td>Anhembi Sambadrome, Brazil</td><td>13 Mar 2027</td><td class="tickets"><a href="https://www.fiaformulae.com/en/tickets" target="_blank" rel="noopener">Tickets →</a></td></tr>
+<tr><td class="name">...season continues through Europe and Asia</td><td>Berlin, Monaco, Zandvoort, Brands Hatch, Madrid, Sanya, Shanghai</td><td>May–Jul 2027</td><td class="tickets"><span class="none">—</span></td></tr>
+<tr><td class="name">Tokyo E-Prix (season finale)</td><td>Tokyo Street Circuit, Japan</td><td>24–25 Jul 2027</td><td class="tickets"><a href="https://www.fiaformulae.com/en/tickets" target="_blank" rel="noopener">Tickets →</a></td></tr>
     </tbody>
   </table>
 
