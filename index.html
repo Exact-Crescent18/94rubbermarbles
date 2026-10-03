@@ -178,28 +178,38 @@ footer .social-links{margin-left:4px;}
 
 /* ---------- CHAMPION BANNER (above Sector 01, every series page) ---------- */
 .champion-banner{
-  display:flex; align-items:center; gap:18px;
-  padding:6px 0 24px; margin:28px 0 -4px;
+  display:flex; align-items:center; gap:20px;
+  padding:10px 0 28px; margin:28px 0 -4px;
   border-bottom:1px solid var(--rule);
 }
 .champion-headshot-frame{
-  width:68px; height:68px; border-radius:50%; position:relative; overflow:hidden;
+  width:96px; height:96px; border-radius:50%; position:relative; overflow:hidden;
   flex-shrink:0; background:var(--surface-2);
   border:2px solid var(--amber);
   box-shadow:0 0 0 4px var(--bg), 0 0 0 5px var(--rule);
 }
 .champion-headshot{width:100%; height:100%; object-fit:cover; position:absolute; inset:0;}
 .champion-number{
-  font-family:'Oswald',sans-serif; font-weight:700; font-style:italic; font-size:30px; line-height:1;
-  color:var(--bg); background:var(--amber); min-width:50px; height:50px; flex-shrink:0;
-  display:flex; align-items:center; justify-content:center; padding:0 6px; box-sizing:border-box;
+  font-family:'Oswald',sans-serif; font-weight:700; font-style:italic; font-size:36px; line-height:1;
+  min-width:62px; height:62px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center; padding:0 8px; box-sizing:border-box;
   clip-path:polygon(12% 0, 100% 0, 88% 100%, 0 100%);
 }
-.champion-info{display:flex; flex-direction:column; gap:3px; min-width:0;}
+.champion-info{display:flex; flex-direction:column; gap:3px; min-width:0; flex-shrink:0;}
 .champion-eyebrow{font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--amber); font-weight:700;}
-.champion-name{font-family:'Oswald',sans-serif; font-size:25px; font-weight:600; text-transform:uppercase; letter-spacing:.01em; color:var(--text); line-height:1.15;}
-.champion-stats{display:flex; flex-wrap:wrap; gap:7px; font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-dim); margin-top:3px;}
+.champion-name{font-family:'Oswald',sans-serif; font-size:26px; font-weight:600; text-transform:uppercase; letter-spacing:.01em; color:var(--text); line-height:1.15; white-space:nowrap;}
+.champion-stats-row{
+  display:flex; align-items:center; gap:22px; flex:1; min-width:0;
+  padding-left:22px; margin-left:2px; border-left:1px solid var(--rule); height:46px;
+}
+.champion-stats{display:flex; flex-wrap:wrap; gap:8px; font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text-dim);}
 .champion-stats .dot{color:var(--text-faint);}
+.champion-mfr-logo{height:26px; width:auto; max-width:84px; object-fit:contain; margin-left:auto; flex-shrink:0; background:#f1efe9; padding:5px 10px; border-radius:3px; box-sizing:content-box;}
+@media (max-width:760px){
+  .champion-banner{flex-wrap:wrap; row-gap:12px;}
+  .champion-stats-row{border-left:none; padding-left:0; margin-left:0; height:auto; flex-basis:100%; order:10;}
+  .champion-mfr-logo{margin-left:0;}
+}
 .hero-dots{display:flex; gap:8px; justify-content:center; margin-top:18px;}
 .hero-dot{width:8px; height:8px; border-radius:50%; background:var(--rule); border:none; cursor:pointer; padding:0;}
 .hero-dot.active{background:var(--amber);}
@@ -988,11 +998,14 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 <section class="view" id="view-f1">
   <div class="champion-banner">
     <div class="champion-headshot-frame"><img class="champion-headshot" src="https://upload.wikimedia.org/wikipedia/commons/9/90/2024-08-25_Motorsport%2C_Formel_1%2C_Gro%C3%9Fer_Preis_der_Niederlande_2024_STP_3968_by_Stepro_%28cropped2%29.jpg" alt="Lando Norris headshot" title="Wikimedia Commons"></div>
-    <div class="champion-number">4</div>
+    <div class="champion-number" style="background:#FF8000; color:#000;">4</div>
     <div class="champion-info">
       <span class="champion-eyebrow">2025 Champion</span>
       <span class="champion-name">Lando Norris</span>
+    </div>
+    <div class="champion-stats-row">
       <div class="champion-stats"><span>McLaren</span><span class="dot">·</span><span>7 wins</span><span class="dot">·</span><span>423 pts</span></div>
+    <img class="champion-mfr-logo" src="https://upload.wikimedia.org/wikipedia/commons/b/bc/McLaren_logo_%282026%29.svg" alt="McLaren logo" title="Wikimedia Commons">
     </div>
   </div>
 
@@ -1158,11 +1171,14 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 <section class="view" id="view-nascar-cup">
   <div class="champion-banner">
     <div class="champion-headshot-frame"><img class="champion-headshot" src="https://upload.wikimedia.org/wikipedia/commons/1/18/Kyle_Larson_Las_Vegas_2026.jpg" alt="Kyle Larson headshot" title="Wikimedia Commons"></div>
-    <div class="champion-number">5</div>
+    <div class="champion-number" style="background:#C8102E; color:#fff;">5</div>
     <div class="champion-info">
       <span class="champion-eyebrow">2025 Champion</span>
       <span class="champion-name">Kyle Larson</span>
+    </div>
+    <div class="champion-stats-row">
       <div class="champion-stats"><span>Hendrick Motorsports</span><span class="dot">·</span><span>Chevrolet</span><span class="dot">·</span><span>3 wins</span></div>
+    <img class="champion-mfr-logo" src="https://upload.wikimedia.org/wikipedia/commons/a/a8/Chevrolet_bowtie_2023.svg" alt="Chevrolet logo" title="Wikimedia Commons">
     </div>
   </div>
 
@@ -1319,11 +1335,14 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 <section class="view" id="view-nascar-oreilly">
   <div class="champion-banner">
     <div class="champion-headshot-frame"><img class="champion-headshot" src="https://upload.wikimedia.org/wikipedia/commons/b/b2/Jesse_Love_Sonoma_2026_%281%29.jpg" alt="Jesse Love headshot" title="Wikimedia Commons"></div>
-    <div class="champion-number">2</div>
+    <div class="champion-number" style="background:#C8102E; color:#fff;">2</div>
     <div class="champion-info">
       <span class="champion-eyebrow">2025 Champion</span>
       <span class="champion-name">Jesse Love</span>
+    </div>
+    <div class="champion-stats-row">
       <div class="champion-stats"><span>Richard Childress Racing</span><span class="dot">·</span><span>Chevrolet</span><span class="dot">·</span><span>2 wins</span></div>
+    <img class="champion-mfr-logo" src="https://upload.wikimedia.org/wikipedia/commons/a/a8/Chevrolet_bowtie_2023.svg" alt="Chevrolet logo" title="Wikimedia Commons">
     </div>
   </div>
 
@@ -1490,11 +1509,14 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 <section class="view" id="view-arca">
   <div class="champion-banner">
     <div class="champion-headshot-frame"><img class="champion-headshot" src="https://upload.wikimedia.org/wikipedia/commons/e/e6/Thomas_Annunziata_2025.jpg" alt="Thomas Annunziata headshot" title="Wikimedia Commons"></div>
-    <div class="champion-number">70</div>
+    <div class="champion-number" style="background:#EB0A1E; color:#fff;">70</div>
     <div class="champion-info">
       <span class="champion-eyebrow">2026 Champion</span>
       <span class="champion-name">Thomas Annunziata</span>
+    </div>
+    <div class="champion-stats-row">
       <div class="champion-stats"><span>Nitro Motorsports</span><span class="dot">·</span><span>Toyota</span><span class="dot">·</span><span>1 win</span><span class="dot">·</span><span>947 pts</span></div>
+    <img class="champion-mfr-logo" src="https://upload.wikimedia.org/wikipedia/commons/c/c8/Toyota_logo.svg" alt="Toyota logo" title="Wikimedia Commons">
     </div>
   </div>
 
@@ -1602,11 +1624,14 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 <section class="view" id="view-indycar">
   <div class="champion-banner">
     <div class="champion-headshot-frame"><img class="champion-headshot" src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Alex_Palou_at_2024_Chevrolet_Detroit_Grand_Prix.jpg" alt="Álex Palou headshot" title="Wikimedia Commons"></div>
-    <div class="champion-number">10</div>
+    <div class="champion-number" style="background:#FFCC00; color:#D40511;">10</div>
     <div class="champion-info">
       <span class="champion-eyebrow">2026 Champion</span>
       <span class="champion-name">Álex Palou</span>
+    </div>
+    <div class="champion-stats-row">
       <div class="champion-stats"><span>Chip Ganassi Racing</span><span class="dot">·</span><span>Honda</span><span class="dot">·</span><span>6 wins</span><span class="dot">·</span><span>631 pts</span></div>
+    <img class="champion-mfr-logo" src="https://upload.wikimedia.org/wikipedia/commons/0/09/Honda-logo.svg" alt="Honda logo" title="Wikimedia Commons">
     </div>
   </div>
 
@@ -1785,10 +1810,12 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 <section class="view" id="view-indy-nxt">
   <div class="champion-banner">
     <div class="champion-headshot-frame"><img class="champion-headshot" src="https://upload.wikimedia.org/wikipedia/commons/7/7c/FIA_F3_Austria_2025_Nr._29_Johnson.jpg" alt="Nikita Johnson headshot" title="Wikimedia Commons"></div>
-    <div class="champion-number">21</div>
+    <div class="champion-number" style="background:var(--amber); color:var(--bg);">21</div>
     <div class="champion-info">
       <span class="champion-eyebrow">2026 Champion</span>
       <span class="champion-name">Nikita Johnson</span>
+    </div>
+    <div class="champion-stats-row">
       <div class="champion-stats"><span>Cape Motorsports</span><span class="dot">·</span><span>2 wins</span><span class="dot">·</span><span>585 pts</span></div>
     </div>
   </div>
@@ -1919,11 +1946,14 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 <section class="view" id="view-motogp">
   <div class="champion-banner">
     <div class="champion-headshot-frame"><img class="champion-headshot" src="https://upload.wikimedia.org/wikipedia/commons/a/a7/Marc_Marquez_at_the_2026_Spanish_Grand_Prix_%28cropped%29.jpg" alt="Marc Márquez headshot" title="Wikimedia Commons"></div>
-    <div class="champion-number">93</div>
+    <div class="champion-number" style="background:#fff; color:#CC0000; -webkit-text-stroke:1.5px #000; text-stroke:1.5px #000;">93</div>
     <div class="champion-info">
       <span class="champion-eyebrow">2025 Champion</span>
       <span class="champion-name">Marc Márquez</span>
+    </div>
+    <div class="champion-stats-row">
       <div class="champion-stats"><span>Ducati Lenovo Team</span><span class="dot">·</span><span>Ducati</span><span class="dot">·</span><span>11 wins</span><span class="dot">·</span><span>541 pts</span></div>
+    <img class="champion-mfr-logo" src="https://upload.wikimedia.org/wikipedia/commons/3/36/Ducati_red_logo.svg" alt="Ducati logo" title="Wikimedia Commons">
     </div>
   </div>
 
@@ -2098,10 +2128,12 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 <section class="view" id="view-wec">
   <div class="champion-banner">
     <div class="champion-headshot-frame"><img class="champion-headshot" src="https://upload.wikimedia.org/wikipedia/commons/9/91/Antonio_Giovinazzi_-_Ferrari_499P_-_Hybrid_during_the_pitwalk_at_the_2023_Le_Mans_%2853468237574%29.jpg" alt="Antonio Giovinazzi headshot" title="Wikimedia Commons"></div>
-    <div class="champion-number">51</div>
+    <div class="champion-number" style="background:#D40000; color:#fff;">51</div>
     <div class="champion-info">
       <span class="champion-eyebrow">2025 Champion</span>
       <span class="champion-name">Antonio Giovinazzi</span>
+    </div>
+    <div class="champion-stats-row">
       <div class="champion-stats"><span>Ferrari AF Corse</span><span class="dot">·</span><span>Ferrari</span><span class="dot">·</span><span>2 wins</span><span class="dot">·</span><span>133 pts</span></div>
     </div>
   </div>
@@ -2229,11 +2261,14 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 <section class="view" id="view-nascar-truck">
   <div class="champion-banner">
     <div class="champion-headshot-frame"><img class="champion-headshot" src="https://upload.wikimedia.org/wikipedia/commons/d/db/NASCAR_San_Diego_Weekend_Victor_Conducts_Interview_%281%29_9764270_%28cropped%29.jpg" alt="Corey Heim headshot" title="Wikimedia Commons"></div>
-    <div class="champion-number">11</div>
+    <div class="champion-number" style="background:#EB0A1E; color:#fff;">11</div>
     <div class="champion-info">
       <span class="champion-eyebrow">2025 Champion</span>
       <span class="champion-name">Corey Heim</span>
+    </div>
+    <div class="champion-stats-row">
       <div class="champion-stats"><span>TRICON Garage</span><span class="dot">·</span><span>Toyota</span><span class="dot">·</span><span>12 wins</span></div>
+    <img class="champion-mfr-logo" src="https://upload.wikimedia.org/wikipedia/commons/c/c8/Toyota_logo.svg" alt="Toyota logo" title="Wikimedia Commons">
     </div>
   </div>
 
@@ -2381,11 +2416,14 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 <section class="view" id="view-wrc">
   <div class="champion-banner">
     <div class="champion-headshot-frame"><img class="champion-headshot" src="https://upload.wikimedia.org/wikipedia/commons/3/38/2023_Central_European_Rally_-_Ogier_01_%28cropped%29.jpg" alt="Sébastien Ogier headshot" title="Wikimedia Commons"></div>
-    <div class="champion-number">17</div>
+    <div class="champion-number" style="background:#EB0A1E; color:#fff;">17</div>
     <div class="champion-info">
       <span class="champion-eyebrow">2025 Champion</span>
       <span class="champion-name">Sébastien Ogier</span>
+    </div>
+    <div class="champion-stats-row">
       <div class="champion-stats"><span>Toyota GAZOO Racing</span><span class="dot">·</span><span>Toyota</span><span class="dot">·</span><span>6 wins</span><span class="dot">·</span><span>293 pts</span></div>
+    <img class="champion-mfr-logo" src="https://upload.wikimedia.org/wikipedia/commons/c/c8/Toyota_logo.svg" alt="Toyota logo" title="Wikimedia Commons">
     </div>
   </div>
 
@@ -2514,10 +2552,12 @@ nav.series-rail a, nav.primary a{cursor:pointer;}
 <section class="view" id="view-formula-e">
   <div class="champion-banner">
     <div class="champion-headshot-frame"><img class="champion-headshot" src="https://upload.wikimedia.org/wikipedia/commons/0/0b/2024-05-10_Motorsport%2C_ABB_FIA_Formula_E_World_Championship%2C_Berlin_E-Prix_2024_STP_2554_by_Stepro.jpg" alt="Pascal Wehrlein headshot" title="Wikimedia Commons"></div>
-    <div class="champion-number">94</div>
+    <div class="champion-number" style="background:#1a1a1a; color:#fff;">94</div>
     <div class="champion-info">
       <span class="champion-eyebrow">2026 Champion</span>
       <span class="champion-name">Pascal Wehrlein</span>
+    </div>
+    <div class="champion-stats-row">
       <div class="champion-stats"><span>Porsche Formula E Team</span><span class="dot">·</span><span>Porsche</span><span class="dot">·</span><span>3 wins</span><span class="dot">·</span><span>169 pts</span></div>
     </div>
   </div>
